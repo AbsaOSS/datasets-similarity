@@ -2,6 +2,9 @@ from enum import Enum
 
 
 class Types(Enum):
+    """
+    Enum class representing column type
+    """
     NUMERICAL = 1
     INT = 5
     FLOAT = 6
