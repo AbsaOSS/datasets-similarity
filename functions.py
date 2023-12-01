@@ -191,7 +191,7 @@ class DataFrameMetadataCreator:
         for i in dataframe.columns:
             self.metadata.type_column[get_type(dataframe[i])].add(i)
 
-        self.metadata.column_categorical = [i / (self.metadata.size * 0.1) < 1 for i in
+        self.metadata.column_categorical = [((i / (self.metadata.size * 0.01) < 1) or i < 50) for i in
                                             dataframe.nunique()]  # less than 10 %
         self.metadata.column_incomplete = [i < self.metadata.size * 0.7 for i in
                                            dataframe.count()]  # more than 30 % missing
@@ -208,12 +208,14 @@ class DataFrameMetadataCreator:
             # categories_embeddings = list()
             # for category in clean_categories:
             #     get_world_embedding(category)
-
+            if name in self.metadata.type_column[Types.BOOL]:
+                continue
             self.metadata.categorical_metadata[name] = CategoricalMetadata(count=self.dataframe[name].nunique(),
                                                                            categories=set(
                                                                                self.dataframe[name].unique()),
                                                                            categories_with_count=self.dataframe[
-                                                                               name].value_counts())
+                                                                               name].value_counts(),
+                                                                           category_embedding=get_sbert_model().encode(list(map(str, self.dataframe[name].unique()))))
             # categories_embeddings=categories_embeddings)
 
     def compute_correlation(self, strong_correlation: float) -> 'DataFrameMetadataCreator':
