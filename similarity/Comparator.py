@@ -36,16 +36,19 @@ class HausdorffDistanceMin(DistanceFunction):
 
 class ComparatorType(ABC):
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         pass
 
-    def concat(self, *data_frames):
+    def concat(self, *data_frames) -> pd.DataFrame:
         """
         Concat all dataframes together, compute avg for each cell
         :param data_frames: array of dataframes
         :return: new dataframe
         """
-        return pd.concat(data_frames).applymap(lambda x: x / len(data_frames))
+        res = data_frames[0]
+        for d in data_frames[1:]:
+            res.add(d).map(lambda x: x / len(data_frames))
+        return res
 
 
 class CategoricalComparator(ComparatorType):
@@ -64,26 +67,48 @@ class CategoricalComparator(ComparatorType):
             res += max(i)
         return count, res / len(similarity_matrix) * (count / len(similarity_matrix))
 
+    def __compute_distance(self, dist_matrix): # Hausdorff
+        row_mins = []
+        column_mins = []
+        for row in dist_matrix:
+            row_mins.append(min(row))
+        for column in zip(*dist_matrix):
+            column_mins.append(min(column))
+        return min([max(row_mins), max(column_mins)])
+
+    def __create_dist_matrix(self, embeddings1, embeddings2):
+        simil_matrix = []
+        for embed1 in embeddings1:
+            siml_line = []
+            for embed2 in embeddings2:
+                # todo rounding for 3 digits ? ok -> two because of minus 0
+                siml_line.append(round(1 - round(cosine(embed1, embed2), 4), 3)) # distance is 1- similarity
+            simil_matrix.append(siml_line)
+        return simil_matrix
+
     def __create_sim_matrix(self, embeddings1, embeddings2):
         simil_matrix = []
         for embed1 in embeddings1:
             siml_line = []
             for embed2 in embeddings2:
-                siml_line.append(cosine(embed1, embed2))
+                siml_line.append( round(cosine(embed1, embed2), 3))
             simil_matrix.append(siml_line)
         return simil_matrix
+
 
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
-        for id1, column1, categorical1 in enumerate(metadata1.categorical_metadata.items()):
-            for id2, column2, categorical2 in enumerate(metadata2.categorical_metadata.items()):
-                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding,
-                                                        categorical2.category_embedding)
-                count, score = self.__compute_similarity_score(simil_matrix)
-                ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)
-                result[id1][id2] = 1 - (score * ratio)  # todo
-                name_distance[id1][id2] = cosine(metadata1.column_name_embeddings[column1],
+        for id1, (column1, categorical1) in enumerate(metadata1.categorical_metadata.items()):
+            for id2, (column2, categorical2) in enumerate(metadata2.categorical_metadata.items()):
+                simil_matrix = self.__create_dist_matrix(categorical1.category_embedding,
+                                                         categorical2.category_embedding)
+                # count, score = self.__compute_similarity_score(simil_matrix)
+                dist = self.__compute_distance(simil_matrix)
+                ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)# todo 1-ratio???
+                # result.loc[id1, id2] = 1 - (score * ratio)  # todo
+                result.loc[id1, id2] = dist * ratio  # todo
+                name_distance.loc[id1, id2] = 1 - cosine(metadata1.column_name_embeddings[column1],
                                                  metadata2.column_name_embeddings[column2])
         ## todo p value or correlation
         return self.concat(result, name_distance)
@@ -94,20 +119,17 @@ class ColumnEmbeddingComparator(ComparatorType):
         ## todo originally there was used threshold
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
-        for id1, column1, embedding1 in enumerate(metadata1.column_embeddings.items()):
-            for id2, column2, embedding2 in enumerate(metadata2.column_embeddings.items()):
-                result[id1][id2] = cosine(embedding1, embedding2)
-                name_distance[id1][id2] = cosine(metadata1.column_name_embeddings[column1],
+        for id1, (column1, embedding1) in enumerate(metadata1.column_embeddings.items()):
+            for id2, (column2, embedding2) in enumerate(metadata2.column_embeddings.items()):
+                result.loc[id1,id2] = 1 - cosine(embedding1, embedding2)
+                name_distance.loc[id1,id2] = 1 - cosine(metadata1.column_name_embeddings[column1],
                                                  metadata2.column_name_embeddings[column2])
         return self.concat(result, name_distance)
 
 
 class Comparator:
-    def __init__(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
-        self.metadata1 = metadata1
-        self.metadata2 = metadata2
-        self.comparator_type: list[ComparatorType]
-        self.comparator_type = []
+    def __init__(self):
+        self.comparator_type: list[ComparatorType] = []
         self.settings = []
         self.distance_function = HausdorffDistanceMin()
 
@@ -127,12 +149,12 @@ class Comparator:
         self.comparator_type.append(comparator)
         return self
 
-    def compare(self):
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
         distances = []
         for comp in self.comparator_type:
-            distance_table = comp.compare(self.metadata1, self.metadata2)
+            distance_table = comp.compare(metadata1, metadata2)
             distances.append((self.distance_function.compute(distance_table),
-                              get_ratio(distance_table.shape()[0], distance_table.shape()[1])
+                              get_ratio(distance_table.shape[0], distance_table.shape[1])
                               ))
         result = 0
         for dist, weight in distances:

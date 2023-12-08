@@ -37,6 +37,7 @@ class DataFrameMetadataCreator:
         """
         self.dataframe = dataframe
         self.metadata = DataFrameMetadata()
+        self.model: Optional[SentenceTransformer] = SentenceTransformer('bert-base-nli-mean-tokens')
         self.metadata.size = dataframe.shape[0]
         self.metadata.column_names = list(dataframe.columns)
         self.metadata.column_names_clean = [re.sub("[^(0-9 | a-z).]", " ", i.lower()) for i in
@@ -53,7 +54,6 @@ class DataFrameMetadataCreator:
                                            dataframe.count()]  # more than 30 % missing
         self.__compute_categorical_info()
 
-        self.model: Optional[SentenceTransformer] = None
 
     def __get_model(self) -> SentenceTransformer:
         """
