@@ -6,7 +6,7 @@ import functions as f
 
 def print_hi(name):
     database, names = f.load__csv_files_from_folder("data")
-    data0 = f.DataFrameWithStat(database[0])
+    data0 = f.DataFrameMetadataCreator(database[0])
     columns = data0.get_numerical_columns()
     print(data0.column_type)
     data0.create_column_embeddings()

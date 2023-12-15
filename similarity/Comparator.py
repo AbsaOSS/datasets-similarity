@@ -11,7 +11,9 @@ def cosine(u, v):  ## todo move to functions.py?
 
 
 def get_ratio(count1: int, count2: int):
-    if count1 > count2:
+    if count1 == 0 or count2 == 0:
+        return 1
+    if count1 < count2:
         return count2 / count1
     else:
         return count1 / count2
@@ -25,6 +27,8 @@ class DistanceFunction(ABC):
 
 class HausdorffDistanceMin(DistanceFunction):
     def compute(self, distance_table: pd.DataFrame):
+        if distance_table.size == 0:
+            return np.nan
         row_mins = []
         column_mins = []
         for index, row in distance_table.iterrows():
@@ -53,20 +57,6 @@ class ComparatorType(ABC):
 
 class CategoricalComparator(ComparatorType):
 
-    def __compute_similarity_score(self, similarity_matrix):  ## todo test some other methods
-        # todo use Haufsdorfe distance ?
-        res = 0
-        count = 0
-        trashold = 0.7 # todo set from outside
-        length = 0
-        for i in similarity_matrix:
-            avg = sum(i) / len(i)
-            length = len(i)
-            if max(i) > trashold:
-                count += 1
-            res += max(i)
-        return count, res / len(similarity_matrix) * (count / len(similarity_matrix))
-
     def __compute_distance(self, dist_matrix): # Hausdorff
         row_mins = []
         column_mins = []
@@ -83,15 +73,6 @@ class CategoricalComparator(ComparatorType):
             for embed2 in embeddings2:
                 # todo rounding for 3 digits ? ok -> two because of minus 0
                 siml_line.append(round(1 - round(cosine(embed1, embed2), 4), 3)) # distance is 1- similarity
-            simil_matrix.append(siml_line)
-        return simil_matrix
-
-    def __create_sim_matrix(self, embeddings1, embeddings2):
-        simil_matrix = []
-        for embed1 in embeddings1:
-            siml_line = []
-            for embed2 in embeddings2:
-                siml_line.append( round(cosine(embed1, embed2), 3))
             simil_matrix.append(siml_line)
         return simil_matrix
 
@@ -113,10 +94,49 @@ class CategoricalComparator(ComparatorType):
         ## todo p value or correlation
         return self.concat(result, name_distance)
 
+class CategoricalComparatorSimilar(CategoricalComparator):
+    def __create_sim_matrix(self, embeddings1, embeddings2):
+        simil_matrix = []
+        for embed1 in embeddings1:
+            siml_line = []
+            for embed2 in embeddings2:
+                siml_line.append( round(cosine(embed1, embed2), 3))
+            simil_matrix.append(siml_line)
+        return simil_matrix
+
+    def __compute_similarity_score(self, similarity_matrix):  ## todo test some other methods
+        # todo use Haufsdorfe distance ?
+        res = 0
+        count = 0
+        trashold = 0.7 # todo set from outside
+        length = 0
+        for i in similarity_matrix:
+            avg = sum(i) / len(i)
+            length = len(i)
+            if max(i) > trashold:
+                count += 1
+            res += max(i)
+        return count, res / len(similarity_matrix) * (count / len(similarity_matrix))
+
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+        result = pd.DataFrame()
+        name_distance = pd.DataFrame()
+        for id1, (column1, categorical1) in enumerate(metadata1.categorical_metadata.items()):
+            for id2, (column2, categorical2) in enumerate(metadata2.categorical_metadata.items()):
+                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding,
+                                                         categorical2.category_embedding)
+                count, score = self.__compute_similarity_score(simil_matrix)
+                ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)  # todo 1-ratio???
+                result.loc[id1, id2] = 1 - (score * ratio)
+                name_distance.loc[id1, id2] = 1 - cosine(metadata1.column_name_embeddings[column1],
+                                                         metadata2.column_name_embeddings[column2])
+        ## todo p value or correlation
+        return self.concat(result, name_distance)
+
 
 class ColumnEmbeddingComparator(ComparatorType):
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
-        ## todo originally there was used threshold
+        ## todo originally it was used threshold here
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
         for id1, (column1, embedding1) in enumerate(metadata1.column_embeddings.items()):

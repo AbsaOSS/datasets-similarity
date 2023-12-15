@@ -1,0 +1,11 @@
+games - https://www.kaggle.com/datasets/arnabchaki/popular-video-games-1980-2023/ Popular video games
+steam - https://www.kaggle.com/datasets/nikdavis/steam-store-games/ Steam games
+vgsales - https://www.kaggle.com/datasets/gregorut/videogamesales/ Video games sale
+amazon - https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset Amazon Sales
+supermarket_sales - https://www.kaggle.com/datasets/aungpyaeap/supermarket-sales Sumermarkt sales
+exam - https://www.kaggle.com/datasets/whenamancodes/students-performance-in-exams Students performance in exams
+states_all - https://www.kaggle.com/datasets/noriuk/us-education-datasets-unification-project U.S. Education Datasets: Unification Project
+SAT_california - https://www.kaggle.com/datasets/thedevastator/unlocking-achievement-understanding-california-s SAT test results for californa
+mathScore - https://www.kaggle.com/datasets/soumyadiptadas/students-math-score-for-different-teaching-style?select=1ResearchProjectData.sav Students maths score
+winequality-red - https://www.kaggle.com/datasets/uciml/red-wine-quality-cortez-et-al-2009 Red wine quality
+winequality - https://www.kaggle.com/datasets/joebeachcapital/wine-quality Wine quality

@@ -1,32 +1,27 @@
-import logging
-import struct
+import dataclasses
+from typing import Optional
 
 import numpy as np
-import pandas as pd
 
-from DataFrameMetadata import DataFrameMetadata
+from similarity.DataFrameMetadata import DataFrameMetadata
 from collections import defaultdict
 from itertools import compress
 
+@dataclasses.dataclass
 class CategoricalSimilarity:
+    categories_ratio: float
+    count_similar: Optional[int] = None
+    similarity_score: Optional[int] = None
 
-    def __init__(self):
-        self.categories_ratio: float
-        self.most_common: tuple[str, str]
-        self.least_common: tuple[str, str]
-        self.number_of_similar_categories: int
-        self.similarity: list
-
-
+@dataclasses.dataclass
 class SimilarityStruct:
-    def __init__(self, table_name: str, column_name: str, similarity: float):
-        self.table_name = table_name
-        self.column_name = column_name
-        self.similarity = similarity
-        self.categorical_similarity = CategoricalSimilarity
-
-    def add_categorical_similarity_struct(self, categorical: CategoricalSimilarity):
-        self.categorical_similarity = categorical
+    """
+    Similarity struct for one column comparing with another column
+    """
+    table_name: Optional[str] = None
+    column_name: Optional[str] = None
+    similarity: Optional[float] = None
+    categorical_similarity: Optional[CategoricalSimilarity] = None
 
     def __lt__(self, other):
         return self.similarity < other.similarity
@@ -48,8 +43,14 @@ class SimilarityStruct:
 
 
 class SimilarityData:
+    """
+    Similarity data for one table
+    """
 
     def __init__(self):
+        """
+        similarity_columns, str represents name of column, list similarity to all other columns
+        """
         self._score = 1
         self.similarity_columns: dict[str, list[SimilarityStruct]] = defaultdict(list)
 
@@ -96,6 +97,9 @@ def most_frequent(list: list[(float, str)]) -> str:
 
 
 class ComparatorForDatasets:
+    """
+    This class gets dictionary of datasets metadata to compare
+    """
     # {name: DataFrameWithStat(table) for table, name in zip(database, names)}
     def __init__(self, database: dict[str, DataFrameMetadata]):
         self.database = database
@@ -106,6 +110,10 @@ class ComparatorForDatasets:
         return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
 
     def cross_compare(self) -> dict:
+        """
+        Methods counts similarity of columns for which we have embeddings
+        :return:
+        """
         result = {}
         for table_name, table in self.database.items():
             similarity_data = SimilarityData()
@@ -136,17 +144,19 @@ class ComparatorForDatasets:
 
 
     def cross_compare_column_names(self):
+        """
+        Method counts similarity for all tables by using column names
+        :return:
+        """
         result = {}
         for table_name, table in self.database.items():
-            if table_name == "disney_movies":
-                logging.debug("")
             similarity_values_for_columns = []
-            for column_emb in table.column_name_embeddings:
+            for column_emb in table.column_name_embeddings.values():
                 all_res = []
                 for name, to_compare in self.database.items():
                     if table is to_compare:
                         continue
-                    for to_comp_emb in to_compare.column_name_embeddings:
+                    for to_comp_emb in to_compare.column_name_embeddings.values():
                         sim = self.cosine(column_emb, to_comp_emb)
                         all_res.append((sim, name))  # todo save also column name ?
                 similarity_values_for_columns.append(max(all_res))  # simillarity for each column to some another column
