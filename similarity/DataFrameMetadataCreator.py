@@ -7,7 +7,7 @@ from typing import Optional
 from sentence_transformers import SentenceTransformer
 
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata
-from similarity.Types import Types, get_type
+from similarity.Types import Types, get_type, get_data_kind
 
 
 class DataFrameMetadataCreator:
@@ -54,7 +54,6 @@ class DataFrameMetadataCreator:
                                            dataframe.count()]  # more than 30 % missing
         self.__compute_categorical_info()
 
-
     def __get_model(self) -> SentenceTransformer:
         """
         :return: embedding model if exists or creates new one
@@ -85,6 +84,8 @@ class DataFrameMetadataCreator:
                                                                                list(map(str, self.dataframe[
                                                                                    name].unique()))))
             # categories_embeddings=categories_embeddings)
+
+    ## Setting Creator
 
     def set_model(self, model: SentenceTransformer) -> 'DataFrameMetadataCreator':
         """
@@ -133,6 +134,11 @@ class DataFrameMetadataCreator:
             self.metadata.column_embeddings[name] = i
         return self
 
+    def compute_data_kind(self):
+        self.metadata.colum_kind = {i: get_data_kind(self.dataframe[i]) for i in self.dataframe.columns}
+
+
+   ## Getters
     def get_column_by_type(self, *types):
         """
         :param types: of columns

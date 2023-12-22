@@ -2,7 +2,7 @@ import hashlib
 import pickle
 from collections import defaultdict, Counter
 from typing import Generator
-from Types import Types
+from Types import Types, DataKind
 
 
 def dumps(value):
@@ -41,6 +41,7 @@ class DataFrameMetadata:
         self.column_embeddings = {}
         self.correlated_columns = set()
         self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
+        self.colum_kind: dict[str, DataKind] = defaultdict()
 
     def hash(self) -> bytes:
         m = hashlib.sha256()
@@ -54,38 +55,38 @@ class DataFrameMetadata:
         # m.update(bytes(str(list(self.type_column.keys())) + str(list(self.type_column.values())), 'utf-8'))
         return m.digest()
 
-    def compare_dict_of_lists(self, dictionary, other):
-        if len(other) is not len(dictionary):
-            return False
-        for key, value in dictionary.items():
-            if key in other.keys():
-                if not Counter(other[key]) == Counter(value):
-                    return False
-            else:
-                return False
-        return True
-
-    def compare_list_of_lists(self, this, other):
-        if len(this) is not len(other):
-            return False
-        for t, o in zip(this, other):
-            if not Counter(t) == Counter(o):
-                return False
-        return True
-
-    def __eq__(self, other):
-        to_return = (
-            self.size == other.size,
-            self.compare_dict_of_lists(self.column_embeddings, other.column_embeddings),
-            self.compare_dict_of_lists(self.type_column, other.type_column),
-            Counter(self.column_names) == Counter(other.column_names),
-            Counter(self.column_names_clean) == Counter(other.column_names_clean),
-            self.compare_dict_of_lists(self.column_name_embeddings, other.column_name_embeddings),
-            # Counter(self.column_name_embeddings) == Counter(other.column_name_embeddings),
-            Counter(list(self.column_categorical)) == Counter(list(other.column_categorical)),
-            Counter(list(self.column_incomplete)) == Counter(list(other.column_incomplete)),
-            Counter(self.correlated_columns) == Counter(other.correlated_columns))
-        return all(to_return)
+    # def compare_dict_of_lists(self, dictionary, other):
+    #     if len(other) is not len(dictionary):
+    #         return False
+    #     for key, value in dictionary.items():
+    #         if key in other.keys():
+    #             if not Counter(other[key]) == Counter(value):
+    #                 return False
+    #         else:
+    #             return False
+    #     return True
+    #
+    # def compare_list_of_lists(self, this, other):
+    #     if len(this) is not len(other):
+    #         return False
+    #     for t, o in zip(this, other):
+    #         if not Counter(t) == Counter(o):
+    #             return False
+    #     return True
+    #
+    # def __eq__(self, other):
+    #     to_return = (
+    #         self.size == other.size,
+    #         self.compare_dict_of_lists(self.column_embeddings, other.column_embeddings),
+    #         self.compare_dict_of_lists(self.type_column, other.type_column),
+    #         Counter(self.column_names) == Counter(other.column_names),
+    #         Counter(self.column_names_clean) == Counter(other.column_names_clean),
+    #         self.compare_dict_of_lists(self.column_name_embeddings, other.column_name_embeddings),
+    #         # Counter(self.column_name_embeddings) == Counter(other.column_name_embeddings),
+    #         Counter(list(self.column_categorical)) == Counter(list(other.column_categorical)),
+    #         Counter(list(self.column_incomplete)) == Counter(list(other.column_incomplete)),
+    #         Counter(self.correlated_columns) == Counter(other.correlated_columns))
+    #     return all(to_return)
 
     def get_column_names_by_type(self, *types):
         columns = []
