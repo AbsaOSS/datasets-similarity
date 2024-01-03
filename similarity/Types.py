@@ -81,16 +81,52 @@ def is_constant(column: pd.Series) -> bool:
 #     return type(column.mode()[0]) is bool
 
 
-def is_numerical(x) -> bool:
+def is_numerical(x: pd.Series) -> bool:
     """
     Decide if np type is numerical
     :param x: the type
     :return: true if it is numerical, otherwise false
     """
-    if x.apply(lambda s: pd.to_numeric(s, errors='coerce')):
-        return np.issubdtype(x, np.integer) or np.issubdtype(x, np.floating)
-    else:
+    try:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
+    except AttributeError:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
+    return to_numeric.any()
+
+
+def is_int(x: pd.Series) -> bool:
+    """
+    Decide if numerical type is integer
+    :param x: the series for decide
+    :return: true if it is integer, otherwise false
+    """
+    to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))  ## todo time efficiency we could do that before
+    return np.issubdtype(to_numeric, np.integer) or to_numeric.apply(float.is_integer).all()
+
+
+def is_human_gen(x: pd.Series) -> bool:
+    """
+     Decide if float number is human generated
+     :param x: the series for decide
+     :return: true if it is human generated, otherwise false
+     """
+    def floating_length_gt(num: Any, gt: int):
+        """
+        Returns true if count of number after floating point is grater then gt
+        :param num: to decide
+        :param gt: threshold
+        """
+        splitted = str(num).split(".")
+        if len(splitted) > 1:
+            return len(splitted[1]) > gt
         return False
+
+    try:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
+    except AttributeError:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
+    ## todo time efficiency
+    return to_numeric.apply(lambda s: not floating_length_gt(s, 3)).all()
 
 
 def is_date(column: pd.Series) -> bool:
