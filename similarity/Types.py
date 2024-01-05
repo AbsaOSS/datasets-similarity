@@ -1,10 +1,18 @@
+import dataclasses
 import enum
 import re
 from enum import Enum, EnumMeta, StrEnum
 from typing import Any
+from dateutil.parser import parse, ParserError
 
 import numpy as np
 import pandas as pd
+
+
+class TypeSettings:
+    categorical_big_threshold = 0.9
+    categorical_small_threshold = 0.7
+    categorical_small_dataset = 50
 
 
 class SuperNestedEnum(Enum):
@@ -57,7 +65,7 @@ def is_bool(column: pd.Series) -> bool:
     try:
         lower = column.map(str.lower)
         return lower.nunique() == 2
-    finally:
+    except:
         return column.nunique() == 2
 
 
@@ -91,7 +99,7 @@ def is_numerical(x: pd.Series) -> bool:
         to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
     except AttributeError:
         to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
-    return to_numeric.any()
+    return to_numeric.any() and to_numeric.dtype != bool
 
 
 def is_int(x: pd.Series) -> bool:
@@ -110,6 +118,7 @@ def is_human_gen(x: pd.Series) -> bool:
      :param x: the series for decide
      :return: true if it is human generated, otherwise false
      """
+
     def floating_length_gt(num: Any, gt: int):
         """
         Returns true if count of number after floating point is grater then gt
@@ -129,12 +138,79 @@ def is_human_gen(x: pd.Series) -> bool:
     return to_numeric.apply(lambda s: not floating_length_gt(s, 3)).all()
 
 
+def is_not_numerical(x: pd.Series) -> bool:
+    return x.map(type).eq(str).all() and not is_numerical(x)
+
+
+def is_categorical(x: pd.Series) -> bool:
+    numer_uniq = x.nunique()
+    size = x.size
+    diff = size - numer_uniq
+    perc_diff = diff / size
+    if size > TypeSettings.categorical_small_dataset and perc_diff >= TypeSettings.categorical_big_threshold:
+        return True
+    return size <= TypeSettings.categorical_small_dataset and perc_diff >= TypeSettings.categorical_small_threshold
+
+
+def is_word(x: pd.Series) -> bool:
+    def is_str_word(word: str):
+        return word.count(" ") == 0
+
+    return x.apply(lambda s: is_str_word(s)).all()
+
+
+def is_phrase(x: pd.Series) -> bool:
+    def is_str_phrase(word: str):
+        return word.count(".") == 0
+
+    return x.apply(lambda s: is_str_phrase(s)).all() and not is_word(x)
+
+
+def is_sentence(x: pd.Series) -> bool:
+    def is_str_sentence(word: str):
+        return ((word.endswith(".") or word.endswith("!") or word.endswith("?")) and word.count(".") <= 1
+                and word.count("!") <= 1 and word.count("?") <= 1) and re.search("^[A-Z]", word)
+
+    return x.apply(lambda s: is_str_sentence(s)).all()
+
+def is_article(x: pd.Series) -> bool:
+    return not is_word(x) and not is_phrase(x) and not is_sentence(x) and not is_multiple(x)
+
+def is_multiple(x: pd.Series) -> bool:
+    def is_str_multiple(word: str):
+        regex = re.compile('[a-zA-Z0-9]')
+        word_clean = regex.sub('', word)
+        res = "".join(dict.fromkeys(word_clean))
+        return (word.count(res) == word_clean.count(res) and word_clean.count(res) > 0) or res == ''
+
+    return x.apply(lambda s: is_str_multiple(s)).all()
+
 def is_date(column: pd.Series) -> bool:
     """
     Decide if type of column is date
     :param column:
     :return:
     """
+
+    def is_str_date(word: str):
+        try:
+            parse(word, fuzzy_with_tokens=True)
+            return True
+        except ParserError:
+            element = str(word).strip()
+            one_or_two = '(\d{1}|\d{2})'
+            two_or_four = '(\d{2}|\d{4})'
+            months = '(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)'
+            pattern = r'|' + r'^(\d{1}|\d{2}|{\d{4}}),(\d{1}|\d{2}) ' + months  # + '$'  # 1999,4 Feb 1999,4 February
+            pattern = pattern + '|' + r'^' + one_or_two + '\. ' + one_or_two + '\. ' + two_or_four  #11. 4. 1999
+            pattern = pattern + '|' + r'^(\d{1}|\d{2}|{\d{4}}),(\d{1}|\d{2})' + months  #1999,4February 1999,4Feb
+            if re.match(pattern, element):
+                return True
+            else:
+                return False
+
+    return column.apply(lambda s: is_str_date(s)).all()
+
     element = str(column.mode()[0]).strip()
     one_or_two = '(\d{1}|\d{2})'
     two_or_four = '(\d{2}|\d{4})'

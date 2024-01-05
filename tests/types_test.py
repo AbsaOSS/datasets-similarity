@@ -1,8 +1,10 @@
 import unittest
 
 import pandas as pd
+from dateutil.parser import parse
 
-from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKind, is_constant, is_int, is_human_gen
+from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKind, is_constant, is_int, is_human_gen, \
+    is_not_numerical, is_categorical, is_word, is_phrase, is_sentence, is_article, is_multiple, is_date
 
 
 class TestID(unittest.TestCase):
@@ -27,6 +29,7 @@ class TestID(unittest.TestCase):
     def test_wine(self):
         data = pd.read_csv(self.directory_val + "winequality.csv")
         self.control_test_for_columns(data, "")
+
 
 class TestEdgeCasesNumerical(unittest.TestCase):
     def setUp(self):
@@ -53,6 +56,10 @@ class TestEdgeCasesNumerical(unittest.TestCase):
 
         self.assertFalse(is_numerical(self.data["id_text_column"]))
         self.assertFalse(is_numerical(self.data["id_column_both"]))
+        self.assertFalse(is_numerical(self.data["bool_str"]))
+        self.assertFalse(is_numerical(self.data["bool_TF"]))
+        self.assertFalse(is_numerical(self.data["bool_TFtf"]))
+        self.assertFalse(is_numerical(self.data["constant_str"]))
 
     def test_numeric_string(self):
         self.assertTrue(is_numerical(self.data["number_int_str"]))
@@ -96,12 +103,150 @@ class TestEdgeCasesNumerical(unittest.TestCase):
         self.assertFalse(is_human_gen(self.str_data["float_computer_gen"]))
         self.assertFalse(is_human_gen(self.str_data["float_rounded"]))
 
+
+class TestNonNumerical(unittest.TestCase):
+    def setUp(self):
+        self.file = "../data_validation/edge_cases.csv"
+        self.data = pd.read_csv(self.file)
+        data = {'int_str': ['2', '3', '5', '2'],
+                'float_with_nan': ['NaN', '3.0', 'Nan', '2.0'],
+                'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0'],
+                'TFtf': ['true', 'false', 'True', 'False'],
+                }
+        self.str_data = pd.DataFrame(data)
+
+    def test_not_numeric(self):
+        self.assertTrue(is_not_numerical(self.data["id_text_column"]))
+        self.assertTrue(is_not_numerical(self.data["id_column_both"]))
+        self.assertTrue(is_not_numerical(self.data["bool_str"]))
+        # self.assertTrue(is_not_numerical(self.data["bool_TF"]))
+        self.assertTrue(is_not_numerical(self.str_data["TFtf"]))
+        self.assertTrue(is_not_numerical(self.data["constant_str"]))
+
+        self.assertFalse(is_not_numerical(self.data["float_str_comma"]))
+        self.assertFalse(is_not_numerical(self.data["constant_number"]))
+        self.assertFalse(is_not_numerical(self.data["bool_int"]))
+        self.assertFalse(is_not_numerical(self.data["number_float"]))
+        self.assertFalse(is_not_numerical(self.data["number_float_str"]))
+        self.assertFalse(is_not_numerical(self.data["float_but_int"]))
+        self.assertFalse(is_not_numerical(self.data["number_int"]))
+        self.assertFalse(is_not_numerical(self.data["number_int_str"]))
+        self.assertFalse(is_not_numerical(self.data["id_column"]))
+        self.assertFalse(is_not_numerical(self.str_data["int_str"]))
+        self.assertFalse(is_not_numerical(self.str_data["float_with_nan"]))
+        self.assertFalse(is_not_numerical(self.str_data["float_with_minus"]))
+
+
+    def test_string_type(self):
+        data = {
+            'word_aZ': ['Pepa', 'Matej', 'Tomas', 'marcel'],
+            'word_aZ09': ['AB09', 'McA2', 'MoA3', '223A'],
+            'word_all': ['AB-09', 'McA2', 'Mo/A3', '223-A'],
+            'phrase': ['John Doe', 'Max Mo', 'No oj', 'La lu li'],
+            'sentence': ['Gregory, on my word we’ll not carry coals.', 'No, for then we should be colliers.',
+                         'I mean, an we be in choler, we’ll draw.', 'Ay, while you live, draw your neck out of '
+                                                                    'collar.'],
+            'article': ['Two households, both alike in dignity (In fair Verona, where we lay our scene), From ancient '
+                        'grudge break to new mutiny,Where civil blood makes civil hands unclean. From forth the fatal '
+                        'loins of these two foes A pair of star-crossed lovers take their life.',
+
+                        'Whose misadventured piteous overthrows Doth with their death bury their parents’ strife.The '
+                        'fearful passage of their death-marked love And the continuance of their parents’ rage',
+                        'Which, but their children’s end, naught could remove, Is now the two hours’ traffic of our '
+                        'stage;',
+
+                        'The which, if you with patient ears attend, What here shall miss, our toil shall strive to '
+                        'mend.'],
+            'multiple': ['Milk, chocolate, flour', 'milk, bread, butter, salt', 'flour, milk', 'chocolate'],
+            'multiple-': ['Milk - chocolate - flour', 'milk - bread - butter - salt', 'flour - milk', 'chocolate - '
+                                                                                                      'orange - '
+                                                                                                      'whisky'],
+            'multiple;': ['Milk; chocolate; flour', 'milk; bread; butter; salt', 'flour; milk', 'chocolate; orange; '
+                                                                                                'whisky'],
+            'multiple|': ['Milk|chocolate|flour', 'milk|bread|butter|salt', 'flour|milk', 'chocolate|orange|whisky'],
+
+        }
+        df_data = pd.DataFrame(data)
+        self.assertTrue(is_not_numerical(df_data["word_aZ"]))
+        self.assertTrue(is_not_numerical(df_data["word_aZ09"]))
+        self.assertTrue(is_not_numerical(df_data["word_all"]))
+        self.assertTrue(is_not_numerical(df_data["phrase"]))
+        self.assertTrue(is_not_numerical(df_data["sentence"]))
+        self.assertTrue(is_not_numerical(df_data["article"]))
+        self.assertTrue(is_not_numerical(df_data["multiple"]))
+        self.assertTrue(is_not_numerical(df_data["multiple-"]))
+        self.assertTrue(is_not_numerical(df_data["multiple;"]))
+        self.assertTrue(is_not_numerical(df_data["multiple|"]))
+
+        self.assertFalse(is_categorical(df_data["word_aZ"]))
+        self.assertFalse(is_categorical(df_data["word_aZ09"]))
+        self.assertFalse(is_categorical(df_data["word_all"]))
+        self.assertFalse(is_categorical(df_data["phrase"]))
+        self.assertFalse(is_categorical(df_data["sentence"]))
+        self.assertFalse(is_categorical(df_data["article"]))
+        self.assertFalse(is_categorical(df_data["multiple"]))
+        self.assertFalse(is_categorical(df_data["multiple-"]))
+        self.assertFalse(is_categorical(df_data["multiple;"]))
+        self.assertFalse(is_categorical(df_data["multiple|"]))
+
+        self.assertTrue(is_word(df_data["word_aZ"]))
+        self.assertTrue(is_word(df_data["word_aZ09"]))
+        self.assertTrue(is_word(df_data["word_all"]))
+        self.assertTrue(is_phrase(df_data["phrase"]))
+        self.assertTrue(is_sentence(df_data["sentence"]))
+        self.assertTrue(is_multiple(df_data["multiple"]))
+        self.assertTrue(is_multiple(df_data["multiple-"]))
+        self.assertTrue(is_multiple(df_data["multiple;"]))
+        self.assertTrue(is_multiple(df_data["multiple|"]))
+        self.assertTrue(is_article(df_data["article"]))
+
+
+
+    def test_categorical_type(self):
+        data = {
+            'ordinal': ['big', 'small', 'medium', 'small', 'big', 'small', 'medium', 'medium', 'medium', 'small', 'big',
+                        'small', 'medium', 'small', 'big', 'small', 'medium', 'medium', 'medium', 'small'],
+            'ordinal_grades': ['A', 'A', 'B', 'B', 'F', 'A', 'C', 'A', 'D', 'A', 'A', 'A', 'B', 'B', 'F', 'A', 'C', 'A',
+                               'D', 'A'],
+            'ordinal_class': ['middle class', 'middle class', 'rich', 'poor', 'rich', 'poor', 'poor', 'middle class',
+                              'poor', 'poor', 'middle class', 'middle class', 'rich', 'poor', 'rich', 'poor', 'poor',
+                              'middle class', 'poor', 'poor'],
+            'nominal': ['car', 'house', 'garden', 'garden', 'garden', 'car', 'house', 'garden', 'house', 'garden',
+                        'car', 'house', 'garden', 'garden', 'garden', 'car', 'house', 'garden', 'house', 'garden'],
+            'nominal_blood_type': ['A', 'AB', 'A', 'B', '0', 'A', 'AB', '0', 'A', '0', 'A', 'AB', 'A', 'B', '0', 'A',
+                                   'AB', '0', 'A', '0'],
+        }
+        df_data = pd.DataFrame(data)
+        self.assertTrue(is_not_numerical(df_data["ordinal"]))
+        self.assertTrue(is_not_numerical(df_data["ordinal_grades"]))
+        self.assertTrue(is_not_numerical(df_data["ordinal_class"]))
+        self.assertTrue(is_not_numerical(df_data["nominal"]))
+        self.assertTrue(is_not_numerical(df_data["nominal_blood_type"]))
+
+        self.assertTrue(is_categorical(df_data["ordinal"]))
+        self.assertTrue(is_categorical(df_data["ordinal_grades"]))
+        self.assertTrue(is_categorical(df_data["ordinal_class"]))
+        self.assertTrue(is_categorical(df_data["nominal"]))
+        self.assertTrue(is_categorical(df_data["nominal_blood_type"]))
+
+        #todo
+        # self.assertTrue(is_ordinal(df_data["ordinal"]))
+        # self.assertTrue(is_ordinal(df_data["ordinal_grades"]))
+        # self.assertTrue(is_ordinal(df_data["ordinal_class"]))
+        # self.assertTrue(is_nominal(df_data["nominal"]))
+        # self.assertTrue(is_nominal(df_data["nominal_blood_type"]))
+
+
 class TestDataKind(unittest.TestCase):
     def setUp(self):
         self.file = "../data_validation/edge_cases.csv"
         self.data = pd.read_csv(self.file)
         file_edge = "../data_validation/edge_cases.csv"
         self.data_edge = pd.read_csv(file_edge)
+
+        data = {'TFtf': ['true', 'false', 'true', 'False', 'True'],
+                }
+        self.str_data = pd.DataFrame(data)
 
     def test_id(self):
         self.assertTrue(is_id(self.data["id_column"]))
@@ -119,11 +264,13 @@ class TestDataKind(unittest.TestCase):
         self.assertTrue(is_bool(self.data["bool_str"]))
         self.assertTrue(is_bool(self.data["bool_TF"]))
         self.assertTrue(is_bool(self.data["bool_TFtf"]))
+        self.assertTrue(is_bool(self.str_data["TFtf"]))
 
         self.assertEqual(DataKind.BOOL, get_data_kind(self.data["bool_int"]))
         self.assertEqual(DataKind.BOOL, get_data_kind(self.data["bool_str"]))
         self.assertEqual(DataKind.BOOL, get_data_kind(self.data["bool_TF"]))
         self.assertEqual(DataKind.BOOL, get_data_kind(self.data["bool_TFtf"]))
+        self.assertEqual(DataKind.BOOL, get_data_kind(self.str_data["TFtf"]))
 
     def test_constant(self):
         self.assertFalse(is_constant(self.data["bool_int"]))
@@ -134,6 +281,48 @@ class TestDataKind(unittest.TestCase):
         self.assertEqual(DataKind.CONSTANT, get_data_kind(self.data["constant_number"]))
         self.assertEqual(DataKind.CONSTANT, get_data_kind(self.data["constant_str"]))
         self.assertEqual(DataKind.UNDEFINED, get_data_kind(self.data["number_int"]))
+
+
+class TestDateTime(unittest.TestCase):
+    def setUp(self):
+        data = {
+            'MM-DD-YYYY': ['11-04-1999', '12-31-1999', '01-03-1999'],
+            'M-D-YY': ['11-4-99', '12-31-99', '1-3-99'],
+            'MM.DD.YYYY': ['11.4.1999', '12.31.1999', '1.3.1999'],
+            'MM.DD.YYYY_': ['11. 4. 1999', '12. 31. 1999', '1. 3. 1999'],
+            'MM.DD.YY': ['11.04.99', '12.31.99', '01.03.99'],
+            'MM/DD/YY': ['11/04/99', '12/31/99', '01/03/99'],
+            'MM/DD/YYYY': ['11/4/1999', '12/31/1999', '1/3/1999'],
+            'YYYY,DDMon': ['1999,4Feb', '1999,31Jan', '1999,3Nov'],
+            'YYYY,DDMonth': ['1999,4February', '1999,31January', '1999,3November'],
+            'YYYY,DD Mon': ['1999,4 Feb', '1999,31 Jan', '1999,3 Nov'],
+            'YYYY,DD Month': ['1999,4 February', '1999,31 January', '1999,3 November'],
+            'MonDD,YYYY': ['Feb4,1999', 'Jan 31,1999', 'Nov 3, 1999'],
+            'MonthDD,YYYY': ['February4,1999', 'January 31,1999', 'November 3, 1999'],
+            'DDMonth,YYYY': ['4February,1999', '31 January,1999', '3 November, 1999 '],
+            'DDMon,YYYY': ['4Feb,1999', '31 Jan,1999', '3 Nov, 1999 '],
+            'DDMonthYYYY': ['4February1999', '31January 1999', '3 November 1999 '],
+            'DDMonYYYY': ['4Feb1999', '31Jan 1999', '3 Nov 1999 '],
+        }
+        self.data = pd.DataFrame(data)
+
+    def test_date(self):
+        self.assertTrue(is_date(self.data['MM-DD-YYYY']))
+        self.assertTrue(is_date(self.data['M-D-YY']))
+        self.assertTrue(is_date(self.data['MM.DD.YYYY']))
+        self.assertTrue(is_date(self.data['MM.DD.YY']))
+        self.assertTrue(is_date(self.data['MM/DD/YY']))
+        self.assertTrue(is_date(self.data['MM/DD/YYYY']))
+        self.assertTrue(is_date(self.data['MonDD,YYYY']))
+        self.assertTrue(is_date(self.data['MonthDD,YYYY']))
+        self.assertTrue(is_date(self.data['DDMonYYYY']))
+        self.assertTrue(is_date(self.data['DDMonthYYYY']))
+        self.assertTrue(is_date(self.data['DDMon,YYYY']))
+        self.assertTrue(is_date(self.data['DDMonth,YYYY']))
+        self.assertTrue(is_date(self.data['YYYY,DD Mon']))
+        self.assertTrue(is_date(self.data['YYYY,DDMonth']))
+        self.assertTrue(is_date(self.data['MM.DD.YYYY_']))
+        self.assertTrue(is_date(self.data['YYYY,DDMon']))
 
 if __name__ == '__main__':
     unittest.main()
