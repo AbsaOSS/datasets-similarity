@@ -4,7 +4,9 @@ import pandas as pd
 from dateutil.parser import parse
 
 from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKind, is_constant, is_int, is_human_gen, \
-    is_not_numerical, is_categorical, is_word, is_phrase, is_sentence, is_article, is_multiple, is_date
+    is_not_numerical, is_categorical, is_word, is_phrase, is_sentence, is_article, is_multiple, is_date, \
+    is_true_multiple, get_basic_type, Types, get_advanced_type, is_alphabetic_word, is_alphanumeric_word, \
+    get_advanced_structural_type
 
 
 class TestID(unittest.TestCase):
@@ -192,12 +194,20 @@ class TestNonNumerical(unittest.TestCase):
         self.assertTrue(is_word(df_data["word_aZ"]))
         self.assertTrue(is_word(df_data["word_aZ09"]))
         self.assertTrue(is_word(df_data["word_all"]))
+        self.assertTrue(is_alphabetic_word(df_data["word_aZ"]))
+        self.assertTrue(is_alphanumeric_word(df_data["word_aZ09"]))
+        self.assertFalse(is_alphabetic_word(df_data["word_all"]))
+        self.assertFalse(is_alphanumeric_word(df_data["word_all"]))
         self.assertTrue(is_phrase(df_data["phrase"]))
         self.assertTrue(is_sentence(df_data["sentence"]))
         self.assertTrue(is_multiple(df_data["multiple"]))
         self.assertTrue(is_multiple(df_data["multiple-"]))
         self.assertTrue(is_multiple(df_data["multiple;"]))
         self.assertTrue(is_multiple(df_data["multiple|"]))
+        self.assertTrue(is_true_multiple(df_data["multiple"]))
+        self.assertTrue(is_true_multiple(df_data["multiple-"]))
+        self.assertTrue(is_true_multiple(df_data["multiple;"]))
+        self.assertTrue(is_true_multiple(df_data["multiple|"]))
         self.assertTrue(is_article(df_data["article"]))
 
 
@@ -281,6 +291,133 @@ class TestDataKind(unittest.TestCase):
         self.assertEqual(DataKind.CONSTANT, get_data_kind(self.data["constant_number"]))
         self.assertEqual(DataKind.CONSTANT, get_data_kind(self.data["constant_str"]))
         self.assertEqual(DataKind.UNDEFINED, get_data_kind(self.data["number_int"]))
+
+class TestDataType(unittest.TestCase):
+    def setUp(self):
+        self.file = "../data_validation/edge_cases.csv"
+        self.data = pd.read_csv(self.file)
+        data = {'int_str': ['2', '3', '5', '2'],
+                'float_str': ['2.2', '3.1', '5.3', '2.2'],
+                'float_but_int_str': ['2.0', '3.0', '5.0', '2.0'],
+                'float_with_nan': ['NaN', '3.0', 'Nan', '2.0'],
+                'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0'],
+
+                'float_computer_gen': ['-2.12341', '-3.02305', '5.234865', '2.345624'],
+                'float_rounded': ['-2.25', '-3.3355', '5.24', '2.445'],
+                'TFtf': ['true', 'false', 'True', 'False'],
+                'multiple': ['Milk, chocolate, flour', 'milk, bread, butter, salt', 'flour, milk', 'chocolate'],
+                'word_all': ['AB-09', 'McA2', 'Mo/A3', '223-A'],
+                'phrase': ['John Doe', 'Max Mo', 'No oj', 'La lu li'],
+                'sentence': ['Gregory, on my word we’ll not carry coals.', 'No, for then we should be colliers.',
+                             'I mean, an we be in choler, we’ll draw.', 'Ay, while you live, draw your neck out of '
+                                                                        'collar.'],
+                'article': [
+                    'Two households, both alike in dignity (In fair Verona, where we lay our scene), From ancient '
+                    'grudge break to new mutiny,Where civil blood makes civil hands unclean. From forth the fatal '
+                    'loins of these two foes A pair of star-crossed lovers take their life.',
+
+                    'Whose misadventured piteous overthrows Doth with their death bury their parents’ strife.The '
+                    'fearful passage of their death-marked love And the continuance of their parents’ rage',
+                    'Which, but their children’s end, naught could remove, Is now the two hours’ traffic of our '
+                    'stage;',
+
+                    'The which, if you with patient ears attend, What here shall miss, our toil shall strive to '
+                    'mend.'],
+                'MM.DD.YYYY': ['11.4.1999', '12.31.1999', '1.3.1999', '11.4.1999'],
+                'DDMonYYYY': ['4Feb1999', '31Jan 1999', '3 Nov 1999', '3 Nov 1999']
+                }
+        self.str_data = pd.DataFrame(data)
+
+    def test_get_basic_type(self):
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["int_str"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["bool_int"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["constant_number"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["id_column"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["number_int"]))
+
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_str"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_with_nan"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_with_minus"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_computer_gen"]))
+        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_rounded"]))
+
+        self.assertEqual(Types.UNDEFINED, get_basic_type(self.data["bool_TF"]))
+        self.assertEqual(Types.UNDEFINED, get_basic_type(self.data["bool_TFtf"]))
+
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_str"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["constant_str"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["id_text_column"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["word_all"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["id_column_both"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["multiple"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["sentence"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["article"]))
+
+        self.assertEqual(Types.DATE, get_basic_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(Types.DATE, get_basic_type(self.str_data["DDMonYYYY"]))
+
+    def test_get_advanced_type(self):
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.str_data["int_str"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["bool_int"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["constant_number"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["id_column"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["number_int"]))
+
+        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_str"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_with_nan"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_with_minus"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_computer_gen"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_rounded"]))
+
+        self.assertEqual(Types.UNDEFINED, get_advanced_type(self.data["bool_TF"]))
+        self.assertEqual(Types.UNDEFINED, get_advanced_type(self.data["bool_TFtf"]))
+
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_type(self.data["bool_str"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_type(self.data["constant_str"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["id_text_column"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["word_all"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["id_column_both"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["multiple"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["sentence"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["article"]))
+
+        self.assertEqual(Types.DATE, get_advanced_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(Types.DATE, get_advanced_type(self.str_data["DDMonYYYY"]))
+
+    def test_get_advanced_structural_type(self):
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.str_data["int_str"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["bool_int"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["constant_number"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["id_column"]))
+        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["number_int"]))
+
+        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED, get_advanced_structural_type(self.str_data["float_str"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED, get_advanced_structural_type(self.str_data["float_with_nan"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED, get_advanced_structural_type(self.str_data["float_with_minus"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED, get_advanced_structural_type(self.str_data["float_computer_gen"]))
+        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED, get_advanced_structural_type(self.str_data["float_rounded"]))
+
+        self.assertEqual(Types.UNDEFINED, get_advanced_structural_type(self.data["bool_TF"]))
+        self.assertEqual(Types.UNDEFINED, get_advanced_structural_type(self.data["bool_TFtf"]))
+
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC, get_advanced_structural_type(self.str_data["TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_structural_type(self.data["bool_str"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_structural_type(self.data["constant_str"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC, get_advanced_structural_type(self.data["id_text_column"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL, get_advanced_structural_type(self.str_data["word_all"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC, get_advanced_structural_type(self.data["id_column_both"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES, get_advanced_structural_type(self.str_data["multiple"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.PHRASE, get_advanced_structural_type(self.str_data["phrase"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.SENTENCE, get_advanced_structural_type(self.str_data["sentence"]))
+        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.ARTICLE, get_advanced_structural_type(self.str_data["article"]))
+
+        self.assertEqual(Types.DATE, get_advanced_structural_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(Types.DATE, get_advanced_structural_type(self.str_data["DDMonYYYY"]))
 
 
 class TestDateTime(unittest.TestCase):
