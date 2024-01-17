@@ -7,7 +7,8 @@ from typing import Optional
 from sentence_transformers import SentenceTransformer
 
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata
-from similarity.Types import Types, get_type, get_data_kind
+from similarity.Types import Types, get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind, \
+    DataKind
 
 
 class DataFrameMetadataCreator:
@@ -45,8 +46,9 @@ class DataFrameMetadataCreator:
         column_name_embeddings = self.__get_model().encode(self.metadata.column_names_clean)
         for i, name in zip(column_name_embeddings, self.metadata.column_names):
             self.metadata.column_name_embeddings[name] = i
-        for i in dataframe.columns:
-            self.metadata.type_column[get_type(dataframe[i])].add(i)
+
+        for i in self.dataframe.columns:
+            self.metadata.column_kind[get_data_kind(self.dataframe[i])].add(i)
 
         self.metadata.column_categorical = [((i / (self.metadata.size * 0.01) < 1) or i < 50) for i in
                                             dataframe.nunique()]  # less than 10 %
@@ -73,7 +75,7 @@ class DataFrameMetadataCreator:
             # categories_embeddings = list()
             # for category in clean_categories:
             #     get_world_embedding(category)
-            if name in self.metadata.type_column[Types.BOOL]:
+            if name in self.metadata.column_kind[DataKind.BOOL]:
                 continue
             self.metadata.categorical_metadata[name] = CategoricalMetadata(count=self.dataframe[name].nunique(),
                                                                            categories=set(
@@ -94,6 +96,21 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         self.model = model
+        return self
+
+    def compute_basic_types(self) -> 'DataFrameMetadataCreator':
+        for i in self.dataframe.columns:
+            self.metadata.type_column[get_basic_type(self.dataframe[i])].add(i)
+        return self
+
+    def compute_advanced_types(self) -> 'DataFrameMetadataCreator':
+        for i in self.dataframe.columns:
+            self.metadata.type_column[get_advanced_type(self.dataframe[i])].add(i)
+        return self
+
+    def compute_advanced_structural_types(self) -> 'DataFrameMetadataCreator':
+        for i in self.dataframe.columns:
+            self.metadata.type_column[get_advanced_structural_type(self.dataframe[i])].add(i)
         return self
 
     def compute_correlation(self, strong_correlation: float) -> 'DataFrameMetadataCreator':
@@ -134,8 +151,8 @@ class DataFrameMetadataCreator:
             self.metadata.column_embeddings[name] = i
         return self
 
-    def compute_data_kind(self):
-        self.metadata.colum_kind = {i: get_data_kind(self.dataframe[i]) for i in self.dataframe.columns}
+    # def compute_data_kind(self):
+    #     self.metadata.column_kind = {i: get_data_kind(self.dataframe[i]) for i in self.dataframe.columns}
 
 
    ## Getters

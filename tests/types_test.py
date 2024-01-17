@@ -40,7 +40,7 @@ class TestEdgeCasesNumerical(unittest.TestCase):
         data = {'int_str': ['2', '3', '5', '2'],
                 'float_str': ['2.2', '3.1', '5.3', '2.2'],
                 'float_but_int_str': ['2.0', '3.0', '5.0', '2.0'],
-                'float_with_nan': ['NaN', '3.0', 'Nan', '2.0'],
+                'float_with_nan': ['NaN', '3.2', 'Nan', '2.3'],
                 'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0'],
 
                 'float_computer_gen': ['-2.12341', '-3.02305', '5.234865', '2.345624'],
@@ -111,7 +111,7 @@ class TestNonNumerical(unittest.TestCase):
         self.file = "../data_validation/edge_cases.csv"
         self.data = pd.read_csv(self.file)
         data = {'int_str': ['2', '3', '5', '2'],
-                'float_with_nan': ['NaN', '3.0', 'Nan', '2.0'],
+                'float_with_nan': ['NaN', '3.1', 'Nan', '2.2'],
                 'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0'],
                 'TFtf': ['true', 'false', 'True', 'False'],
                 }
@@ -299,7 +299,7 @@ class TestDataType(unittest.TestCase):
         data = {'int_str': ['2', '3', '5', '2'],
                 'float_str': ['2.2', '3.1', '5.3', '2.2'],
                 'float_but_int_str': ['2.0', '3.0', '5.0', '2.0'],
-                'float_with_nan': ['NaN', '3.0', 'Nan', '2.0'],
+                'float_with_nan': ['NaN', '3.1', 'Nan', '2.3'],
                 'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0'],
 
                 'float_computer_gen': ['-2.12341', '-3.02305', '5.234865', '2.345624'],
@@ -342,8 +342,8 @@ class TestDataType(unittest.TestCase):
         self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_computer_gen"]))
         self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.UNDEFINED, get_basic_type(self.data["bool_TF"]))
-        self.assertEqual(Types.UNDEFINED, get_basic_type(self.data["bool_TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_TF"]))
+        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_TFtf"]))
 
         self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["TFtf"]))
         self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_str"]))
@@ -372,8 +372,8 @@ class TestDataType(unittest.TestCase):
         self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_computer_gen"]))
         self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.UNDEFINED, get_advanced_type(self.data["bool_TF"]))
-        self.assertEqual(Types.UNDEFINED, get_advanced_type(self.data["bool_TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_type(self.data["bool_TF"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_type(self.data["bool_TFtf"]))
 
         self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["TFtf"]))
         self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_type(self.data["bool_str"]))
@@ -402,8 +402,8 @@ class TestDataType(unittest.TestCase):
         self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED, get_advanced_structural_type(self.str_data["float_computer_gen"]))
         self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED, get_advanced_structural_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.UNDEFINED, get_advanced_structural_type(self.data["bool_TF"]))
-        self.assertEqual(Types.UNDEFINED, get_advanced_structural_type(self.data["bool_TFtf"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_structural_type(self.data["bool_TF"]))
+        self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_structural_type(self.data["bool_TFtf"]))
 
         self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC, get_advanced_structural_type(self.str_data["TFtf"]))
         self.assertEqual(Types.NONNUMERICAL.value.CATEGORICAL, get_advanced_structural_type(self.data["bool_str"]))

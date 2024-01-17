@@ -36,12 +36,13 @@ class DataFrameMetadata:
         self.column_names_clean = list()
         self.column_name_embeddings = {}
         self.type_column: dict[Types, set[str]] = defaultdict(set)
+        self.column_kind: dict[DataKind, set[str]] = defaultdict(set)
         self.column_categorical = list()
         self.column_incomplete = list()
         self.column_embeddings = {}
         self.correlated_columns = set()
         self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
-        self.colum_kind: dict[str, DataKind] = defaultdict()
+        # self.column_kind: dict[str, DataKind] = defaultdict()
 
     def hash(self) -> bytes:
         m = hashlib.sha256()

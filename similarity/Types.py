@@ -55,7 +55,7 @@ def is_numerical(x: pd.Series) -> bool:
         to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
     except AttributeError:
         to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
-    return to_numeric.any() and to_numeric.dtype != bool
+    return to_numeric.any() and (to_numeric.dtype == np.float64 or to_numeric.dtype == np.int64) and not to_numeric.isnull().values.all()
 
 
 def is_int(x: pd.Series) -> bool:
@@ -64,8 +64,11 @@ def is_int(x: pd.Series) -> bool:
     :param x: the series for decide
     :return: true if it is integer, otherwise false
     """
-    to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))  ## todo time efficiency we could do that before
-    return np.issubdtype(to_numeric, np.integer) or to_numeric.apply(float.is_integer).all()
+    try:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
+    except AttributeError:
+        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))  ## todo time efficiency we could do that before
+    return np.issubdtype(to_numeric, np.integer) or to_numeric.dropna().apply(float.is_integer).all()
 
 
 def is_human_gen(x: pd.Series) -> bool:
@@ -100,7 +103,7 @@ def is_not_numerical(x: pd.Series) -> bool:
      :param x: the series for decide
      :return: false if it is numerical, otherwise true
      """
-    return x.map(type).eq(str).all() and not is_numerical(x)
+    return x.apply(lambda s: str(s)).all() and not is_numerical(x)
 
 
 def is_categorical(x: pd.Series) -> bool:
@@ -128,9 +131,10 @@ def is_word(x: pd.Series) -> bool:
     """
 
     def is_str_word(word: str):
-        return word.count(" ") == 0
+        return word.strip().count(" ") == 0
 
     return x.apply(lambda s: is_str_word(s)).all()
+
 
 def is_word_by_regex(x: pd.Series, pattern: str) -> bool:
     """
@@ -145,6 +149,8 @@ def is_word_by_regex(x: pd.Series, pattern: str) -> bool:
         return False
 
     return x.apply(lambda s: is_by_regex(s)).all()
+
+
 def is_alphabetic_word(x: pd.Series) -> bool:
     """
     the word is alphabetic if contains only A-Z and a-z
@@ -154,6 +160,7 @@ def is_alphabetic_word(x: pd.Series) -> bool:
     """
     pattern = "^[A-Za-z]*$"
     return is_word_by_regex(x, pattern)
+
 
 def is_alphanumeric_word(x: pd.Series) -> bool:
     """
@@ -256,7 +263,7 @@ def is_date(column: pd.Series) -> bool:
 
     def is_str_date(word: str):
         try:
-            parse(str(word), fuzzy_with_tokens=True)
+            parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
             return True
         except ParserError:
             element = str(word).strip()
@@ -355,6 +362,7 @@ def get_advanced_structural_type(column: pd.Series) -> Any:
     if is_date(column):
         return Types.DATE
     if is_not_numerical(column):
+        column = column.apply(lambda s: str(s))
         if is_categorical(column):
             return Types.NONNUMERICAL.value.CATEGORICAL
         else:
