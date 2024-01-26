@@ -8,15 +8,32 @@ import pandas as pd
 
 
 class TypeSettings:
+    """
+    This class represents settings for deciding data types.
+
+    categorical_big_threshold is threshold for large datasets
+    categorical_small_threshold is threshold for small datasets
+    small dataset has size smaller than categorical_small_dataset
+    large dataset has size bigger than categorical_small_dataset
+
+    threshold is comparison for size of dataset minus number of uniq values divided by size
+    threshold = (size_dataset - uniq_count) / size_dataset
+
+    computer_generated_threshold is threshold for number of numbers after decimal point
+    
+    """
     categorical_big_threshold = 0.9
     categorical_small_threshold = 0.7
     categorical_small_dataset = 50
+
+    computer_generated_threshold = 3
 
 
 def is_id(column: pd.Series) -> bool:
     """
     The column is id if all values
     are uniq
+
     :param column: to check
     :return: true if the column is id
     """
@@ -26,6 +43,7 @@ def is_id(column: pd.Series) -> bool:
 def is_bool(column: pd.Series) -> bool:
     """
     If the column contains only two values it could be transferred into bool
+
     :param column: to check
     :return: true for bool column
     """
@@ -38,42 +56,52 @@ def is_bool(column: pd.Series) -> bool:
 
 def is_constant(column: pd.Series) -> bool:
     """
-    If the column contains only one value
+    If the column contains only one value, the column is constant
+
     :param column: to check
     :return: true if the values are constant
     """
     return column.nunique() == 1
 
 
-def is_numerical(x: pd.Series) -> bool:
-    """
-    Decide if np type is numerical
-    :param x: the type
-    :return: true if it is numerical, otherwise false
-    """
+def series_to_numeric(x: pd.Series):
     try:
         to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
     except AttributeError:
         to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
-    return to_numeric.any() and (to_numeric.dtype == np.float64 or to_numeric.dtype == np.int64) and not to_numeric.isnull().values.all()
+    return to_numeric
+
+
+def is_numerical(x: pd.Series) -> bool:
+    """
+    Decide if column type is numerical.
+
+    Column is numerical if it could be transferred into numeric, and it is float or int, and it is not full nulls
+
+    :param x: the type
+    :return: true if it is numerical, otherwise false
+    """
+    return x.any() and (x.dtype == np.float64 or x.dtype == np.int64) and not x.isnull().values.all()
 
 
 def is_int(x: pd.Series) -> bool:
     """
     Decide if numerical type is integer
+
+    Column is int if is subtype of integer or is float, but it could be transferred into integer.
+
     :param x: the series for decide
     :return: true if it is integer, otherwise false
     """
-    try:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
-    except AttributeError:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))  ## todo time efficiency we could do that before
-    return np.issubdtype(to_numeric, np.integer) or to_numeric.dropna().apply(float.is_integer).all()
+    return np.issubdtype(x, np.integer) or x.dropna().apply(float.is_integer).all()
 
 
 def is_human_gen(x: pd.Series) -> bool:
     """
      Decide if float number is human generated
+
+     Float is human generated if number of numbers after decimal point is smaller than computer_generated_threshold
+
      :param x: the series for decide
      :return: true if it is human generated, otherwise false
      """
@@ -89,17 +117,14 @@ def is_human_gen(x: pd.Series) -> bool:
             return len(splitted[1]) > gt
         return False
 
-    try:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
-    except AttributeError:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
-    ## todo time efficiency
-    return to_numeric.apply(lambda s: not floating_length_gt(s, 3)).all()
+    return x.apply(lambda s: not floating_length_gt(s, TypeSettings.computer_generated_threshold)).all()
 
 
 def is_not_numerical(x: pd.Series) -> bool:
     """
      Decide if  type is not numerical
+     The column is not numerical if it is not numerical and it could be transfer to string
+
      :param x: the series for decide
      :return: false if it is numerical, otherwise true
      """
@@ -124,7 +149,7 @@ def is_categorical(x: pd.Series) -> bool:
 
 def is_word(x: pd.Series) -> bool:
     """
-    the string is word if it does not have any spaces
+    The string is word if it does not have any spaces
 
     :param x: series for decide
     :return: true for word
@@ -138,7 +163,9 @@ def is_word(x: pd.Series) -> bool:
 
 def is_word_by_regex(x: pd.Series, pattern: str) -> bool:
     """
+    Decide if the word is same as regex
 
+    :param pattern: for regex
     :param x: series for decide
     :return: true if all words matches regex
     """
@@ -315,7 +342,7 @@ def get_basic_type(column: pd.Series) -> Any:
     :param column: to indicate
     :return: detected type
     """
-    if is_numerical(column):
+    if is_numerical(series_to_numeric(column)):
         return Types.NUMERICAL
     if is_date(column):  # todo what about year?
         return Types.DATE
@@ -420,3 +447,15 @@ class Types(Enum):
     NONNUMERICAL = _NonNumerical
     DATE = "date"
     UNDEFINED = "undefined"
+
+
+def get_supper_type(type_: Types) -> Types:
+    if (type_ == Types.NUMERICAL or type_ == Types.NUMERICAL.value.FLOAT or type_ == Types.NUMERICAL.value.INT or
+            type_ == Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED or
+            type_ == Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED):
+        return Types.NUMERICAL
+    if type_ == Types.DATE:
+        return Types.DATE
+    if type_ == Types.UNDEFINED:
+        return Types.UNDEFINED
+    return Types.NONNUMERICAL
