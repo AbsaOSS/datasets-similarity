@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from similarity.DataFrameMetadata import DataFrameMetadata
+from similarity.Types import DataKind
 
 
 def cosine(u, v):  ## todo move to functions.py?
@@ -145,6 +146,59 @@ class ColumnEmbeddingComparator(ComparatorType):
                 name_distance.loc[id1,id2] = 1 - cosine(metadata1.column_name_embeddings[column1],
                                                  metadata2.column_name_embeddings[column2])
         return self.concat(result, name_distance)
+
+class KindComparator(ComparatorType):
+    def compare_bools(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+        type_re = pd.DataFrame()
+        name_re = pd.DataFrame()
+        null_re = pd.DataFrame()
+        for column1 in metadata1.column_kind[DataKind.BOOL]:
+            for column2 in metadata2.column_kind[DataKind.BOOL]:
+                type_re.loc[column1][column2] = 1 if metadata1.get_column_type(column1) == metadata2.get_column_type(column2) else 0
+                name_re.loc[column1][column2] = 1 - cosine(metadata1.column_embeddings[column1], metadata2.column_embeddings[column2])
+                if metadata1.kind_metadata[column1].value == metadata2.kind_metadata[column2].value:
+                    ...# todo controla embeddings
+                null_re.loc[column1][column2] = 1 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[column2].nulls else 0
+                if metadata1.kind_metadata[column1].distribution == metadata2.kind_metadata[column2].distribution:
+                    ... # todo
+        # todo concat
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+        bools = self.compare_bools(metadata1, metadata2)
+        constants = self.compare_constants(metadata1, metadata2)
+        ids = self.compare_ids(metadata1, metadata2)
+
+    def compare_constants(self, metadata1, metadata2):
+        type_re = pd.DataFrame()
+        name_re = pd.DataFrame()
+        value_re = pd.DataFrame()
+        for column1 in metadata1.column_kind[DataKind.CONSTANT]:
+            for column2 in metadata2.column_kind[DataKind.CONSTANT]:
+                type_re.loc[column1][column2] = 1 if metadata1.get_column_type(column1) == metadata2.get_column_type(
+                    column2) else 0
+                name_re.loc[column1][column2] = 1 - cosine(metadata1.column_embeddings[column1], metadata2.column_embeddings[column2])
+                value_re.loc[column1][column2] = 1 - cosine(metadata1.kind_metadata[column1].value_embedding,
+                                                            metadata2.kind_metadata[column2].value_embedding)
+                ## todo create embeddings for values then we can compare them
+        return self.concat(type_re, name_re, value_re)
+
+    def compare_ids(self, metadata1, metadata2):
+        type_re = pd.DataFrame()
+        name_re = pd.DataFrame()
+        value_long_re = pd.DataFrame()
+        value_short_re = pd.DataFrame()
+        for column1 in metadata1.column_kind[DataKind.ID]:
+            for column2 in metadata2.column_kind[DataKind.ID]:
+                type_re.loc[column1][column2] = 1 if metadata1.get_column_type(column1) == metadata2.get_column_type(
+                    column2) else 0
+                name_re.loc[column1][column2] = 1 - cosine(metadata1.column_embeddings[column1],
+                                                           metadata2.column_embeddings[column2])
+                value_long_re.loc[column1][column2] = 1 - cosine(metadata1.kind_metadata[column1].longest_embedding,
+                                                            metadata2.kind_metadata[column2].longest_embedding)
+                value_short_re.loc[column1][column2] = 1 - cosine(metadata1.kind_metadata[column1].shortest_embedding,
+                                                                 metadata2.kind_metadata[column2].shortest_embedding)
+
+                ## todo create embeddings for longest and shortest then we can compare them
+        return self.concat(type_re, name_re, value_short_re, value_long_re)
 
 
 class Comparator:
