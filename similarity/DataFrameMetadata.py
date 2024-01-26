@@ -1,8 +1,8 @@
 import hashlib
 import pickle
 from collections import defaultdict, Counter
-from typing import Generator
-from Types import Types, DataKind
+from typing import Generator, Optional, Any
+from similarity.Types import Types, DataKind
 
 
 def dumps(value):
@@ -14,6 +14,8 @@ def dumps(value):
 class CategoricalMetadata:
     """
     Metadata for categorical columns
+    todo
+
     """
 
     def __init__(self, count: int, categories: list, categories_with_count, category_embedding):
@@ -23,10 +25,61 @@ class CategoricalMetadata:
         self.category_embedding = category_embedding
         # self.categories_embeddings = categories_embeddings
 
-    def hash(self) -> bytes:
-        return (pickle.dumps(self.count_categories) +
-                pickle.dumps(self.categories) +
-                pickle.dumps(self.categories_with_count))
+
+class KindMetadata:
+    """
+    Metadata for kind
+    value: for BOOL tuple and CONSTANT one value
+    distribution: for BOOL
+    longest: for ID
+    shortest: for ID
+    nulls: for BOOL, CONSTANT, ID
+    ratio_max_length = for CONSTANT (max value)/(size column)
+
+    todo format (uuid, rodc, visa/mastercard ...)
+    """
+
+    def __init__(self, value: Optional[tuple], distribution: Optional[tuple[int, ...]],
+                 longest: Optional[Any], shortest: Optional[Any], null_values: Optional[bool],
+                 ratio_max_length: Optional[float]):
+        self.value = value
+        self.distribution = distribution
+        self.longest = longest
+        self.shortest = shortest
+        self.nulls = null_values
+        self.ratio_max_length = ratio_max_length
+
+
+class NonnumericalMetadata:
+    """
+    Metadata for nonnumerical columns
+
+    It is store longest and shortest str, average length
+
+    It should also store bigrams, trigrams ...
+    """
+    def __init__(self, longest: str, shortest: str, avg_length: int):
+        self.longest = longest
+        self.shortest = shortest
+        self.avg_length = avg_length
+        # todo bigrams trigrams ?
+        # todo embeddings ?? nebo mame pro cele sloupce ?
+
+
+class NumericalMetadata:
+    """
+    Metadata for numerical columns
+
+    It is store range, range size, if values have the same length
+
+    It should also store distribution
+    """
+    def __init__(self, min_value: float | int,  max_value: float | int, same_value_length: bool):
+        self.min_value = min_value
+        self.max_value = max_value
+        self.range_size = max_value - min_value
+        self.same_value_length = same_value_length
+        # todo distribution !!!!!!
 
 
 class DataFrameMetadata:
@@ -37,57 +90,18 @@ class DataFrameMetadata:
         self.column_name_embeddings = {}
         self.type_column: dict[Types, set[str]] = defaultdict(set)
         self.column_kind: dict[DataKind, set[str]] = defaultdict(set)
-        self.column_categorical = list()
         self.column_incomplete = list()
         self.column_embeddings = {}
         self.correlated_columns = set()
         self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
-        # self.column_kind: dict[str, DataKind] = defaultdict()
+        self.kind_metadata: dict[str, KindMetadata] = defaultdict()
+        self.numerical_metadata: dict[str, NumericalMetadata] = defaultdict()
+        self.nonnumerical_metadata: dict[str, NonnumericalMetadata] = defaultdict()
 
-    def hash(self) -> bytes:
-        m = hashlib.sha256()
-        m.update(bytes(self.size))
-        m.update(bytes(''.join(self.column_names), 'utf-8'))
-        m.update(bytes(''.join(self.column_names_clean), 'utf-8'))
-        m.update(bytes(self.column_name_embeddings))
-        for i in self.column_embeddings.values():
-            m.update(bytes(i))
-        m.update(bytes(''.join(dumps(self.column_categorical)), 'utf-8'))  ## does nothing
-        # m.update(bytes(str(list(self.type_column.keys())) + str(list(self.type_column.values())), 'utf-8'))
-        return m.digest()
-
-    # def compare_dict_of_lists(self, dictionary, other):
-    #     if len(other) is not len(dictionary):
-    #         return False
-    #     for key, value in dictionary.items():
-    #         if key in other.keys():
-    #             if not Counter(other[key]) == Counter(value):
-    #                 return False
-    #         else:
-    #             return False
-    #     return True
-    #
-    # def compare_list_of_lists(self, this, other):
-    #     if len(this) is not len(other):
-    #         return False
-    #     for t, o in zip(this, other):
-    #         if not Counter(t) == Counter(o):
-    #             return False
-    #     return True
-    #
-    # def __eq__(self, other):
-    #     to_return = (
-    #         self.size == other.size,
-    #         self.compare_dict_of_lists(self.column_embeddings, other.column_embeddings),
-    #         self.compare_dict_of_lists(self.type_column, other.type_column),
-    #         Counter(self.column_names) == Counter(other.column_names),
-    #         Counter(self.column_names_clean) == Counter(other.column_names_clean),
-    #         self.compare_dict_of_lists(self.column_name_embeddings, other.column_name_embeddings),
-    #         # Counter(self.column_name_embeddings) == Counter(other.column_name_embeddings),
-    #         Counter(list(self.column_categorical)) == Counter(list(other.column_categorical)),
-    #         Counter(list(self.column_incomplete)) == Counter(list(other.column_incomplete)),
-    #         Counter(self.correlated_columns) == Counter(other.correlated_columns))
-    #     return all(to_return)
+    def get_column_type(self, name):
+        for column_type, columns in self.type_column.items():
+            if name in columns:
+                return column_type
 
     def get_column_names_by_type(self, *types):
         columns = []
@@ -96,4 +110,7 @@ class DataFrameMetadata:
         return columns
 
     def get_numerical_columns_names(self):
-        return self.get_column_names_by_type(Types.NUMERICAL, Types.FLOAT, Types.INT)
+        return self.get_column_names_by_type(Types.NUMERICAL, Types.NUMERICAL.value.FLOAT,
+                                             Types.NUMERICAL.value.INT,
+                                             Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED,
+                                             Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED)
