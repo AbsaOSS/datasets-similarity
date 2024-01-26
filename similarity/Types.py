@@ -294,6 +294,8 @@ def get_data_kind(column: pd.Series) -> "DataKind":
         return DataKind.ID
     if is_constant(column):
         return DataKind.CONSTANT
+    if is_categorical(column):
+        return DataKind.CATEGORICAL
     else:
         return DataKind.UNDEFINED
 
@@ -303,6 +305,7 @@ class DataKind(Enum):
     ID = "id"
     CONSTANT = "constant"
     UNDEFINED = "undefined"
+    CATEGORICAL = "categorical"
 
 
 def get_basic_type(column: pd.Series) -> Any:
@@ -324,63 +327,59 @@ def get_basic_type(column: pd.Series) -> Any:
 
 def get_advanced_type(column: pd.Series) -> Any:
     """
-    Indicates type of column int, float, date, text, categorical
+    Indicates type of column int, float, date, text
 
     :param column: to indicate
     :return: detected type
     """
-    if is_numerical(column):
-        if is_int(column):
+    column_num = series_to_numeric(column)
+    if is_numerical(column_num):
+        if is_int(column_num):
             return Types.NUMERICAL.value.INT
         else:
             return Types.NUMERICAL.value.FLOAT
     if is_date(column):  # todo what about year?
         return Types.DATE
     if is_not_numerical(column):
-        if is_categorical(column):
-            return Types.NONNUMERICAL.value.CATEGORICAL
-        else:
-            return Types.NONNUMERICAL.value.TEXT
+        return Types.NONNUMERICAL.value.TEXT
     else:
         return Types.UNDEFINED
 
 
 def get_advanced_structural_type(column: pd.Series) -> Any:
     """
-    Indicates type of column int, float - human, computer, date, text - word, sentence, phrase article, multiple, categorical
+    Indicates type of column int, float - human, computer, date, text - word, sentence, phrase article, multiple
 
     :param column: to indicate
     :return: detected type
     """
-    if is_numerical(column):
-        if is_int(column):
+    column_num = series_to_numeric(column)
+    if is_numerical(column_num):
+        if is_int(column_num):
             return Types.NUMERICAL.value.INT
         else:
-            if is_human_gen(column):
+            if is_human_gen(column_num):
                 return Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED
             return Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED
     if is_date(column):
         return Types.DATE
     if is_not_numerical(column):
         column = column.apply(lambda s: str(s))
-        if is_categorical(column):
-            return Types.NONNUMERICAL.value.CATEGORICAL
-        else:
-            if is_word(column):
-                if is_alphabetic_word(column):
-                    return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC
-                if is_alphanumeric_word(column):
-                    return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC
-                return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL
-            if is_true_multiple(column):
-                return Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES
-            if is_sentence(column):
-                return Types.NONNUMERICAL.value.TEXT.value.SENTENCE
-            if is_phrase(column):
-                return Types.NONNUMERICAL.value.TEXT.value.PHRASE
-            if is_article(column):
-                return Types.NONNUMERICAL.value.TEXT.value.ARTICLE
-            return Types.NONNUMERICAL.value.TEXT
+        if is_word(column):
+            if is_alphabetic_word(column):
+                return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC
+            if is_alphanumeric_word(column):
+                return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC
+            return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL
+        if is_true_multiple(column):
+            return Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES
+        if is_sentence(column):
+            return Types.NONNUMERICAL.value.TEXT.value.SENTENCE
+        if is_phrase(column):
+            return Types.NONNUMERICAL.value.TEXT.value.PHRASE
+        if is_article(column):
+            return Types.NONNUMERICAL.value.TEXT.value.ARTICLE
+        return Types.NONNUMERICAL.value.TEXT
     else:
         return Types.UNDEFINED
 
@@ -393,11 +392,6 @@ class _Float(Enum):
 class _Numerical(Enum):
     FLOAT = _Float
     INT = "int"
-
-
-class _Categorical(Enum):
-    ORDINAL = "ordinal"
-    NOMINAL = "nominal"
 
 
 class _Word(Enum):
@@ -415,7 +409,6 @@ class _Text(Enum):
 
 
 class _NonNumerical(Enum):
-    CATEGORICAL = _Categorical
     TEXT = _Text
 
 
