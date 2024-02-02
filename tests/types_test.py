@@ -5,8 +5,9 @@ from dateutil.parser import parse
 
 from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKind, is_constant, is_int, is_human_gen, \
     is_not_numerical, is_categorical, is_word, is_phrase, is_sentence, is_article, is_multiple, is_date, \
-    is_true_multiple, get_basic_type, Types, get_advanced_type, is_alphabetic_word, is_alphanumeric_word, \
-    get_advanced_structural_type, get_supper_type, series_to_numeric
+    is_true_multiple, get_basic_type, get_advanced_type, is_alphabetic_word, is_alphanumeric_word, \
+    get_advanced_structural_type, series_to_numeric, NUMERICAL, NONNUMERICAL, DATE, ALPHABETIC, ALL, ALPHANUMERIC, \
+    MULTIPLE_VALUES, PHRASE, SENTENCE, ARTICLE, INT, FLOAT, WORD, HUMAN_GENERATED, COMPUTER_GENERATED, UNDEFINED
 
 
 class TestID(unittest.TestCase):
@@ -348,111 +349,111 @@ class TestDataType(unittest.TestCase):
         self.str_data = pd.DataFrame(data)
 
     def test_get_basic_type(self):
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["int_str"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_but_int_str"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["bool_int"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["constant_number"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["id_column"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.data["number_int"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["int_str"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.data["bool_int"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.data["constant_number"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.data["id_column"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.data["number_int"]))
 
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_str"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_with_nan"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_with_minus"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_computer_gen"]))
-        self.assertEqual(Types.NUMERICAL, get_basic_type(self.str_data["float_rounded"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_str"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_with_nan"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_with_minus"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_computer_gen"]))
+        self.assertEqual(NUMERICAL, get_basic_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_TF"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_TFtf"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["bool_TF"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["bool_TFtf"]))
 
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["TFtf"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["bool_str"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["constant_str"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["id_text_column"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["word_all"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.data["id_column_both"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["multiple"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["sentence"]))
-        self.assertEqual(Types.NONNUMERICAL, get_basic_type(self.str_data["article"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.str_data["TFtf"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["bool_str"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["constant_str"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["id_text_column"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.str_data["word_all"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.data["id_column_both"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.str_data["multiple"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.str_data["sentence"]))
+        self.assertEqual(NONNUMERICAL, get_basic_type(self.str_data["article"]))
 
-        self.assertEqual(Types.DATE, get_basic_type(self.str_data["MM.DD.YYYY"]))
-        self.assertEqual(Types.DATE, get_basic_type(self.str_data["DDMonYYYY"]))
+        self.assertEqual(DATE, get_basic_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(DATE, get_basic_type(self.str_data["DDMonYYYY"]))
 
     def test_get_advanced_type(self):
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.str_data["int_str"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.str_data["float_but_int_str"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["bool_int"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["constant_number"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["id_column"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_type(self.data["number_int"]))
+        self.assertEqual(INT, get_advanced_type(self.str_data["int_str"]))
+        self.assertEqual(INT, get_advanced_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(INT, get_advanced_type(self.data["bool_int"]))
+        self.assertEqual(INT, get_advanced_type(self.data["constant_number"]))
+        self.assertEqual(INT, get_advanced_type(self.data["id_column"]))
+        self.assertEqual(INT, get_advanced_type(self.data["number_int"]))
 
-        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_str"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_with_nan"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_with_minus"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_computer_gen"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT, get_advanced_type(self.str_data["float_rounded"]))
+        self.assertEqual(FLOAT, get_advanced_type(self.str_data["float_str"]))
+        self.assertEqual(FLOAT, get_advanced_type(self.str_data["float_with_nan"]))
+        self.assertEqual(FLOAT, get_advanced_type(self.str_data["float_with_minus"]))
+        self.assertEqual(FLOAT, get_advanced_type(self.str_data["float_computer_gen"]))
+        self.assertEqual(FLOAT, get_advanced_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["bool_TF"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["bool_TFtf"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["bool_TF"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["bool_TFtf"]))
 
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["TFtf"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["bool_str"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["constant_str"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["id_text_column"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["word_all"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.data["id_column_both"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["multiple"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["sentence"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT, get_advanced_type(self.str_data["article"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.str_data["TFtf"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["bool_str"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["constant_str"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["id_text_column"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.str_data["word_all"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.data["id_column_both"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.str_data["multiple"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.str_data["sentence"]))
+        self.assertEqual(NONNUMERICAL, get_advanced_type(self.str_data["article"]))
 
-        self.assertEqual(Types.DATE, get_advanced_type(self.str_data["MM.DD.YYYY"]))
-        self.assertEqual(Types.DATE, get_advanced_type(self.str_data["DDMonYYYY"]))
+        self.assertEqual(DATE, get_advanced_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(DATE, get_advanced_type(self.str_data["DDMonYYYY"]))
 
     def test_get_advanced_structural_type(self):
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.str_data["int_str"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.str_data["float_but_int_str"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["bool_int"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["constant_number"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["id_column"]))
-        self.assertEqual(Types.NUMERICAL.value.INT, get_advanced_structural_type(self.data["number_int"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.str_data["int_str"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.str_data["float_but_int_str"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.data["bool_int"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.data["constant_number"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.data["id_column"]))
+        self.assertEqual(INT, get_advanced_structural_type(self.data["number_int"]))
 
-        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED,
+        self.assertEqual(HUMAN_GENERATED,
                          get_advanced_structural_type(self.str_data["float_str"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED,
+        self.assertEqual(HUMAN_GENERATED,
                          get_advanced_structural_type(self.str_data["float_with_nan"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED,
+        self.assertEqual(HUMAN_GENERATED,
                          get_advanced_structural_type(self.str_data["float_with_minus"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED,
+        self.assertEqual(COMPUTER_GENERATED,
                          get_advanced_structural_type(self.str_data["float_computer_gen"]))
-        self.assertEqual(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED,
+        self.assertEqual(COMPUTER_GENERATED,
                          get_advanced_structural_type(self.str_data["float_rounded"]))
 
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC,
+        self.assertEqual(ALPHABETIC,
                          get_advanced_structural_type(self.data["bool_TF"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC,
+        self.assertEqual(ALPHABETIC,
                          get_advanced_structural_type(self.data["bool_TFtf"]))
 
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC,
+        self.assertEqual(ALPHABETIC,
                          get_advanced_structural_type(self.str_data["TFtf"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC,
+        self.assertEqual(ALPHABETIC,
                          get_advanced_structural_type(self.data["bool_str"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC, get_advanced_structural_type(self.data["constant_str"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC,
+        self.assertEqual(ALPHABETIC, get_advanced_structural_type(self.data["constant_str"]))
+        self.assertEqual(ALPHABETIC,
                          get_advanced_structural_type(self.data["id_text_column"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL,
+        self.assertEqual(ALL,
                          get_advanced_structural_type(self.str_data["word_all"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC,
+        self.assertEqual(ALPHANUMERIC,
                          get_advanced_structural_type(self.data["id_column_both"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES,
+        self.assertEqual(MULTIPLE_VALUES,
                          get_advanced_structural_type(self.str_data["multiple"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.PHRASE,
+        self.assertEqual(PHRASE,
                          get_advanced_structural_type(self.str_data["phrase"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.SENTENCE,
+        self.assertEqual(SENTENCE,
                          get_advanced_structural_type(self.str_data["sentence"]))
-        self.assertEqual(Types.NONNUMERICAL.value.TEXT.value.ARTICLE,
+        self.assertEqual(ARTICLE,
                          get_advanced_structural_type(self.str_data["article"]))
 
-        self.assertEqual(Types.DATE, get_advanced_structural_type(self.str_data["MM.DD.YYYY"]))
-        self.assertEqual(Types.DATE, get_advanced_structural_type(self.str_data["DDMonYYYY"]))
+        self.assertEqual(DATE, get_advanced_structural_type(self.str_data["MM.DD.YYYY"]))
+        self.assertEqual(DATE, get_advanced_structural_type(self.str_data["DDMonYYYY"]))
 
 
 class TestDateTime(unittest.TestCase):
@@ -499,40 +500,39 @@ class TestDateTime(unittest.TestCase):
 
 class TestTypesComparing(unittest.TestCase):
     def test_basic_types(self):
-        self.assertTrue(issubclass(type(Types.NUMERICAL), Types))
-        self.assertTrue(issubclass(type(Types.DATE), Types))
-        self.assertTrue(issubclass(type(Types.NONNUMERICAL), Types))
 
-        self.assertNotEqual(Types.NONNUMERICAL, Types.DATE)
-        self.assertNotEqual(Types.NONNUMERICAL, Types.NUMERICAL)
-        self.assertNotEqual(Types.NUMERICAL, Types.DATE)
+        self.assertNotEqual(NONNUMERICAL, DATE)
+        self.assertNotEqual(NONNUMERICAL, NUMERICAL)
+        self.assertNotEqual(NUMERICAL, DATE)
 
-        self.assertEqual(Types.NUMERICAL, Types.NUMERICAL)
-        self.assertEqual(Types.DATE, Types.DATE)
-        self.assertEqual(Types.NONNUMERICAL, Types.NONNUMERICAL)
+        self.assertEqual(NUMERICAL, NUMERICAL)
+        self.assertEqual(DATE, DATE)
+        self.assertEqual(NONNUMERICAL, NONNUMERICAL)
 
     def test_advanced_types(self):
-        self.assertTrue(get_supper_type(Types.NUMERICAL.value.INT), Types.NUMERICAL)
-        self.assertTrue(get_supper_type(Types.NUMERICAL.value.FLOAT), Types.NUMERICAL)
-        self.assertTrue(get_supper_type(Types.NUMERICAL), Types.NUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.UNDEFINED), Types.UNDEFINED)
-        self.assertTrue(get_supper_type(Types.DATE), Types.DATE)
+        self.assertTrue(issubclass(INT, NUMERICAL))
+        self.assertTrue(issubclass(FLOAT, NUMERICAL))
+        self.assertTrue(issubclass(NUMERICAL, NUMERICAL))
+        self.assertTrue(issubclass(NONNUMERICAL, NONNUMERICAL))
+        self.assertTrue(issubclass(NONNUMERICAL, NONNUMERICAL))
+        self.assertTrue(issubclass(UNDEFINED, UNDEFINED))
+        self.assertTrue(issubclass(DATE, DATE))
 
     def test_structural_types(self):
-        self.assertTrue(get_supper_type(Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED), Types.NUMERICAL)
-        self.assertTrue(get_supper_type(Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED), Types.NUMERICAL)
+        self.assertTrue(issubclass(HUMAN_GENERATED, NUMERICAL))
+        self.assertTrue(issubclass(COMPUTER_GENERATED, NUMERICAL))
+        self.assertFalse(issubclass(HUMAN_GENERATED, NONNUMERICAL))
+        self.assertFalse(issubclass(COMPUTER_GENERATED, NONNUMERICAL))
 
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.WORD), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.PHRASE), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.ARTICLE), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.SENTENCE), Types.NONNUMERICAL)
+        self.assertTrue(issubclass(MULTIPLE_VALUES, NONNUMERICAL))
+        self.assertTrue(issubclass(WORD, NONNUMERICAL))
+        self.assertTrue(issubclass(PHRASE, NONNUMERICAL))
+        self.assertTrue(issubclass(ARTICLE, NONNUMERICAL))
+        self.assertTrue(issubclass(SENTENCE, NONNUMERICAL))
 
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL), Types.NONNUMERICAL)
-        self.assertTrue(get_supper_type(Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC), Types.NONNUMERICAL)
+        self.assertTrue(issubclass(ALPHABETIC, NONNUMERICAL))
+        self.assertTrue(issubclass(ALL, NONNUMERICAL))
+        self.assertTrue(issubclass(ALPHANUMERIC, NONNUMERICAL))
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,7 +2,7 @@ import hashlib
 import pickle
 from collections import defaultdict, Counter
 from typing import Generator, Optional, Any
-from similarity.Types import Types, DataKind
+from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL
 
 
 def dumps(value):
@@ -34,7 +34,7 @@ class KindMetadata:
     longest: for ID
     shortest: for ID
     nulls: for BOOL, CONSTANT, ID
-    ratio_max_length = for CONSTANT (max value)/(size column)
+    ratio_max_length = for ID (max value)/(size column)
 
     todo format (uuid, rodc, visa/mastercard ...)
     """
@@ -110,7 +110,7 @@ class DataFrameMetadata:
         return columns
 
     def get_numerical_columns_names(self):
-        return self.get_column_names_by_type(Types.NUMERICAL, Types.NUMERICAL.value.FLOAT,
-                                             Types.NUMERICAL.value.INT,
-                                             Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED,
-                                             Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED)
+        return self.get_column_names_by_type(NUMERICAL, FLOAT,
+                                             INT,
+                                             HUMAN_GENERATED,
+                                             COMPUTER_GENERATED)

@@ -9,8 +9,9 @@ from sentence_transformers import SentenceTransformer
 
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
-from similarity.Types import Types, get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind, \
-    DataKind, get_supper_type, series_to_numeric
+from similarity.Types import get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind, \
+    DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, \
+    ALPHANUMERIC, ALPHABETIC
 
 
 class DataFrameMetadataCreator:
@@ -88,12 +89,12 @@ class DataFrameMetadataCreator:
         :param name: name of the column
         :return: None
         """
-        if get_supper_type(type_) == Types.NUMERICAL:
+        if issubclass(type_, NUMERICAL):
             column = series_to_numeric(column)
             self.metadata.numerical_metadata[name] = NumericalMetadata(
                 column.min(), column.max(), (column.astype(str).str.len().nunique() == 1)
             )
-        elif get_supper_type(type_) == Types.NONNUMERICAL:
+        elif issubclass(type_, NONNUMERICAL):
             self.metadata.nonnumerical_metadata[name] = NonnumericalMetadata(
                 column[column.astype(str).str.len().idxmax()],  # longest string
                 column[column.astype(str).str.len().idxmin()],  # shortest string
@@ -215,7 +216,7 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         if types is None:
-            types = [Types.STRING, Types.TEXT, Types.UNDEFINED]
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC ] ## todo
         sentences = []
         names = []
         for i in types:

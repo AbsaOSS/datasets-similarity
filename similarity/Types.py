@@ -343,13 +343,13 @@ def get_basic_type(column: pd.Series) -> Any:
     :return: detected type
     """
     if is_numerical(series_to_numeric(column)):
-        return Types.NUMERICAL
+        return NUMERICAL
     if is_date(column):  # todo what about year?
-        return Types.DATE
+        return DATE
     if is_not_numerical(column):
-        return Types.NONNUMERICAL
+        return NONNUMERICAL
     else:
-        return Types.UNDEFINED
+        return UNDEFINED
 
 
 def get_advanced_type(column: pd.Series) -> Any:
@@ -362,15 +362,15 @@ def get_advanced_type(column: pd.Series) -> Any:
     column_num = series_to_numeric(column)
     if is_numerical(column_num):
         if is_int(column_num):
-            return Types.NUMERICAL.value.INT
+            return INT
         else:
-            return Types.NUMERICAL.value.FLOAT
+            return FLOAT
     if is_date(column):  # todo what about year?
-        return Types.DATE
+        return DATE
     if is_not_numerical(column):
-        return Types.NONNUMERICAL.value.TEXT
+        return NONNUMERICAL
     else:
-        return Types.UNDEFINED
+        return UNDEFINED
 
 
 def get_advanced_structural_type(column: pd.Series) -> Any:
@@ -383,79 +383,151 @@ def get_advanced_structural_type(column: pd.Series) -> Any:
     column_num = series_to_numeric(column)
     if is_numerical(column_num):
         if is_int(column_num):
-            return Types.NUMERICAL.value.INT
+            return INT
         else:
             if is_human_gen(column_num):
-                return Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED
-            return Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED
+                return HUMAN_GENERATED
+            return COMPUTER_GENERATED
     if is_date(column):
-        return Types.DATE
+        return DATE
     if is_not_numerical(column):
         column = column.apply(lambda s: str(s))
         if is_word(column):
             if is_alphabetic_word(column):
-                return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHABETIC
+                return ALPHABETIC
             if is_alphanumeric_word(column):
-                return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALPHANUMERIC
-            return Types.NONNUMERICAL.value.TEXT.value.WORD.value.ALL
+                return ALPHANUMERIC
+            return ALL
         if is_true_multiple(column):
-            return Types.NONNUMERICAL.value.TEXT.value.MULTIPLE_VALUES
+            return MULTIPLE_VALUES
         if is_sentence(column):
-            return Types.NONNUMERICAL.value.TEXT.value.SENTENCE
+            return SENTENCE
         if is_phrase(column):
-            return Types.NONNUMERICAL.value.TEXT.value.PHRASE
+            return PHRASE
         if is_article(column):
-            return Types.NONNUMERICAL.value.TEXT.value.ARTICLE
-        return Types.NONNUMERICAL.value.TEXT
+            return ARTICLE
+        return NONNUMERICAL
     else:
-        return Types.UNDEFINED
+        return UNDEFINED
 
 
-class _Float(Enum):
-    HUMAN_GENERATED = "human_generated"
-    COMPUTER_GENERATED = "computer_generated"
+# class _Float(Enum):
+#     HUMAN_GENERATED = "human_generated"
+#     COMPUTER_GENERATED = "computer_generated"
+#
+#
+# class _Numerical(Enum):
+#     FLOAT = _Float
+#     INT = "int"
+#
+#
+# class _Word(Enum):
+#     ALPHABETIC = "alphabetic"
+#     ALPHANUMERIC = "alphanumeric"
+#     ALL = "all"
+#
+#
+# class _Text(Enum):
+#     WORD = _Word
+#     SENTENCE = "sentence"
+#     PHRASE = "phrase"  # max 4 words without punctuation
+#     ARTICLE = "article"
+#     MULTIPLE_VALUES = "multiple"  # genres name : "Action, Adventure, Drama"
+#
+#
+# class _NonNumerical(Enum):
+#     TEXT = _Text
+#
+#
+# class Types(Enum):
+#     """
+#     Enum class representing column type
+#     """
+#     NUMERICAL = _Numerical
+#     NONNUMERICAL = _NonNumerical
+#     DATE = "date"
+#     UNDEFINED = "undefined"
 
 
-class _Numerical(Enum):
-    FLOAT = _Float
-    INT = "int"
+class Type:
+    def __init__(self, value):
+        self.value = value  ## todo add values ?
 
 
-class _Word(Enum):
-    ALPHABETIC = "alphabetic"
-    ALPHANUMERIC = "alphanumeric"
-    ALL = "all"
+class DATE(Type):
+    pass
 
 
-class _Text(Enum):
-    WORD = _Word
-    SENTENCE = "sentence"
-    PHRASE = "phrase"  # max 4 words without punctuation
-    ARTICLE = "article"
-    MULTIPLE_VALUES = "multiple"  # genres name : "Action, Adventure, Drama"
+class UNDEFINED(Type):
+    pass
 
 
-class _NonNumerical(Enum):
-    TEXT = _Text
+class NUMERICAL(Type):
+    pass
 
 
-class Types(Enum):
-    """
-    Enum class representing column type
-    """
-    NUMERICAL = _Numerical
-    NONNUMERICAL = _NonNumerical
-    DATE = "date"
-    UNDEFINED = "undefined"
+class INT(NUMERICAL):
+    pass
 
 
-def get_supper_type(type_: Types) -> Types:
-    if (type_ == Types.NUMERICAL or type_ == Types.NUMERICAL.value.FLOAT or type_ == Types.NUMERICAL.value.INT or
-            type_ == Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED or
-            type_ == Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED):
-        return Types.NUMERICAL
-    if type_ == Types.DATE:
-        return Types.DATE
-    if type_ == Types.UNDEFINED:
-        return Types.UNDEFINED
-    return Types.NONNUMERICAL
+class FLOAT(NUMERICAL):
+    pass
+
+
+class HUMAN_GENERATED(FLOAT):
+    pass
+
+
+class COMPUTER_GENERATED(FLOAT):
+    pass
+
+
+class NONNUMERICAL(Type):
+    pass
+
+
+class WORD(NONNUMERICAL):
+    pass
+
+
+class ALPHABETIC(WORD):
+    pass
+
+
+class ALPHANUMERIC(WORD):
+    pass
+
+
+class ALL(WORD):
+    pass
+
+
+class SENTENCE(NONNUMERICAL):
+    pass
+
+
+class ARTICLE(NONNUMERICAL):
+    pass
+
+
+class PHRASE(NONNUMERICAL):
+    pass
+
+
+class MULTIPLE_VALUES(NONNUMERICAL):
+    pass
+
+
+# def get_super_type(type_: Types) -> Types:
+#     if (type_ == Types.NUMERICAL or type_ == Types.NUMERICAL.value.FLOAT or type_ == Types.NUMERICAL.value.INT or
+#             type_ == Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED or
+#             type_ == Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED):
+#         return Types.NUMERICAL
+#     if type_ == Types.DATE:
+#         return Types.DATE
+#     if type_ == Types.UNDEFINED:
+#         return Types.UNDEFINED
+#     return Types.NONNUMERICAL
+#
+#
+# x = Types.NUMERICAL.value

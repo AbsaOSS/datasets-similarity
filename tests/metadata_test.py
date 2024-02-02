@@ -2,9 +2,8 @@ import unittest
 
 import pandas as pd
 
-
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
-from similarity.Types import Types
+from similarity.Types import (INT, HUMAN_GENERATED, ALPHABETIC, ALPHANUMERIC, NUMERICAL, NONNUMERICAL)
 
 
 class TestGetColumnType(unittest.TestCase):
