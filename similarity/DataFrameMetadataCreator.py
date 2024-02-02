@@ -63,22 +63,22 @@ class DataFrameMetadataCreator:
             null_values = True if len(column) != count.iloc[0] + count.iloc[1] else False
             return KindMetadata(tuple([count.keys()[0], count.keys()[1]]),
                                 self.__normalize(count.iloc[0], count.iloc[1]),
-                                None, None, null_values)
+                                None, None, null_values, None)
         if kind == DataKind.ID:
             null_values = True if column.nunique() != len(column) else False
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
-            return KindMetadata(None, None, longest, shortest, null_values)
+            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max()/column.size)
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
                 return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True)
+                                    None, None, True, None)
             else:
-                return KindMetadata(tuple(column.dropna().unique()[0], ), None, None, None, False)
+                return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None)
 
-    def __compute_type_metadata(self, type_: Types, column: pd.Series, name: str) -> None:
+    def __compute_type_metadata(self, type_: Type, column: pd.Series, name: str) -> None:
         """
         Compute metadata for numerical and nonnumerical columns
         column.str.len().nunique() == 1 returns len for each element in series, then we count number of uniq values

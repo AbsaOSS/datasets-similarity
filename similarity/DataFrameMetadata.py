@@ -84,19 +84,28 @@ class NumericalMetadata:
 
 class DataFrameMetadata:
     def __init__(self):
+        ## default
         self.size = int
         self.column_names = list()
         self.column_names_clean = list()
-        self.column_name_embeddings = {}
-        self.type_column: dict[Types, set[str]] = defaultdict(set)
-        self.column_kind: dict[DataKind, set[str]] = defaultdict(set)
         self.column_incomplete = list()
-        self.column_embeddings = {}
-        self.correlated_columns = set()
-        self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
-        self.kind_metadata: dict[str, KindMetadata] = defaultdict()
+        self.correlated_columns = set()         # todo
+
+        ## compute_*_type
+        self.type_column: dict[Type, set[str]] = defaultdict(set)
         self.numerical_metadata: dict[str, NumericalMetadata] = defaultdict()
         self.nonnumerical_metadata: dict[str, NonnumericalMetadata] = defaultdict()
+
+        ## compute_column_kind
+        self.column_kind: dict[DataKind, set[str]] = defaultdict(set)
+        self.kind_metadata: dict[str, KindMetadata] = defaultdict()
+        self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
+
+        ## compute_column_names_embeddings
+        self.column_name_embeddings = {}
+
+        ##create_column_embeddings
+        self.column_embeddings = {}
 
     def get_column_type(self, name):
         for column_type, columns in self.type_column.items():
