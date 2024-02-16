@@ -1,6 +1,4 @@
-import hashlib
-import pickle
-from collections import defaultdict, Counter
+from collections import defaultdict
 from typing import Generator, Optional, Any
 from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL
 
@@ -41,11 +39,14 @@ class KindMetadata:
 
     def __init__(self, value: Optional[tuple], distribution: Optional[tuple[int, ...]],
                  longest: Optional[Any], shortest: Optional[Any], null_values: Optional[bool],
-                 ratio_max_length: Optional[float]):
+                 ratio_max_length: Optional[float], model):
         self.value = value
+        self.value_embeddings = None if value is None or value[0] is not str else model.encode(list(value))
         self.distribution = distribution
         self.longest = longest
         self.shortest = shortest
+        self.longest_embeddings = None if value is None or value[0] is not str else model.encode(longest)
+        self.shortest_embeddings = None if value is None or value[0] is not str else model.encode(shortest)
         self.nulls = null_values
         self.ratio_max_length = ratio_max_length
 
@@ -58,6 +59,7 @@ class NonnumericalMetadata:
 
     It should also store bigrams, trigrams ...
     """
+
     def __init__(self, longest: str, shortest: str, avg_length: int):
         self.longest = longest
         self.shortest = shortest
@@ -74,7 +76,8 @@ class NumericalMetadata:
 
     It should also store distribution
     """
-    def __init__(self, min_value: float | int,  max_value: float | int, same_value_length: bool):
+
+    def __init__(self, min_value: float | int, max_value: float | int, same_value_length: bool):
         self.min_value = min_value
         self.max_value = max_value
         self.range_size = max_value - min_value
@@ -84,27 +87,27 @@ class NumericalMetadata:
 
 class DataFrameMetadata:
     def __init__(self):
-        ## default
+        # default
         self.size = int
-        self.column_names = list()
-        self.column_names_clean = list()
-        self.column_incomplete = list()
-        self.correlated_columns = set()         # todo
+        self.column_names: list[str] = list()
+        self.column_names_clean: list[str] = list()
+        self.column_incomplete: list[bool] = list()
+        self.correlated_columns = set()  # todo
 
-        ## compute_*_type
+        # compute_*_type
         self.type_column: dict[Type, set[str]] = defaultdict(set)
         self.numerical_metadata: dict[str, NumericalMetadata] = defaultdict()
         self.nonnumerical_metadata: dict[str, NonnumericalMetadata] = defaultdict()
 
-        ## compute_column_kind
+        # compute_column_kind
         self.column_kind: dict[DataKind, set[str]] = defaultdict(set)
         self.kind_metadata: dict[str, KindMetadata] = defaultdict()
         self.categorical_metadata: dict[str, CategoricalMetadata] = defaultdict()
 
-        ## compute_column_names_embeddings
+        # compute_column_names_embeddings
         self.column_name_embeddings = {}
 
-        ##create_column_embeddings
+        # create_column_embeddings
         self.column_embeddings = {}
 
     def get_column_type(self, name):

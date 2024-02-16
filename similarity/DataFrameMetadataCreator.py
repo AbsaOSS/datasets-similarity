@@ -31,7 +31,7 @@ class DataFrameMetadataCreator:
         :param dataframe: DataFrame from which we will create metadata
 
         size of metadata will be set to number of DataFrames rows
-        column_names_clean will be set to column names with only letters and numbers
+        column_names_clean will be set to column names with only letters and numbers, in lower case
         column_name_embeddings will be created by using vector embedding model
         type_column - each type will have list of names of columns with this specific type
         column_categorical - list of booleans, for each column list will contain
@@ -44,7 +44,7 @@ class DataFrameMetadataCreator:
         self.model: Optional[SentenceTransformer] = SentenceTransformer('bert-base-nli-mean-tokens')
         self.metadata.size = dataframe.shape[0]
         self.metadata.column_names = list(dataframe.columns)
-        self.metadata.column_names_clean = [re.sub("[^(0-9 | a-z).]", " ", i.lower()) for i in
+        self.metadata.column_names_clean = [re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in
                                             self.metadata.column_names]
 
         self.metadata.column_incomplete = [i < self.metadata.size * 0.7 for i in
@@ -54,7 +54,15 @@ class DataFrameMetadataCreator:
         # -----------------------------------------------------------------------------------
 
     def __normalize(self, num1: int, num2: int) -> tuple[int, int]:
+        """
+        Normalize fraction, ratio between two numbers
+        :param num1:
+        :param num2:
+        :return: tuple of two numbers
+        """
         gcd = math.gcd(num1, num2)
+        if num1 > num2:
+            return int(num2/gcd), int(num1/gcd)
         return int(num1 / gcd), int(num2 / gcd)
 
     def __compute_kind_metadata(self, kind: DataKind, column: pd.Series) -> KindMetadata:
@@ -63,20 +71,20 @@ class DataFrameMetadataCreator:
             null_values = True if len(column) != count.iloc[0] + count.iloc[1] else False
             return KindMetadata(tuple([count.keys()[0], count.keys()[1]]),
                                 self.__normalize(count.iloc[0], count.iloc[1]),
-                                None, None, null_values, None)
+                                None, None, null_values, None, self.__get_model())
         if kind == DataKind.ID:
             null_values = True if column.nunique() != len(column) else False
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
-            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max()/column.size)
+            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max()/column.size, self.__get_model())
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
                 return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True, None)
+                                    None, None, True, None,  self.__get_model())
             else:
-                return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None)
+                return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None,  self.__get_model())
 
     def __compute_type_metadata(self, type_: Type, column: pd.Series, name: str) -> None:
         """
@@ -150,7 +158,6 @@ class DataFrameMetadataCreator:
                                         category_embedding=self.__get_model().encode(
                                             list(map(str, self.dataframe[i].unique()
                                                      ))))
-
         return self
 
     def compute_basic_types(self) -> 'DataFrameMetadataCreator':
