@@ -286,9 +286,27 @@ class KindComparator(ComparatorType):
             column_mins.append(min(column))
         return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
 
+    def __are_columns_null(self, column1, column2, message) -> tuple[bool, pd.DataFrame]:
+        """
+        Check if columns are empty
+        :param column1:
+        :param column2:
+        :param message:
+        :return:  tuple of bool and dataframe, if columns are empty return True
+        """
+        if len(column1) == 0 and len(column2) == 0:
+            warnings.warn(f"Warning: {message} is not present in the dataframe.")
+            return True, pd.DataFrame([0])
+        if (len(column1) == 0) != (len(column2) == 0):
+            warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
+            return True, pd.DataFrame([1])
+        return False, pd.DataFrame()
     def compare_constants(self, metadata1, metadata2):
         value_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
+        if are_nulls[0]:
+            return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CONSTANT]:
             for column2 in metadata2.column_kind[DataKind.CONSTANT]:
                 # Extract metadata for columns
@@ -317,6 +335,9 @@ class KindComparator(ComparatorType):
         value_long_re = pd.DataFrame()
         value_short_re = pd.DataFrame()
         ratio_max_re = pd.DataFrame()
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID metadata")
+        if are_nulls[0]:
+            return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.ID]:
             for column2 in metadata2.column_kind[DataKind.ID]:
                 for value_re, attribute in [(value_long_re, 'longest'), (value_short_re, 'shortest')]:
@@ -341,6 +362,9 @@ class KindComparator(ComparatorType):
         value_re = pd.DataFrame()
         distr_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL], "Boolean metadata")
+        if are_nulls[0]:
+            return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.BOOL]:
             for column2 in metadata2.column_kind[DataKind.BOOL]:
                 nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[
@@ -361,6 +385,9 @@ class KindComparator(ComparatorType):
     def compare_categorical(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
         value_re = pd.DataFrame()
         count_re = pd.DataFrame()
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL], "Categorical metadata")
+        if are_nulls[0]:
+            return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CATEGORICAL]:
             for column2 in metadata2.column_kind[DataKind.CATEGORICAL]:
                 value_re.loc[column1, column2] = self.compute_embeddings_distance(
@@ -372,7 +399,6 @@ class KindComparator(ComparatorType):
                 # todo compare categories_with_count for metadata1 and metadata2
                 # firstly normalize dictionary categories_with_count then
                 # compare the difference between the two dictionaries
-
         return self.concat(value_re, count_re)
 
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
@@ -425,11 +451,15 @@ class Comparator:
                               comp.weight
                               ))
         result = 0
+        nan = 0
         for dist, ratio, weight in distances:
             if math.isnan(dist):
+                nan += 1
                 continue
             if Settings.NO_RATIO in self.settings:
                 result += dist * dist * weight
             else:
                 result += dist * dist * ratio * weight
+        if nan == len(distances):
+            return 1
         return np.sqrt(result)
