@@ -18,3 +18,7 @@ File contains Comparator class ComparatorType class and DistanceFunction
 
 
 
+
+### todo 
+
+

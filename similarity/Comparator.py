@@ -210,8 +210,8 @@ class ColumnExactNamesComparator(ComparatorType):
         if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
             warnings.warn("Warning: column_names_clean is not computed")
         result = pd.DataFrame()
-        for idx1, name1 in enumerate(metadata1.column_names_clean):
-            for idx2, name2 in enumerate(metadata2.column_names_clean):
+        for idx1, name1 in enumerate(metadata1.column_names_clean.values()):
+            for idx2, name2 in enumerate(metadata2.column_names_clean.values()):
                 result.loc[idx1, idx2] = 0 if name1 == name2 else 1
         return result
 
@@ -250,8 +250,8 @@ class IncompleteColumnsComparator(ComparatorType):
         """
         result = pd.DataFrame()
 
-        for idx1, col1 in enumerate(metadata1.column_incomplete):
-            for idx2, col2 in enumerate(metadata2.column_incomplete):
+        for idx1, col1 in enumerate(metadata1.column_incomplete.values()):
+            for idx2, col2 in enumerate(metadata2.column_incomplete.values()):
                 result.loc[idx1, idx2] = 0 if col1 == col2 else 1
         return result
 

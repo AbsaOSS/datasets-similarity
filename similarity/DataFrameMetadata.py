@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Generator, Optional, Any
-from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL
+from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL, NONNUMERICAL, \
+    WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES
 
 
 def dumps(value):
@@ -40,6 +41,7 @@ class KindMetadata:
     def __init__(self, value: Optional[tuple], distribution: Optional[tuple[int, ...]],
                  longest: Optional[Any], shortest: Optional[Any], null_values: Optional[bool],
                  ratio_max_length: Optional[float], model):
+        self.kind_metadata = None
         self.value = value
         self.value_embeddings = None if value is None or value[0] is not str else model.encode(list(value))
         self.distribution = distribution
@@ -90,8 +92,8 @@ class DataFrameMetadata:
         # default
         self.size = int
         self.column_names: list[str] = list()
-        self.column_names_clean: list[str] = list()
-        self.column_incomplete: list[bool] = list()
+        self.column_names_clean: dict[str, str] = defaultdict()
+        self.column_incomplete: dict[str, bool] = defaultdict()
         self.correlated_columns = set()  # todo
 
         # compute_*_type
@@ -116,6 +118,9 @@ class DataFrameMetadata:
                 return column_type
 
     def get_column_names_by_type(self, *types):
+        if NONNUMERICAL in types:
+            types = list(types)
+            types.extend([WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES])
         columns = []
         for t in types:
             columns.extend(self.type_column[t])

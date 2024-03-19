@@ -7,6 +7,7 @@ import pandas as pd
 from typing import Optional
 from sentence_transformers import SentenceTransformer
 
+from column2Vec.Column2Vec import column2vec_as_sentence
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
 from similarity.Types import get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind, \
@@ -44,11 +45,11 @@ class DataFrameMetadataCreator:
         self.model: Optional[SentenceTransformer] = SentenceTransformer('bert-base-nli-mean-tokens')
         self.metadata.size = dataframe.shape[0]
         self.metadata.column_names = list(dataframe.columns)
-        self.metadata.column_names_clean = [re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in
-                                            self.metadata.column_names]
+        self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in
+                                            self.metadata.column_names}
 
-        self.metadata.column_incomplete = [i < self.metadata.size * 0.7 for i in
-                                           dataframe.count()]  # more than 30 % missing
+        self.metadata.column_incomplete = {name: i < self.metadata.size * 0.7 for i, name in
+                                           zip(dataframe.count(), list(dataframe.columns))}  # more than 30 % missing
 
         # todo correlated column
         # -----------------------------------------------------------------------------------
@@ -134,7 +135,7 @@ class DataFrameMetadataCreator:
 
         :return: self
         """
-        column_name_embeddings = self.__get_model().encode(self.metadata.column_names_clean)
+        column_name_embeddings = self.__get_model().encode(list(self.metadata.column_names_clean.values()))
         for i, name in zip(column_name_embeddings, self.metadata.column_names):
             self.metadata.column_name_embeddings[name] = i
         return self
@@ -228,14 +229,15 @@ class DataFrameMetadataCreator:
         names = []
         for i in types:
             for column in self.metadata.type_column[i]:
-                sentences.append(str(self.dataframe[column].tolist())
-                                 .replace("\'", "")
-                                 .replace("]", "")
-                                 .replace("[", ""))  # column to string
-                names.append(column)
-        column_embeddings = self.__get_model().encode(sentences)
-        for i, name in zip(column_embeddings, names):
-            self.metadata.column_embeddings[name] = i
+                self.metadata.column_embeddings[column] = column2vec_as_sentence(self.dataframe[column], self.__get_model()) ## todo is it the same ?
+        #         sentences.append(str(self.dataframe[column].tolist())
+        #                          .replace("\'", "")
+        #                          .replace("]", "")
+        #                          .replace("[", ""))  # column to string
+        #         names.append(column)
+        # column_embeddings = self.__get_model().encode(sentences)
+        # for i, name in zip(column_embeddings, names):
+        #     self.metadata.column_embeddings[name] = i
         return self
 
     ## Getters

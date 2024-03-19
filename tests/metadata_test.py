@@ -59,17 +59,29 @@ class TestGetColumnType(unittest.TestCase):
         self.assertTrue('constant_number' in self.metadata.column_names)
         self.assertTrue('float_str_comma' in self.metadata.column_names)
 
-        self.assertTrue('id column' in self.metadata.column_names_clean)
-        self.assertTrue('number int' in self.metadata.column_names_clean)
-        self.assertTrue('number int str' in self.metadata.column_names_clean)
-        self.assertTrue('number float' in self.metadata.column_names_clean)
-        self.assertTrue('number float str' in self.metadata.column_names_clean)
-        self.assertTrue('float but int' in self.metadata.column_names_clean)
-        self.assertTrue('bool int' in self.metadata.column_names_clean)
-        self.assertTrue('constant number' in self.metadata.column_names_clean)
-        self.assertTrue('float str comma' in self.metadata.column_names_clean)
+        self.assertTrue('id column' in self.metadata.column_names_clean.values())
+        self.assertTrue('number int' in self.metadata.column_names_clean.values())
+        self.assertTrue('number int str' in self.metadata.column_names_clean.values())
+        self.assertTrue('number float' in self.metadata.column_names_clean.values())
+        self.assertTrue('number float str' in self.metadata.column_names_clean.values())
+        self.assertTrue('float but int' in self.metadata.column_names_clean.values())
+        self.assertTrue('bool int' in self.metadata.column_names_clean.values())
+        self.assertTrue('constant number' in self.metadata.column_names_clean.values())
+        self.assertTrue('float str comma' in self.metadata.column_names_clean.values())
 
-        self.assertEqual(self.metadata.column_incomplete.count(True), 0)  # any incomplete column
+        self.assertEqual(sum(1 for value in self.metadata.column_incomplete.values() if value),
+                         0)  # any incomplete column
+        data = {'int_str': ['2', '3', '5', '2'],
+                'float_str': ['2.2', '3.1', '5.3', '2.2'],
+                'float_but_int_str': ['2.0', '3.0', '5.0', '2.0'],
+                'float_with_nan': ['NaN', '3.1', 'Nan', '2.3'],
+                'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0']}
+        str_data = pd.DataFrame(data)
+        str_data.float_with_nan = str_data.float_with_nan.astype(float)
+        metadata_creator = (DataFrameMetadataCreator(str_data))
+        metadata = metadata_creator.get_metadata()
+        self.assertEqual(sum(1 for value in metadata.column_incomplete.values() if value),
+                         1)  # any incomplete column
 
         # todo correlated columns
 
@@ -139,7 +151,6 @@ class TestGetColumnType(unittest.TestCase):
 
         self.assertEqual(self.metadata.categorical_metadata, {})
 
-
         ## id metadata
         self.assertTrue(self.metadata.kind_metadata['id_column_both'].longest, "AB1")
         self.assertTrue(self.metadata.kind_metadata['id_column_both'].shortest, "AB1")
@@ -153,7 +164,7 @@ class TestGetColumnType(unittest.TestCase):
         self.assertIsNone(self.metadata.kind_metadata['id_column'].value)
         self.assertIsNone(self.metadata.kind_metadata['id_column'].distribution)
         self.assertFalse(self.metadata.kind_metadata['id_column'].nulls)
-        self.assertTrue(self.metadata.kind_metadata['id_column'].ratio_max_length, 2/10)
+        self.assertTrue(self.metadata.kind_metadata['id_column'].ratio_max_length, 2 / 10)
 
         ## constant metadata
         self.assertIsNone(self.metadata.kind_metadata['constant_str'].longest)
@@ -181,14 +192,14 @@ class TestGetColumnType(unittest.TestCase):
     def test_embeddings(self):
         self.assertEqual(self.metadata.column_embeddings, {})
         self.assertEqual(self.metadata.column_name_embeddings, {})
-        self.assertIsNot(self.metadata.column_names_clean, {})
+        self.assertIsNot(self.metadata.column_names_clean.values(), {})
         self.assertIsNot(self.metadata.column_names, {})
 
         metadata = self.metadata_creator.compute_column_names_embeddings().create_column_embeddings().get_metadata()
 
         self.assertIsNot({}, metadata.column_embeddings)
         self.assertIsNot({}, metadata.column_name_embeddings)
-        self.assertIsNot({}, metadata.column_names_clean)
+        self.assertIsNot({}, metadata.column_names_clean.values())
         self.assertIsNot({}, metadata.column_names)
 
 
