@@ -24,7 +24,7 @@ Company .
 make .
 gear .
 offerType .
-fuel 
+fuel -
 transmission_type .
 fuel_type .
 car_name 
@@ -34,29 +34,29 @@ vin .
 brand .
 state .
 title_status .
-color 
-condition 
+color .
+condition .
 Certificate 
 Gross .
-Poster_Link 
-Director 
-Series_Title 
-Overview 
-Star2 
-Star3 
-Star1 
-Star4 
-Genre 
-show_id 
-cast 
-title 
-director 
-description 
-type 
-listed_in 
-rating 
-duration 
-date_added 
+Poster_Link .
+Director .
+Series_Title .
+Overview .
+Star2 .
+Star3 .
+Star1 .
+Star4 .
+Genre -
+show_id .
+cast .
+title .
+director .
+description .
+type .
+listed_in .
+rating .
+duration .
+date_added .
 ```
 # How Did I cluster by copilot 
 - I wrote: `I will send you few rows of diferent tables could you please clustered columns of these tables ?`
