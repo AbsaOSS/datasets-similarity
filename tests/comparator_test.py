@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import pandas as pd
@@ -12,6 +13,8 @@ from similarity.ComparatorByColumn import (ComparatorByColumn, SizeComparator as
                                            )
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import DataKind
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestFunctions(unittest.TestCase):
@@ -44,7 +47,8 @@ class TestFunctions(unittest.TestCase):
 class TestSingleSpecificComparator(unittest.TestCase):
     def setUp(self):
         self.compartor = Comparator()
-        self.file = "../data_validation/edge_cases.csv"
+
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         self.data_diff_column_names = self.data.copy()
         self.data_diff_column_names.columns = [f"column_{i}" for i in range(len(self.data.columns))]
@@ -154,7 +158,7 @@ class TestSingleSpecificComparator(unittest.TestCase):
 class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
     def setUp(self):
         self.compartor = ComparatorByColumn()
-        self.file = "../data_validation/edge_cases.csv"
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         self.data_diff_column_names = self.data.copy()
         self.data_diff_column_names.columns = [f"column_{i}" for i in range(len(self.data.columns))]

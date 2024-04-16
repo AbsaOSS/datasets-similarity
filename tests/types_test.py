@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import pandas as pd
@@ -9,11 +10,12 @@ from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKi
     get_advanced_structural_type, series_to_numeric, NUMERICAL, NONNUMERICAL, DATE, ALPHABETIC, ALL, ALPHANUMERIC, \
     MULTIPLE_VALUES, PHRASE, SENTENCE, ARTICLE, INT, FLOAT, WORD, HUMAN_GENERATED, COMPUTER_GENERATED, UNDEFINED
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TestID(unittest.TestCase):
     def setUp(self):
-        self.directory = "../data/"
-        self.directory_val = "../data_validation/"
+        self.directory = os.path.join(THIS_DIR, os.pardir, 'data/')
+        self.directory_val = os.path.join(THIS_DIR, os.pardir, 'data_validation/')
 
     def control_test_for_columns(self, data: pd.DataFrame, id_column: str):
         for i in data.columns:
@@ -36,7 +38,7 @@ class TestID(unittest.TestCase):
 
 class TestEdgeCasesNumerical(unittest.TestCase):
     def setUp(self):
-        self.file = "../data_validation/edge_cases.csv"
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         data = {'int_str': ['2', '3', '5', '2'],
                 'float_str': ['2.2', '3.1', '5.3', '2.2'],
@@ -109,7 +111,7 @@ class TestEdgeCasesNumerical(unittest.TestCase):
 
 class TestNonNumerical(unittest.TestCase):
     def setUp(self):
-        self.file = "../data_validation/edge_cases.csv"
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         data = {'int_str': ['2', '3', '5', '2'],
                 'float_with_nan': ['NaN', '3.1', 'Nan', '2.2'],
@@ -247,9 +249,9 @@ class TestNonNumerical(unittest.TestCase):
 
 class TestDataKind(unittest.TestCase):
     def setUp(self):
-        self.file = "../data_validation/edge_cases.csv"
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
-        file_edge = "../data_validation/edge_cases.csv"
+        file_edge = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data_edge = pd.read_csv(file_edge)
 
         data = {'TFtf': ['true', 'false', 'true', 'False', 'True'],
@@ -314,7 +316,7 @@ class TestDataKind(unittest.TestCase):
 
 class TestDataType(unittest.TestCase):
     def setUp(self):
-        self.file = "../data_validation/edge_cases.csv"
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         data = {'int_str': ['2', '3', '5', '2'],
                 'float_str': ['2.2', '3.1', '5.3', '2.2'],

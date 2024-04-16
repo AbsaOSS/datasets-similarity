@@ -1,10 +1,11 @@
+import os
 import unittest
 
 import pandas as pd
 
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import (INT, HUMAN_GENERATED, ALPHABETIC, ALPHANUMERIC, NUMERICAL, NONNUMERICAL)
-
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TestGetColumnType(unittest.TestCase):
     def setUp(self):
@@ -12,7 +13,8 @@ class TestGetColumnType(unittest.TestCase):
         # metadata: dict[str, DataFrameMetadata] = defaultdict()
         # for dataframe, name in zip(database, names):
         #     metadata[name] = DataFrameMetadataCreator(dataframe).compute_advanced_structural_types().get_metadata()
-        self.file = "../data_validation/edge_cases.csv"
+
+        self.file = os.path.join(THIS_DIR, os.pardir, 'data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
         self.metadata_creator = (DataFrameMetadataCreator(self.data).
                                  compute_advanced_structural_types().
