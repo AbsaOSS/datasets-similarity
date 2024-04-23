@@ -293,13 +293,14 @@ def is_date(column: pd.Series) -> bool:
         try:
             parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
             return True
-        except ParserError:
+        except (ParserError, OverflowError) as e:
             element = str(word).strip()
-            one_or_two = '(\d{1}|\d{2})'
-            two_or_four = '(\d{2}|\d{4})'
-            months = '(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)'
+            one_or_two = r'(\d{1}|\d{2})'
+            two_or_four = r'(\d{2}|\d{4})'
+            months = ('(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb'
+                      '|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)')
             pattern = r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months  # + '$'  # 1999,4 Feb 1999,4 February
-            pattern = pattern + '|' + r'^' + one_or_two + '\. ' + one_or_two + '\. ' + two_or_four  # 11. 4. 1999
+            pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four  # 11. 4. 1999
             pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months  # 1999,4February 1999,4Feb
             if re.match(pattern, element):
                 return True
@@ -454,70 +455,88 @@ class Type:
     def __init__(self, value):
         self.value = value  ## todo add values ?
 
+    def __str__(self):
+        return ""
+
 
 class DATE(Type):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class UNDEFINED(Type):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class NUMERICAL(Type):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class INT(NUMERICAL):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class FLOAT(NUMERICAL):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class HUMAN_GENERATED(FLOAT):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class COMPUTER_GENERATED(FLOAT):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class NONNUMERICAL(Type):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class WORD(NONNUMERICAL):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class ALPHABETIC(WORD):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class ALPHANUMERIC(WORD):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class ALL(WORD):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class SENTENCE(NONNUMERICAL):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class ARTICLE(NONNUMERICAL):
-    pass
+    def __str__(self):
+        return "DATE"
 
 
 class PHRASE(NONNUMERICAL):
-    pass
+    def __str__(self):
+        return "PHRASE"
 
 
 class MULTIPLE_VALUES(NONNUMERICAL):
-    pass
-
+    def __str__(self):
+        return "MULTIPLE_VALUES"
 
 # def get_super_type(type_: Types) -> Types:
 #     if (type_ == Types.NUMERICAL or type_ == Types.NUMERICAL.value.FLOAT or type_ == Types.NUMERICAL.value.INT or
