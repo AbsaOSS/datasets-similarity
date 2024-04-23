@@ -1,0 +1,26 @@
+Column names
+aircraft-data_nov_dec  is most similar to  Airplane_Cleaned  by  0.8323986977338791
+Airplane_Cleaned  is most similar to  autoscout24-germany-dataset  by  0.8640899062156677
+autoscout24-germany-dataset  is most similar to  USA_cars_datasets  by  1.00000003973643
+CARS_1  is most similar to  autoscout24-germany-dataset  by  0.800908217827479
+disney_movies  is most similar to  netflix_titles  by  0.8333031535148621
+exchange_rates  is most similar to  Sales_Transaction10000  by  0.9383035004138947
+imdb_top_1000  is most similar to  netflix_titles  by  0.8560600280761719
+netflix_titles  is most similar to  imdb_top_1000  by  0.9133218765258789
+Sales_Transaction10000  is most similar to  transaction_data  by  0.955013374487559
+transaction_data  is most similar to  Sales_Transaction10000  by  0.8231026291847229
+USA_cars_datasets  is most similar to  autoscout24-germany-dataset  by  0.945112923781077
+Accuracy is 1.1
+
+aircraft-data_nov_dec  is most similar to  Airplane_Cleaned  by  0.8323986977338791
+Airplane_Cleaned  is most similar to  autoscout24-germany-dataset  by  0.8640899062156677
+autoscout24-germany-dataset  is most similar to  USA_cars_datasets  by  1.00000003973643
+CARS_1  is most similar to  autoscout24-germany-dataset  by  0.800908217827479
+disney_movies  is most similar to  imdb_top_1000  by  0.8230797648429871
+exchange_rates  is most similar to  Sales_Transaction10000  by  0.9383035004138947
+imdb_top_1000  is most similar to  netflix_titles  by  0.8560600280761719
+netflix_titles  is most similar to  imdb_top_1000  by  0.9133218765258789
+Sales_Transaction10000  is most similar to  transaction_data  by  0.955013374487559
+transaction_data  is most similar to  Sales_Transaction10000  by  0.8231026291847229
+USA_cars_datasets  is most similar to  autoscout24-germany-dataset  by  0.945112923781077
+Accuracy is 1.1
