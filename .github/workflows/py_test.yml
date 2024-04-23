@@ -1,0 +1,32 @@
+name: "PyTest"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+jobs:
+  python-tests:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest tests/types_test.py
+          pytest tests/metadata_test.py
+          pytest tests/comparator_test.py
+          pytest tests/column2Vec_test.py
