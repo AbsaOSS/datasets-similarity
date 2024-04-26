@@ -6,7 +6,35 @@ on:
   pull_request:
 
 jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    name: Pylint Analysis
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pylint
+
+      - name: Analysing the code with pylint
+        run: |
+          pylint \
+            --fail-under=6.0 \
+            --ignore-patterns=test_.*?py \
+            --max-line-length=180 \
+            $(git ls-files '*.py')
+
   python-tests:
+    env:
+      TEST_FILES: test/test_types.py test/test_metadata.py test/test_comparator.py
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:
@@ -21,16 +49,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytest
           pip install -r requirements.txt
-          pip install pylint
+          pip install coverage pytest
 
       - name: Run tests
-        run: |
-          pytest test/test_types.py
-          pytest test/test_metadata.py
-          pytest test/test_comparator.py
+        run: coverage run -m pytest test/test_types.py test/test_metadata.py
 
-      - name: Analysing the code with pylint
-        run: |
-           pylint --fail-under=6.0 --ignore-patterns=test_.*?py --max-line-length=180 $(git ls-files '*.py')
+      - name: Show coverage
+        run: coverage report -m
+
+      - name: Create coverage file
+        run: coverage xml
+
+      - name: Get Cover
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}

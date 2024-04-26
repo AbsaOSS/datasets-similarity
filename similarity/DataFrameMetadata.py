@@ -52,6 +52,10 @@ class KindMetadata:
         self.nulls = null_values
         self.ratio_max_length = ratio_max_length
 
+    def __str__(self):
+        return f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest}, shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})"
+
+
 
 class NonnumericalMetadata:
     """
@@ -69,6 +73,8 @@ class NonnumericalMetadata:
         # todo bigrams trigrams ?
         # todo embeddings ?? nebo mame pro cele sloupce ?
 
+    def __str__(self):
+        return f"NonnumericalMetadata(longest={self.longest}, shortest={self.shortest}, avg_length={self.avg_length})"
 
 class NumericalMetadata:
     """
@@ -85,6 +91,9 @@ class NumericalMetadata:
         self.range_size = max_value - min_value
         self.same_value_length = same_value_length
         # todo distribution !!!!!!
+
+    def __str__(self):
+        return f"NumericalMetadata(min_value={self.min_value}, max_value={self.max_value}, range_size={self.range_size}, same_value_length={self.same_value_length})"
 
 
 class DataFrameMetadata:
@@ -116,6 +125,11 @@ class DataFrameMetadata:
         for column_type, columns in self.type_column.items():
             if name in columns:
                 return column_type
+
+    def get_column_kind(self, name):
+        for column_kind, columns in self.column_kind.items():
+            if name in columns:
+                return column_kind
 
     def get_column_names_by_type(self, *types):
         if NONNUMERICAL in types:
