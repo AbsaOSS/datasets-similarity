@@ -1,10 +1,9 @@
-name: "Column2Vec"
+name: "Column2Vec tests"
 
 on:
   schedule:
-    - cron: '38 10 * * *'
+    - cron: '0 10 * * 6'
   workflow_dispatch:
-  push:
 
 
 jobs:
@@ -19,14 +18,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-#       - name: Install dependencies
-#              run: |
-#                  pip install pytest
-#                  pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          pip install -r requirements.txt
 
       - name: Run tests
         run: |
-          echo "Hi"
-#                  pytest test/test_column2Vec.py
+          pytest test/test_column2Vec.py
 

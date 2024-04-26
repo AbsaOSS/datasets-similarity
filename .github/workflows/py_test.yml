@@ -1,4 +1,4 @@
-name: "PyTest"
+name: "Static analysis & tests"
 
 on:
   push:
@@ -34,4 +34,3 @@ jobs:
       - name: Analysing the code with pylint
         run: |
            pylint --fail-under=6.0 --ignore-patterns=test_.*?py $(git ls-files '*.py')
-#          pylint $(git ls-files '*.py')
