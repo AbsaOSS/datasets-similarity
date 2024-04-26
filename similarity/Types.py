@@ -322,7 +322,7 @@ def is_date(column: pd.Series) -> bool:
             pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
             # 1999,4February 1999,4Feb
             pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months
-            return re.match(pattern, element)
+            return bool(re.match(pattern, element))
 
     return column.apply(lambda s: is_str_date(s)).all()
 
