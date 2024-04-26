@@ -1,3 +1,6 @@
+"""
+This files contains all
+"""
 import re
 from enum import Enum
 from typing import Any
@@ -65,6 +68,11 @@ def is_constant(column: pd.Series) -> bool:
 
 
 def series_to_numeric(x: pd.Series):
+    """
+    Apply to_numeric on pd.Series
+    :param x:
+    :return: numeric series
+    """
     try:
         to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
     except AttributeError:
@@ -76,13 +84,15 @@ def is_numerical(x: pd.Series) -> bool:
     """
     Decide if column type is numerical.
 
-    Column is numerical if it could be transferred into numeric, and it is float or int, and it is not full nulls
+    Column is numerical if it could be transferred into numeric,
+    and it is float or int, and it is not full nulls
 
     :param x: the type
     :return: true if it is numerical, otherwise false
     """
-    x.isnull().values.sum() / x.size
-    return x.any() and (x.dtype == np.float64 or x.dtype == np.int64) and not (x.isnull().values.sum() / x.size > 0.9)
+    return (x.any() and
+            (x.dtype in (np.float64, np.int64)) and not
+            (x.isnull().values.sum() / x.size > 0.9))
 
 
 def is_int(x: pd.Series) -> bool:
@@ -101,7 +111,8 @@ def is_human_gen(x: pd.Series) -> bool:
     """
      Decide if float number is human generated
 
-     Float is human generated if number of numbers after decimal point is smaller than computer_generated_threshold
+     Float is human generated if number of numbers after decimal
+     point is smaller than computer_generated_threshold
 
      :param x: the series for decide
      :return: true if it is human generated, otherwise false
@@ -113,9 +124,9 @@ def is_human_gen(x: pd.Series) -> bool:
         :param num: to decide
         :param gt: threshold
         """
-        splitted = str(num).split(".")
-        if len(splitted) > 1:
-            return len(splitted[1]) > gt
+        split = str(num).split(".")
+        if len(split) > 1:
+            return len(split[1]) > gt
         return False
 
     return x.apply(lambda s: not floating_length_gt(s, TypeSettings.computer_generated_threshold)).all()
@@ -124,7 +135,7 @@ def is_human_gen(x: pd.Series) -> bool:
 def is_not_numerical(x: pd.Series) -> bool:
     """
      Decide if  type is not numerical
-     The column is not numerical if it is not numerical and it could be transfer to string
+     The column is not numerical if it is not numerical, and it could be transferred to string
 
      :param x: the series for decide
      :return: false if it is numerical, otherwise true
@@ -217,15 +228,17 @@ def is_phrase(x: pd.Series) -> bool:
 
 def is_sentence(x: pd.Series) -> bool:
     """
-    The string is sentence if it starts with uperCasse letter and end with interpunction
+    The string is sentence if it starts with upperCase letter and end with fullstops.
 
     :param x:  series for decide
     :return:  true for sentence
     """
 
     def is_str_sentence(word: str):
-        return ((word.endswith(".") or word.endswith("!") or word.endswith("?")) and word.count(".") <= 1
-                and word.count("!") <= 1 and word.count("?") <= 1) and re.search("^[A-Z]", word)
+        return (((word.endswith(".") or word.endswith("!")
+                 or word.endswith("?")) and word.count(".") <= 1
+                and word.count("!") <= 1 and word.count("?") <= 1)
+                and re.search("^[A-Z]", word))
 
     return x.apply(lambda s: is_str_sentence(s)).all()
 
@@ -252,14 +265,17 @@ def is_multiple(x: pd.Series) -> bool:
         regex = re.compile('[a-zA-Z0-9]')
         word_clean = regex.sub('', word)
         res = "".join(dict.fromkeys(word_clean))
-        return (word.count(res) == word_clean.count(res) and word_clean.count(res) > 0) or res == '' and res != ' '
+        return ((word.count(res) == word_clean.count(res)
+                and word_clean.count(res) > 0)
+                or res == '' and res != ' ')
 
     return x.apply(lambda s: is_str_multiple(s)).all()
 
 
 def is_true_multiple(x: pd.Series) -> bool:
     """
-    The string is true multiple if the record is split by some sequence and the sequence is the same for all rows
+    The string is true multiple if the record is split
+    by some sequence and the sequence is the same for all rows
 
     :param x:  series for decide
     :return:  true for multiple
@@ -272,7 +288,7 @@ def is_true_multiple(x: pd.Series) -> bool:
         return res
 
     result_arr = x.apply(lambda s: is_str_multiple(s)).values
-    to_return = [i for i in result_arr if (i != '')]
+    to_return = [i for i in result_arr if i != '']
     if len(to_return) == 0:
         return True
     if to_return[0].replace(" ", "") == '':
@@ -297,15 +313,16 @@ def is_date(column: pd.Series) -> bool:
             element = str(word).strip()
             one_or_two = r'(\d{1}|\d{2})'
             two_or_four = r'(\d{2}|\d{4})'
-            months = ('(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb'
+            months = ('(January|February|March|April|May|June|July|August|'
+                      'September|October|November|December|Jan|Feb'
                       '|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)')
-            pattern = r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months  # + '$'  # 1999,4 Feb 1999,4 February
-            pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four  # 11. 4. 1999
-            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months  # 1999,4February 1999,4Feb
-            if re.match(pattern, element):
-                return True
-            else:
-                return False
+            # + '$'  # 1999,4 Feb 1999,4 February
+            pattern = r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months
+            # 11. 4. 1999
+            pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
+            # 1999,4February 1999,4Feb
+            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months
+            return re.match(pattern, element)
 
     return column.apply(lambda s: is_str_date(s)).all()
 
@@ -325,11 +342,13 @@ def get_data_kind(column: pd.Series) -> "DataKind":
         return DataKind.CONSTANT
     if is_categorical(column):
         return DataKind.CATEGORICAL
-    else:
-        return DataKind.UNDEFINED
+    return DataKind.UNDEFINED
 
 
 class DataKind(Enum):
+    """
+    Represents all data kind.
+    """
     BOOL = "bool"
     ID = "id"
     CONSTANT = "constant"
@@ -350,8 +369,7 @@ def get_basic_type(column: pd.Series) -> Any:
         return DATE
     if is_not_numerical(column):
         return NONNUMERICAL
-    else:
-        return UNDEFINED
+    return UNDEFINED
 
 
 def get_advanced_type(column: pd.Series) -> Any:
@@ -365,19 +383,18 @@ def get_advanced_type(column: pd.Series) -> Any:
     if is_numerical(column_num):
         if is_int(column_num):
             return INT
-        else:
-            return FLOAT
+        return FLOAT
     if is_date(column):  # todo what about year?
         return DATE
     if is_not_numerical(column):
         return NONNUMERICAL
-    else:
-        return UNDEFINED
+    return UNDEFINED
 
 
 def get_advanced_structural_type(column: pd.Series) -> Any:
     """
-    Indicates type of column int, float - human, computer, date, text - word, sentence, phrase article, multiple
+    Indicates type of column int, float - human, computer, date,
+    text - word, sentence, phrase article, multiple
 
     :param column: to indicate
     :return: detected type
@@ -386,10 +403,9 @@ def get_advanced_structural_type(column: pd.Series) -> Any:
     if is_numerical(column_num):
         if is_int(column_num):
             return INT
-        else:
-            if is_human_gen(column_num):
-                return HUMAN_GENERATED
-            return COMPUTER_GENERATED
+        if is_human_gen(column_num):
+            return HUMAN_GENERATED
+        return COMPUTER_GENERATED
     if is_date(column):
         return DATE
     if is_not_numerical(column):
@@ -409,145 +425,145 @@ def get_advanced_structural_type(column: pd.Series) -> Any:
         if is_article(column):
             return ARTICLE
         return NONNUMERICAL
-    else:
-        return UNDEFINED
-
-
-# class _Float(Enum):
-#     HUMAN_GENERATED = "human_generated"
-#     COMPUTER_GENERATED = "computer_generated"
-#
-#
-# class _Numerical(Enum):
-#     FLOAT = _Float
-#     INT = "int"
-#
-#
-# class _Word(Enum):
-#     ALPHABETIC = "alphabetic"
-#     ALPHANUMERIC = "alphanumeric"
-#     ALL = "all"
-#
-#
-# class _Text(Enum):
-#     WORD = _Word
-#     SENTENCE = "sentence"
-#     PHRASE = "phrase"  # max 4 words without punctuation
-#     ARTICLE = "article"
-#     MULTIPLE_VALUES = "multiple"  # genres name : "Action, Adventure, Drama"
-#
-#
-# class _NonNumerical(Enum):
-#     TEXT = _Text
-#
-#
-# class Types(Enum):
-#     """
-#     Enum class representing column type
-#     """
-#     NUMERICAL = _Numerical
-#     NONNUMERICAL = _NonNumerical
-#     DATE = "date"
-#     UNDEFINED = "undefined"
+    return UNDEFINED
 
 
 class Type:
+    """
+    Base class for type
+    """
     def __init__(self, value):
-        self.value = value  ## todo add values ?
+        self.value = value
 
     def __str__(self):
         return ""
 
 
 class DATE(Type):
+    """
+    Represents type date.
+    """
     def __str__(self):
         return "DATE"
 
 
 class UNDEFINED(Type):
+    """
+    Represents class undefined
+    """
     def __str__(self):
-        return "DATE"
+        return "UNDEFINED"
 
 
 class NUMERICAL(Type):
+    """
+    Represents numerical types.
+    """
     def __str__(self):
-        return "DATE"
+        return "NUMERICAL"
 
 
 class INT(NUMERICAL):
+    """
+    Represents INT type.
+    """
     def __str__(self):
-        return "DATE"
+        return "INT"
 
 
 class FLOAT(NUMERICAL):
+    """
+    Represents FLOAT type.
+    """
     def __str__(self):
-        return "DATE"
+        return "FLOAT"
 
 
 class HUMAN_GENERATED(FLOAT):
+    """
+    Represents float, which is probably generated by human.
+    Number of numbers after floating point is small or rounded.
+    """
     def __str__(self):
-        return "DATE"
+        return "HUMAN_GENERATED"
 
 
 class COMPUTER_GENERATED(FLOAT):
+    """
+    Represents float, which is probably generated by computer.
+    Number of numbers after floating point is bigger or not rounded.
+    """
     def __str__(self):
-        return "DATE"
+        return "COMPUTER_GENERATED"
 
 
 class NONNUMERICAL(Type):
+    """
+    Subclass for nonnumerical types
+    """
     def __str__(self):
-        return "DATE"
+        return "NONNUMERICAL"
 
 
 class WORD(NONNUMERICAL):
+    """
+    Word is string without spaces.
+    """
     def __str__(self):
-        return "DATE"
+        return "WORD"
 
 
 class ALPHABETIC(WORD):
+    """
+    This type is WORD, it contains only letters (a-z)
+    """
     def __str__(self):
-        return "DATE"
+        return "ALPHABETIC"
 
 
 class ALPHANUMERIC(WORD):
+    """
+    This type is WORD, it contains only letters (a-z) and numbers (0-9)
+    """
     def __str__(self):
-        return "DATE"
+        return "ALPHANUMERIC"
 
 
 class ALL(WORD):
+    """
+    This type is WORD, it could contain all characters.
+    """
     def __str__(self):
-        return "DATE"
+        return "ALL"
 
 
 class SENTENCE(NONNUMERICAL):
+    """
+    Sentence is string that ends with fullstops. It could contain spaces.
+    """
     def __str__(self):
-        return "DATE"
+        return "SENTENCE"
 
 
 class ARTICLE(NONNUMERICAL):
+    """
+    Article is string composite from sentences.
+    """
     def __str__(self):
-        return "DATE"
+        return "ARTICLE"
 
 
 class PHRASE(NONNUMERICAL):
+    """
+    Phrase is string with spaces, but it is not sentence.
+    """
     def __str__(self):
         return "PHRASE"
 
 
 class MULTIPLE_VALUES(NONNUMERICAL):
+    """
+    MULTIPLE_VALUES is string, and it contains pattern that is repeated. (Name1|Name2|Name3|Name4)
+    """
     def __str__(self):
         return "MULTIPLE_VALUES"
-
-# def get_super_type(type_: Types) -> Types:
-#     if (type_ == Types.NUMERICAL or type_ == Types.NUMERICAL.value.FLOAT or type_ == Types.NUMERICAL.value.INT or
-#             type_ == Types.NUMERICAL.value.FLOAT.value.HUMAN_GENERATED or
-#             type_ == Types.NUMERICAL.value.FLOAT.value.COMPUTER_GENERATED):
-#         return Types.NUMERICAL
-#     if type_ == Types.DATE:
-#         return Types.DATE
-#     if type_ == Types.UNDEFINED:
-#         return Types.UNDEFINED
-#     return Types.NONNUMERICAL
-#
-#
-# x = Types.NUMERICAL.value
