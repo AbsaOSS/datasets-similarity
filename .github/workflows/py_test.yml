@@ -53,7 +53,7 @@ jobs:
           pip install coverage pytest
 
       - name: Run tests
-        run: coverage run -m pytest $TEST_FILES
+        run: coverage run --source='similarity,column2Vec' -m pytest $TEST_FILES
 
       - name: Show coverage
         run: coverage report -m
