@@ -1,33 +1,8 @@
-from itertools import compress
-
-from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata
-from similarity.Types import Types
-from typing import Optional
-
-import pandas as pd
-import numpy as np
+"""
+This module contains helpful functions
+"""
 import os
-import re
-from sentence_transformers import SentenceTransformer
-import gensim.downloader as api
-
-
-# def get_world_embedding(world):
-#     # takes 3-10 minutes to load
-#     global wv
-#     if not wv:
-#         wv = api.load('word2vec-google-news-300')
-#     return wv[world]
-
-
-# sbert_model: Optional[SentenceTransformer] = None
-#
-#
-# def get_sbert_model() -> SentenceTransformer:
-#     global sbert_model
-#     if not sbert_model:
-#         sbert_model = SentenceTransformer('bert-base-nli-mean-tokens')
-#     return sbert_model
+import pandas as pd
 
 
 def load__csv_files_from_folder(folder: str) -> (list[pd.DataFrame], list[str]):
@@ -44,6 +19,7 @@ def load__csv_files_from_folder(folder: str) -> (list[pd.DataFrame], list[str]):
             names.append(file.replace(".csv", ""))
     return data, names
 
+
 def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> (list[str], list[str]):
     """
     For each column in each table in database it creates string from that column.
@@ -59,5 +35,3 @@ def create_string_from_columns(database: list[pd.DataFrame], table_names: list[s
                 str(table[column].tolist()).replace("\'", "").replace("]", "").replace("[", ""))  # column to string
             sentences_datasets.append(name)
     return sentences, sentences_datasets
-
-
