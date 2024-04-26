@@ -8,7 +8,7 @@ on:
 
 jobs:
   python-tests:
-    name: Run Python Tests
+    name: Run Tests for Column2Vec
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
