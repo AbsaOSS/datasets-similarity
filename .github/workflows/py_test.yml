@@ -33,5 +33,5 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          find . -name '*.py' -print -exe pylint --fail-under=7.0 --recursive=y --enable=W
+          find . -name '*.py' -print -exec pylint --fail-under=7.0 --recursive=y --enable=W
 #          pylint $(git ls-files '*.py')
