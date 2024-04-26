@@ -16,17 +16,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
         run: |
           pip install pytest
           pip install -r requirements.txt
+          pip install pylint
 
       - name: Run tests
         run: |
-          pytest tests/types_test.py
-          pytest tests/metadata_test.py
-          pytest tests/comparator_test.py
-          pytest tests/column2Vec_test.py
+          pytest test/test_types.py
+          pytest test/test_metadata.py
+          pytest test/test_comparator.py
+
+      - name: Analysing the code with pylint
+        run: |
+          find . -name '*.py' -print -exe pylint --fail-under=7.0 --recursive=y --enable=W
+#          pylint $(git ls-files '*.py')

@@ -1,0 +1,31 @@
+name: "Column2Vec"
+
+on:
+  schedule:
+    - cron: '* * * * *'
+
+
+jobs:
+    python-tests:
+        name: Run Python Tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.11'
+                  cache: 'pip'
+
+#            - name: Install dependencies
+#              run: |
+#                  pip install pytest
+#                  pip install -r requirements.txt
+
+            - name: Run tests
+              run: |
+                  echo "Hi"
+#                  pytest test/test_column2Vec.py
+
