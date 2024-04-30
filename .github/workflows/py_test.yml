@@ -61,21 +61,21 @@ jobs:
       - name: Create coverage file
         run: coverage xml
 
-#      - name: Get Cover
-#        uses: orgoro/coverage@v3.1
-#        with:
-#          coverageFile: coverage.xml
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          thresholdAll: 0.7
-#          thresholdNew: 0.9
-
-      - name: Collect coverage
-        uses: codecov/codecov-action@v3
+      - name: Get Cover
+        uses: orgoro/coverage@v3.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          verbose: true
+          coverageFile: simillarity/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdAll: 0.7
+          thresholdNew: 0.9
+
+#      - name: Collect coverage
+#        uses: codecov/codecov-action@v3
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          fail_ci_if_error: true
+#          files: ./coverage.xml
+#          verbose: true
 
       - uses: actions/upload-artifact@v4
         with:
