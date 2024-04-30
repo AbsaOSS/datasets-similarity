@@ -9,7 +9,6 @@ from similarity.Comparator import DistanceFunction, Settings, cosine_sim, Hausdo
 from similarity.DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
 from similarity.Types import DataKind
 
-
 class ComparatorType(ABC):
     def __init__(self, weight=1):
         self.weight = weight
