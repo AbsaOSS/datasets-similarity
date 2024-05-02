@@ -59,10 +59,11 @@ jobs:
         run: coverage report -m
 
       - name: Create coverage file
+        if: github.event_name == 'pull_request'
         run: coverage xml
 
       - name: Get Cover
-      - if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         uses: orgoro/coverage@v3.1
         with:
           coverageFile: coverage.xml
@@ -70,15 +71,8 @@ jobs:
           thresholdAll: 0.7
           thresholdNew: 0.9
 
-#      - name: Collect coverage
-#        uses: codecov/codecov-action@v3
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          fail_ci_if_error: true
-#          files: ./coverage.xml
-#          verbose: true
-
       - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
         with:
           name: coverage
           path: coverage.xml
