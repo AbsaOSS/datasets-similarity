@@ -277,9 +277,13 @@ class KindComparator(ComparatorType):
     def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
         res = pd.DataFrame()
         row_mins = []
-        for id1, embed1 in enumerate(embeddings1.items()):
-            for id2, embed2 in enumerate(embeddings2.items()):
+        id1 = 0
+        id2 = 0
+        for embed1 in embeddings1:
+            for embed2 in embeddings2:
                 res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
+                id1 += 1
+                id2 += 1
             row_mins.append(min(res[id1]))
         column_mins = []
         for _, column in res.items():
