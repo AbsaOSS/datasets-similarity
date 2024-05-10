@@ -1,15 +1,24 @@
+"""
+The main.py contains example usage.
+You can run program to compare tables by main
+"""
 import sys
 
 import pandas as pd
 
-from similarity.Comparator import Comparator, SizeComparator, IncompleteColumnsComparator, KindComparator, \
-    ColumnNamesEmbeddingsComparator
+from similarity.Comparator import (Comparator, SizeComparator,
+                                   IncompleteColumnsComparator, KindComparator,
+                                   ColumnNamesEmbeddingsComparator)
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
 if not sys.warnoptions:
     import warnings
 
+
 def supress_warning():
+    """
+    Supress timezone warning
+    """
     warnings.filterwarnings('ignore',
                             message='*return a timezone-aware datetime.'
                                     '  In a future version, this will raise an exception*')
@@ -17,12 +26,23 @@ def supress_warning():
 
 
 def create_metadata(data):
+    """
+    This function creates metadata
+    :return created metadata
+    """
     return (DataFrameMetadataCreator(data).
             compute_advanced_structural_types().
             compute_column_kind().compute_column_names_embeddings()).get_metadata()
 
 
 def compare_datasets(path1, path2):
+    """
+    This function compare two tables
+    It will read datasets, create metadata and comparator, compare them
+    :param path1: to file with table 1
+    :param path2: to file with table 2
+    :return: distance between tables
+    """
     data1 = pd.read_csv(path1)
     data2 = pd.read_csv(path2)
     metadata1 = create_metadata(data1)
