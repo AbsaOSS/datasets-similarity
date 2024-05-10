@@ -275,20 +275,25 @@ class KindComparator(ComparatorType):
         return tmp
 
     def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
-        res = pd.DataFrame()
+        res = []
         row_mins = []
         id1 = 0
-        id2 = 0
         for embed1 in embeddings1:
+            # for embed2 in embeddings2:
+            #     res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
+            #     id2 += 1
+            results = []
             for embed2 in embeddings2:
-                res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
-                id1 += 1
-                id2 += 1
-            row_mins.append(min(res[id1]))
+                result = 1 - cosine_sim(embed1, embed2)
+                results.append(result)
+            res.append(results)  #
+            row_mins.append(min(results))
+            id1 += 1
         column_mins = []
-        for _, column in res.items():
+        for_iter = pd.DataFrame(data=res)
+        for _, column in for_iter.items():
             column_mins.append(min(column))
-        return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
+        return max([mean(column_mins), mean(row_mins)])  # todo vysvetlit v textu
 
     def __are_columns_null(self, column1, column2, message) -> tuple[bool, pd.DataFrame]:
         """

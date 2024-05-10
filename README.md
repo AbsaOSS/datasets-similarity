@@ -150,6 +150,13 @@ stored in DatasetDescription.md in belonging folder ([**data**](data/DatasetDesc
 Both folders contain file DataShow.md with metadata information for each dataset ([**data**](data/DataShow.md), [**data_validation**](data_validation/DatasetDescription.md)).
 
 ## How to run
+You can compare two or more tables by running main.py.
+The Result will be distance between tables.
+```bash
+ python main.py # for fix files
+ python main.py data/imdb_top_1000.csv data/netflix_titles.csv # for specific files
+```
+
 ### generate DataShow
 
 ## How to run tests

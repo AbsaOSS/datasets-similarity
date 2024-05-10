@@ -6,6 +6,15 @@ from similarity.Comparator import Comparator, SizeComparator, IncompleteColumnsC
     ColumnNamesEmbeddingsComparator
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
+if not sys.warnoptions:
+    import warnings
+
+def supress_warning():
+    warnings.filterwarnings('ignore',
+                            message='*return a timezone-aware datetime.'
+                                    '  In a future version, this will raise an exception*')
+    # todo fix
+
 
 def create_metadata(data):
     return (DataFrameMetadataCreator(data).
@@ -23,6 +32,7 @@ def compare_datasets(path1, path2):
                  .add_comparator_type(KindComparator())
                  .add_comparator_type(ColumnNamesEmbeddingsComparator()))
     return compartor.compare(metadata1, metadata2)
+
 
 if __name__ == '__main__':
     files = sys.argv[1:]
