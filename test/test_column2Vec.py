@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 
 from column2Vec.Column2Vec import column2vec_as_sentence, column2vec_as_sentence_clean, \
     column2vec_as_sentence_clean_uniq, column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum
-from column2Vec.functions import get_data, get_clusters, compute_distances
+from column2Vec.functions import get_nonnumerical_data, get_clusters, compute_distances
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import NONNUMERICAL
 
@@ -62,7 +62,7 @@ class TestSimilarityOfVectors(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         files = [fileM2]
-        self.data = get_data(files)
+        self.data = get_nonnumerical_data(files)
         stop = 0
         for i in self.data:
             if stop == 0:
@@ -148,7 +148,7 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_data(self.files)
+        self.data = get_nonnumerical_data(self.files)
 
     def test_column2vec_as_sentence(self):
         vectors_sentence = get_vectors(column2vec_as_sentence, self.data)
@@ -223,7 +223,7 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_data(self.files)
+        self.data = get_nonnumerical_data(self.files)
 
     def get_cluster_num(self, name):
         for number, names in self.clusters_MC_Copilot.items():

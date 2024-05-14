@@ -1,21 +1,26 @@
 # What is column2Vec
-Is word2Vec type tool for creating embeddings vectors for string columns
+Is word2Vec type tool for creating embedding vectors for string columns
 in tables.
+We have implemented seven different approaches. 
 
 ## Structure
 
-folder [**generated**](generated) contains all generated files. Mostly html files representing
+Folder [**generated**](generated) contains all generated files.
+Mostly html files representing
 2D clusters, created by clustering vectors. 
 
 file [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of column2Vec.
+
+## Implementation description
 - **column2vec_as_sentence** creates one string from column, and then it transforms it to vector
 - **column2vec_as_sentence_clean** creates one string from column. String contains only numbers and a-z. Then it transforms clean string in to vector.
 - **column2vec_as_sentence_clean_uniq** creates one string from uniq values in column. String contains only numbers and a-z. Then it transforms clean string in to vector.
-- **column2vec_avg** transforms every element in column into vector and then it makes average of them.
-- **column2vec_weighted_avg** transforms every element in column into vector and then it makes weighted average of them (based on occurrence).
+- **column2vec_avg** transforms every element in column into vector, and then it makes average of them.
+- **column2vec_weighted_avg** transforms every element in column into vector, and then it makes weighted average of them (based on occurrence).
 - **column2vec_sum** transforms every uniq element in column into vector and then sum it.
 - **column2vec_weighted_sum** transforms every element in column into vector and then sum it.
 
+> Inspired by [Michael J. Mior, Alexander G. Ororbia](https://arxiv.org/pdf/1903.08621)
 ---
 # Data and cluster description
 #### Used tables
@@ -78,12 +83,12 @@ rating .
 duration .
 date_added .
 ```
-## How Did I cluster by copilot 
+## Making clusters by Microsoft Copilot
 - I wrote: `I will send you few rows of diferent tables could you please clustered columns of these tables ?`
 - I wrote: `I will send you all tables in cvs format i will say done when i will be done`
-- Then I send 15 rows of each table to copilot and I worote done. 
+- Then I send 15 rows of each table to co-pilot. 
 - I wrote all names of columns in the list above.
-- I wrote `Could you please guess the clusters`, this does not worke and copilot response was `As an AI, I can provide a high-level approach to clustering the data based on the columns you’ve provided. However, I’m unable to perform the actual clustering operation or guess the clusters without running a specific clustering algorithm on the data. Here’s a general approach:`
+- I wrote `Could you please guess the clusters`, this does not work and copilot response was `As an AI, I can provide a high-level approach to clustering the data based on the columns you’ve provided. However, I’m unable to perform the actual clustering operation or guess the clusters without running a specific clustering algorithm on the data. Here’s a general approach:`
 - I wrote `Could you show similar groups of columns` and I got the response below. (Ad Clustering by Microsoft Copilot)
 - I wrote `Could you split it to more groups ?` and I got the response below. (Ad Granular Clustering by Microsoft Copilot)
 ### Clustering by Microsoft Copilot

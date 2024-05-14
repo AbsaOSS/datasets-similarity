@@ -43,7 +43,9 @@ class Cache:
         :param function: Function name
         :param embedding: to save
         """
-        self.__cache.loc[function, key] = embedding
+        print(f"|{int(function)}| : |{int(key)}|") # todo solve this
+        self.__cache.at[function, key] = embedding
+        # self.__cache.loc[function, key] = embedding
 
     def save_persistently(self):
         """

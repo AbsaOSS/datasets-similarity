@@ -1,6 +1,7 @@
 """
 This file contains constants
 """
+from sentence_transformers import SentenceTransformer
 
 
 class WarningEnable:
@@ -37,5 +38,25 @@ class WarningEnable:
         """
         return self.__timezone
 
+class TrainedModel:
+    """
+    Class encapsulating trained module
+    """
+    __model = SentenceTransformer('bert-base-nli-mean-tokens')
+
+    def set_module(self, model: SentenceTransformer):
+        """
+        Sets __model
+        :param model: to be set
+        """
+        self.__model = model
+
+    def get_module(self) -> SentenceTransformer:
+        """
+        :return: __module
+        """
+        return self.__model
+
 
 warning_enable = WarningEnable()
+trained_model = TrainedModel()
