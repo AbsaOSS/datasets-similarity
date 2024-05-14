@@ -6,23 +6,11 @@ import sys
 
 import pandas as pd
 
+from constants import warning_enable
 from similarity.Comparator import (Comparator, SizeComparator,
                                    IncompleteColumnsComparator, KindComparator,
                                    ColumnNamesEmbeddingsComparator)
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
-
-if not sys.warnoptions:
-    import warnings
-
-
-def supress_warning():
-    """
-    Supress timezone warning
-    """
-    warnings.filterwarnings('ignore',
-                            message='*return a timezone-aware datetime.'
-                                    '  In a future version, this will raise an exception*')
-    # todo fix
 
 
 def create_metadata(data):
@@ -55,6 +43,8 @@ def compare_datasets(path1, path2):
 
 
 if __name__ == '__main__':
+    warning_enable.change_status(False)
+    warning_enable.disable_timezone_warn()
     files = sys.argv[1:]
     print(files)
     for file1 in files:

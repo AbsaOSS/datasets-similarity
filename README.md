@@ -135,7 +135,7 @@ Explaining kinds:
 - **Source code for column2Vec** is in folder [column2Vec](column2Vec).
 - **Tests** are in folder [test](test)
 - **Data** are stored in folders [**data**](data) and [**data_validation**](data_validation).
-- **Main folder** contains: folder .github, files .gitignore, CONTRIBUTING.MD, LICENSE, README.md, requirements.txt and main.py
+- **Main folder** contains: folder .github, files .gitignore, CONTRIBUTING.MD, LICENSE, README.md, requirements.txt, constants.py and main.py
 - Folder **images** contains images for README.md
 
 ---
@@ -156,7 +156,16 @@ The Result will be distance between tables.
  python main.py # for fix files
  python main.py data/imdb_top_1000.csv data/netflix_titles.csv # for specific files
 ```
-
+You can disable or enable warnings in main by adding these to line for disabling:
+```python
+warning_enable.change_status(False)
+warning_enable.disable_timezone_warn()
+```
+Enable by:
+```python
+warning_enable.change_status(True)
+warning_enable.enable_timezone_warn()
+```
 ### generate DataShow
 
 ## How to run tests
