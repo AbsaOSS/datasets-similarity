@@ -8,9 +8,20 @@ We have implemented seven different approaches.
 Folder [**generated**](generated) contains all generated files.
 Mostly html files representing
 2D clusters, created by clustering vectors. 
+It also contains cache file where could be stored created embeddings.
+Cashing is possible to switch of or switch on.
 
-file [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of column2Vec.
-
+File [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of column2Vec.
+All implementations could use cache.
+There is implemented run time cache and persistent cache stored in cache.txt in folder generated.
+To store cache persistently it is necessary to call:
+```python
+cache.save_persistently()
+```
+Run time cache will be done automatically. For switching off caching, you have to call:
+```python
+cache.off()
+```
 ## Implementation description
 - **column2vec_as_sentence** creates one string from column, and then it transforms it to vector
 - **column2vec_as_sentence_clean** creates one string from column. String contains only numbers and a-z. Then it transforms clean string in to vector.
@@ -21,6 +32,29 @@ file [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of 
 - **column2vec_weighted_sum** transforms every element in column into vector and then sum it.
 
 > Inspired by [Michael J. Mior, Alexander G. Ororbia](https://arxiv.org/pdf/1903.08621)
+
+File [**functions.py**](functions.py) contains functions for using column2Vec.
+It contains functions:
+- get_nonnumerical_data (returns string columns)
+- get_vectors (creates embeddings)
+- get_clusters (create clusters and give a list of them)
+- plot_clusters (create and plots clusters)
+- compute_distances (compute distance betwen vectors)
+
+## How to use
+You can create vectors(embeddings) by using one of the seven implementations.
+You have to call `get_vectors` function with two parameters. ()
+First parameter is implementation of column2vec,
+second parameter is data that is dictionary (string:column).
+You should use only nonnumerical data you can get them from table by running `get_nonumerical_data`.
+```python
+vectors_avg = get_vectors(column2vec_avg, data)
+```
+
+If you want to create clusters or plot them, 
+you can call get_clusters or plot_clusters.
+For getting distances between vectors you can run `compute_distances`.
+
 ---
 # Data and cluster description
 #### Used tables

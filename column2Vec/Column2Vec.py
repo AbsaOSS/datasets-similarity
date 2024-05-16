@@ -1,6 +1,7 @@
 """
 This file contains column2Vec implementations.
 """
+import json
 import re
 
 import numpy as np
@@ -14,10 +15,11 @@ class Cache:
     """
     __cache = pd.DataFrame()
     __read_from_file = False
+    __on = True
 
     def __read(self):
         try:
-            self.__cache = pd.read_csv("generated/cache.txt")
+            self.__cache = pd.io.parsers.read_csv("generated/cache.txt", index_col=0)
         except Exception as error:
             pass
 
@@ -29,11 +31,13 @@ class Cache:
         :param function: Name of function
         :return: Cache for a specific key
         """
+        if not self.__on:
+            return None
         if not self.__read_from_file:
             self.__read()
             self.__read_from_file = True
         if function in self.__cache.index and key in self.__cache.columns:
-            return self.__cache.loc[function, key]
+            return json.loads(self.__cache.loc[function, key]) # json is faster than ast
         return None
 
     def save(self, key: str, function: str, embedding: list):
@@ -43,15 +47,26 @@ class Cache:
         :param function: Function name
         :param embedding: to save
         """
-        print(f"|{int(function)}| : |{int(key)}|") # todo solve this
-        self.__cache.at[function, key] = embedding
+        if not self.__on:
+            return
+        self.__cache.loc[function, key] = str(list(embedding))
+        print(f"{self.__cache.loc[function, key]}")
         # self.__cache.loc[function, key] = embedding
 
     def save_persistently(self):
         """
         Write cache to csv file
         """
-        self.__cache.to_csv("generated/cache.txt")
+        if not self.__on:
+            return
+        print(self.__cache.index)
+        print(self.__cache.columns)
+        self.__cache.to_csv("generated/cache.txt", index=True)
+
+    def off(self):
+        self.__on = False
+    def on(self):
+        self.__on = True
 
 
 cache = Cache()
