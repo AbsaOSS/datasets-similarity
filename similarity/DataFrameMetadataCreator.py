@@ -223,12 +223,13 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         if types is None:
-            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC ] ## todo
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC] ## todo
         sentences = []
         names = []
         for i in types:
             for column in self.metadata.type_column[i]:
-                self.metadata.column_embeddings[column] = column2vec_as_sentence(self.dataframe[column], self.__get_model()) ## todo is it the same ?
+                self.metadata.column_embeddings[column] = column2vec_as_sentence(self.dataframe[column],
+                                                                                 self.__get_model(), column)
         #         sentences.append(str(self.dataframe[column].tolist())
         #                          .replace("\'", "")
         #                          .replace("]", "")
@@ -246,6 +247,13 @@ class DataFrameMetadataCreator:
         :return: dataframe with columns with specific types
         """
         return self.dataframe[self.metadata.get_column_names_by_type(types)]
+
+    def get_column_by_kind(self, *kinds):
+        """
+        :param kinds: of columns
+        :return: dataframe with columns with specific kind
+        """
+        return self.dataframe[self.metadata.get_column_names_by_type(kinds)]
 
     def get_numerical_columns(self):
         """

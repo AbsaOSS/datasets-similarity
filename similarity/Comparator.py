@@ -168,7 +168,6 @@ class CategoricalComparatorSimilar(CategoricalComparator):
 class ColumnEmbeddingComparator(ComparatorType):
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
                 settings: set[Settings]) -> pd.DataFrame:
-        ## todo originally it was used threshold here
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
         for id1, (column1, embedding1) in enumerate(metadata1.column_embeddings.items()):

@@ -131,7 +131,7 @@ Explaining kinds:
 - found out which data are duplicated 
 - finding similar or different data
 ## Structure
-- **Source code** is in folder [similarity](similarity).
+- **Source code** is in folder [similarity](similarity). More about similarity folder structure in [README.md](similarity/README.md)
 - **Source code for column2Vec** is in folder [column2Vec](column2Vec).
 - **Tests** are in folder [test](test)
 - **Data** are stored in folders [**data**](data) and [**data_validation**](data_validation).
