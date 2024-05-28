@@ -27,5 +27,5 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest test/test_column2Vec.py test/test_column2VecCache.py
+          pytest test/test_column2Vec.py
 

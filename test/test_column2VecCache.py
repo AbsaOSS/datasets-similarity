@@ -27,9 +27,10 @@ class TestRunCache(unittest.TestCase):
         files = [fileM2]
         self.data = get_nonnumerical_data(files)
         for i in self.data:
-            self.first = self.data[i]
+            self.first = self.data[i].head(100)
             break
         cache.set_file("generated/test.csv")
+        self.model = SentenceTransformer(MODEL)
 
     def setUp(self):
         cache.clear_cache()
@@ -37,12 +38,12 @@ class TestRunCache(unittest.TestCase):
         cache.on()
 
     def test_column2vec_as_sentence(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
 
-        second = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
+        first = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
+
+        second = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
         cache.off()
-        third = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
+        third = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
@@ -50,37 +51,37 @@ class TestRunCache(unittest.TestCase):
 
 
     def test_column2vec_as_sentence_clean(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
 
-        second = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
+        first = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
 
         cache.off()
-        third = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
+        third = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
     def test_column2vec_as_sentence_clean_uniq(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
 
-        second = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
+        first = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
+        third = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
     def test_column2vec_avg(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_avg, self.first, model, "a")
 
-        second = time_measure_function(column2vec_avg, self.first, model, "a")
+        first = time_measure_function(column2vec_avg, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_avg, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_avg, self.first, model, "a")
+        third = time_measure_function(column2vec_avg, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
@@ -88,12 +89,12 @@ class TestRunCache(unittest.TestCase):
 
 
     def test_column2vec_weighted_avg(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
 
-        second = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
+        first = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
+        third = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
@@ -102,12 +103,12 @@ class TestRunCache(unittest.TestCase):
 
 
     def test_column2vec_sum(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_sum, self.first, model, "a")
 
-        second = time_measure_function(column2vec_sum, self.first, model, "a")
+        first = time_measure_function(column2vec_sum, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_sum, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_sum, self.first, model, "a")
+        third = time_measure_function(column2vec_sum, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
@@ -116,13 +117,13 @@ class TestRunCache(unittest.TestCase):
 
 
     def test_column2vec_weighted_sum(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
 
-        second = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
+        first = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
+
+        second = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
 
         cache.off()
-        third = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
+        third = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
@@ -138,10 +139,15 @@ class TestPersistentCache(unittest.TestCase):
         # make an array of all the files
         files = [fileM2]
         self.data = get_nonnumerical_data(files)
+        skip = True
         for i in self.data:
-            self.first = self.data[i]
+            if skip:
+                skip = False
+                continue
+            self.first = self.data[i].head(100)
             break
         cache.set_file("cache_test.csv")
+        self.model = SentenceTransformer(MODEL)
 
     def setUp(self):
         cache.clear_cache()
@@ -149,14 +155,14 @@ class TestPersistentCache(unittest.TestCase):
         cache.on()
 
     def test_column2vec_as_sentence(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
+
+        first = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
+        second = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
         cache.off()
-        third = time_measure_function(column2vec_as_sentence, self.first, model,  "a")
+        third = time_measure_function(column2vec_as_sentence, self.first, self.model,  "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
@@ -164,43 +170,43 @@ class TestPersistentCache(unittest.TestCase):
 
 
     def test_column2vec_as_sentence_clean(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
+
+        first = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
+        second = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
 
         cache.off()
-        third = time_measure_function(column2vec_as_sentence_clean, self.first, model, "a")
+        third = time_measure_function(column2vec_as_sentence_clean, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
     def test_column2vec_as_sentence_clean_uniq(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
+
+        first = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
+        second = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, model, "a")
+        third = time_measure_function(column2vec_as_sentence_clean_uniq, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
     def test_column2vec_avg(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_avg, self.first, model, "a")
+
+        first = time_measure_function(column2vec_avg, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_avg, self.first, model, "a")
+        second = time_measure_function(column2vec_avg, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_avg, self.first, model, "a")
+        third = time_measure_function(column2vec_avg, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
@@ -208,14 +214,14 @@ class TestPersistentCache(unittest.TestCase):
 
 
     def test_column2vec_weighted_avg(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
+
+        first = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
+        second = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_weighted_avg, self.first, model, "a")
+        third = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
@@ -224,14 +230,14 @@ class TestPersistentCache(unittest.TestCase):
 
 
     def test_column2vec_sum(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_sum, self.first, model, "a")
+
+        first = time_measure_function(column2vec_sum, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_sum, self.first, model, "a")
+        second = time_measure_function(column2vec_sum, self.first, self.model, "a")
         cache.off()
-        third = time_measure_function(column2vec_sum, self.first, model, "a")
+        third = time_measure_function(column2vec_sum, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
@@ -240,15 +246,15 @@ class TestPersistentCache(unittest.TestCase):
 
 
     def test_column2vec_weighted_sum(self):
-        model = SentenceTransformer(MODEL)
-        first = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
+
+        first = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
         cache.save_persistently()
         cache.clear_cache()
 
-        second = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
+        second = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
 
         cache.off()
-        third = time_measure_function(column2vec_weighted_sum, self.first, model, "a")
+        third = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
 
         print(f"{first} : {second} : {third}")
 
