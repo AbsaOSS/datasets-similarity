@@ -10,6 +10,9 @@ from constants import warning_enable
 from similarity.Comparator import (Comparator, SizeComparator,
                                    IncompleteColumnsComparator, KindComparator,
                                    ColumnNamesEmbeddingsComparator)
+from similarity.ComparatorByColumn import (ComparatorByColumn, SizeComparator,
+                                           IncompleteColumnsComparator,
+                                           ColumnNamesEmbeddingsComparator)
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
 
@@ -35,11 +38,15 @@ def compare_datasets(path1, path2):
     data2 = pd.read_csv(path2)
     metadata1 = create_metadata(data1)
     metadata2 = create_metadata(data2)
+    comparator2 = (ComparatorByColumn().add_comparator_type(SizeComparator()).
+                   add_comparator_type(IncompleteColumnsComparator())
+                   .add_comparator_type(ColumnNamesEmbeddingsComparator()))
     compartor = (Comparator().add_comparator_type(SizeComparator()).
                  add_comparator_type(IncompleteColumnsComparator())
                  .add_comparator_type(KindComparator())
                  .add_comparator_type(ColumnNamesEmbeddingsComparator()))
-    return compartor.compare(metadata1, metadata2)
+    # return compartor.compare(metadata1, metadata2)
+    return comparator2.compare(metadata1, metadata2)
 
 
 if __name__ == '__main__':
