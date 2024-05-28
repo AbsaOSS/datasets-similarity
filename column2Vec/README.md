@@ -22,6 +22,11 @@ Run time cache will be done automatically. For switching off caching, you have t
 ```python
 cache.off()
 ```
+For clearing cache you can use:
+```python
+cache.clear_cache() # clears cache in runtime
+cache.clear_persistent_cache() # clears the cache file
+```
 ## Implementation description
 - **column2vec_as_sentence** creates one string from column, and then it transforms it to vector
 - **column2vec_as_sentence_clean** creates one string from column. String contains only numbers and a-z. Then it transforms clean string in to vector.
