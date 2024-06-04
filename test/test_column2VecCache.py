@@ -4,8 +4,14 @@ import time
 
 from sentence_transformers import SentenceTransformer
 
-from column2Vec.Column2Vec import cache, Cache, column2vec_as_sentence, column2vec_as_sentence_clean, \
-    column2vec_as_sentence_clean_uniq, column2vec_avg, column2vec_weighted_sum, column2vec_sum, column2vec_weighted_avg
+from column2Vec.Column2Vec import (cache,
+                                   column2vec_as_sentence,
+                                   column2vec_as_sentence_clean,
+                                   column2vec_as_sentence_clean_uniq,
+                                   column2vec_avg,
+                                   column2vec_weighted_sum,
+                                   column2vec_sum,
+                                   column2vec_weighted_avg)
 from column2Vec.functions import get_nonnumerical_data
 
 MODEL = 'bert-base-nli-mean-tokens'

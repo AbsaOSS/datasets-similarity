@@ -70,7 +70,7 @@ def get_clusters(vectors_to_cluster: pd.DataFrame, n_clusters: int) -> list[list
     Creates clusters by KMeans for given vectors.
 
     :param vectors_to_cluster: Embeddings for all column
-    :param n_clusters: numbers of clusters we want
+    :param n_clusters: number of clusters we want
     :return: List, for each cluster number it contains a list of column names
     """
     kmeans = KMeans(n_clusters=n_clusters, random_state=0)  # Change n_clusters as needed
