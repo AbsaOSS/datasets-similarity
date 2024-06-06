@@ -19,7 +19,7 @@ datasets that we want to compare with each other
 and find out their similarity or distance.
 This project mainly focuses on comparing only two tables. 
 The final similarity is calculated according
-to the similarity of individual columns. 
+to the similarity of individual columns based on their metadata. 
 Columns are compared by type and by content.
 
 For testing, we have prepared two sets of data,
@@ -73,7 +73,8 @@ MetadataCreator has:
 > then we can get metadata
 
 #### Comparator picture 1
-This comparator creates comparing several matrixes for each type.
+This comparator creates several matrixes, each matrix represents a
+comparison for two columns of the same type.
 Matrix's could represent different aspects. 
 
 For example, for type int we will create:
@@ -88,9 +89,9 @@ For type string we will create:
 - a matrix comparing the most used word
 
 Then we will create one matrix for string and one matrix for int by using
-some function to unite matrix's. 
+built-in function to unite matrix's. 
 
-From each of these two matrixes we will compute one distance number. 
+From each of these two matrixes we will compute a distance number. 
 Then these distances will be merged. 
 #### Comparator picture 2
 This comparator will create one big matrix for all columns regardless of the type. 
@@ -108,7 +109,7 @@ Types define the real type of column. Some you may know from programming languag
 and some are specific (human generated, word, sentence ...).
 Kinds represent higher categorization.
 
-Types have some hierarchy as you can see on picture 1. 
+Types have some hierarchy as you can see on picture 3. 
 In the previous lines we named it: top level, middle level, smaller level. 
 Explaining some types:
 - Human generated: with more than three numbers after decimal point. All others are computer generated.
@@ -117,14 +118,14 @@ Explaining some types:
 - phrase: string with more than one word
 - multiple: string that represents not atomic data or structured data
 - article: string with more than one sentence
-1. ![img.png](images/types.png)
-Kind has only for "types" plus undefined. You can see all types on the picture 2.
+3. ![img.png](images/types.png)
+Kind has only for "types" plus undefined. You can see all types on the picture 4.
 Explaining kinds:
    - As **Id** will be marked column that contains only uniq values
    - As **Bool** will be marked column that contains only two unique values
    - As **Constant** will be marked column that contains only one unique value
    - As **Categorical** will be marked column that contains categories. Number of uniq values is less than threshold % of the total number of rows. Threshold is different for small and big dataset.
-2. ![img.png](images/kind.png)
+4. ![img.png](images/kind.png)
 ### Applicability
 - merging teams 
 - fuze of companies

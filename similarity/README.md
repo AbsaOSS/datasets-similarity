@@ -13,10 +13,10 @@ so it is constructed by nested loops.
 It is very complicated, it has not a good design, and
 we do not recommend to use it. 
 
-File categorical.ipynb shows usage of comparing.py
+File `categorical.ipynb` shows usage of `comparing.py`.
 
 ## file Comparator.py
-File contains Comparator class ComparatorType classes and DistanceFunction
+File contains Comparator class, ComparatorType classes and DistanceFunction
 Comparator is part of the pipeline that is shown below
 ![img_2.png](../images/pipeline1.png)
 You can see the visualization of the Comparator implementation
@@ -29,9 +29,9 @@ Then these tables are merged by counting average for each cell.
 That will create one distance table for bool this table will be passed to
 Distance function together with a weight and table ratio, and it will count number.
 All numbers will be passed to Euclidean distance and the overall distance will be computed.
-![img.png](images/img.png)
+![img.png](../images/Comparator.png)
 
-This comparator is used in main.py, test.ipynb and test_comparator.py
+This comparator is used in `main.py`, `test.ipynb` and `test_comparator.py`
 
 ### File test.ipynb
 The file test.ipynb contains usage example of MetadataCreator class and 
@@ -40,7 +40,7 @@ Comparator class. It also shows heatmaps and accuracy scores.
 
 ## file ComparatorByColumns
 This file contains the second implementation which was described 
-in [README.md](../README.md) The pipeline is in the picture below.
+in [README.md](../README.md/#approach). The pipeline is in the picture below.
 ![img_3.png](../images/pipeline2.png)
 You can see the visualization of the ComparatorByColumns implementation
 in the picture below.

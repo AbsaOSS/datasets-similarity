@@ -44,7 +44,7 @@ It contains functions:
 - get_vectors (creates embeddings)
 - get_clusters (create clusters and give a list of them)
 - plot_clusters (create and plots clusters)
-- compute_distances (compute distance betwen vectors)
+- compute_distances (compute distance between vectors)
 
 ## How to use
 You can create vectors(embeddings) by using one of the seven implementations.
