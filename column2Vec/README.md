@@ -1,4 +1,68 @@
-## Using tables 
+# What is column2Vec
+Is word2Vec type tool for creating embedding vectors for string columns
+in tables.
+We have implemented seven different approaches. 
+
+## Structure
+
+Folder [**generated**](generated) contains all generated files.
+Mostly html files representing
+2D clusters, created by clustering vectors. 
+It also contains cache file where could be stored created embeddings.
+Cashing is possible to switch of or switch on.
+
+File [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of column2Vec.
+All implementations could use cache.
+There is implemented run time cache and persistent cache stored in cache.txt in folder generated.
+To store cache persistently it is necessary to call:
+```python
+cache.save_persistently()
+```
+Run time cache will be done automatically. For switching off caching, you have to call:
+```python
+cache.off()
+```
+For clearing cache you can use:
+```python
+cache.clear_cache() # clears cache in runtime
+cache.clear_persistent_cache() # clears the cache file
+```
+## Implementation description
+- **column2vec_as_sentence** creates one string from column, and then it transforms it to vector
+- **column2vec_as_sentence_clean** creates one string from column. String contains only numbers and a-z. Then it transforms clean string in to vector.
+- **column2vec_as_sentence_clean_uniq** creates one string from uniq values in column. String contains only numbers and a-z. Then it transforms clean string in to vector.
+- **column2vec_avg** transforms every element in column into vector, and then it makes average of them.
+- **column2vec_weighted_avg** transforms every element in column into vector, and then it makes weighted average of them (based on occurrence).
+- **column2vec_sum** transforms every uniq element in column into vector and then sum it.
+- **column2vec_weighted_sum** transforms every element in column into vector and then sum it.
+
+> Inspired by [Michael J. Mior, Alexander G. Ororbia](https://arxiv.org/pdf/1903.08621)
+
+File [**functions.py**](functions.py) contains functions for using column2Vec.
+It contains functions:
+- get_nonnumerical_data (returns string columns)
+- get_vectors (creates embeddings)
+- get_clusters (create clusters and give a list of them)
+- plot_clusters (create and plots clusters)
+- compute_distances (compute distance between vectors)
+
+## How to use
+You can create vectors(embeddings) by using one of the seven implementations.
+You have to call `get_vectors` function with two parameters. ()
+First parameter is implementation of column2vec,
+second parameter is data that is dictionary (string:column).
+You should use only nonnumerical data you can get them from table by running `get_nonumerical_data`.
+```python
+vectors_avg = get_vectors(column2vec_avg, data)
+```
+
+If you want to create clusters or plot them, 
+you can call get_clusters or plot_clusters.
+For getting distances between vectors you can run `compute_distances`.
+
+---
+# Data and cluster description
+#### Used tables
 aircraft-data_nov_dec.csv
 Airplane_Cleaned.csv
 autoscout24-germany-dataset.csv
@@ -6,7 +70,7 @@ CARS_1.csv
 USA_cars_datasets.csv
 imdb_top_1000.csv
 netflix_titles.csv
-## Using columns:
+#### Used columns:
 ```
 reg_state .
 reg_city .
@@ -58,15 +122,15 @@ rating .
 duration .
 date_added .
 ```
-# How Did I cluster by copilot 
+## Making clusters by Microsoft Copilot
 - I wrote: `I will send you few rows of diferent tables could you please clustered columns of these tables ?`
 - I wrote: `I will send you all tables in cvs format i will say done when i will be done`
-- Then I send 15 rows of each table to copilot and I worote done. 
+- Then I send 15 rows of each table to co-pilot. 
 - I wrote all names of columns in the list above.
-- I wrote `Could you please guess the clusters`, this does not worke and copilot response was `As an AI, I can provide a high-level approach to clustering the data based on the columns you’ve provided. However, I’m unable to perform the actual clustering operation or guess the clusters without running a specific clustering algorithm on the data. Here’s a general approach:`
+- I wrote `Could you please guess the clusters`, this does not work and copilot response was `As an AI, I can provide a high-level approach to clustering the data based on the columns you’ve provided. However, I’m unable to perform the actual clustering operation or guess the clusters without running a specific clustering algorithm on the data. Here’s a general approach:`
 - I wrote `Could you show similar groups of columns` and I got the response below. (Ad Clustering by Microsoft Copilot)
 - I wrote `Could you split it to more groups ?` and I got the response below. (Ad Granular Clustering by Microsoft Copilot)
-## Clustering by Microsoft Copilot
+### Clustering by Microsoft Copilot
 Sure, based on the data you've provided, here are some potential groupings of similar columns:
 
 1. **Geographical Information**: These columns contain location-related information.
@@ -127,7 +191,7 @@ Sure, based on the data you've provided, here are some potential groupings of si
 
 Please note that these are just suggested groupings based on the column names and the context provided. The actual similarity between columns would depend on the specific values in these columns. If you have a specific clustering algorithm or similarity measure in mind, please provide more details. I'm here to help!
 
-## Granular Clustering by Microsoft Copilot
+### Granular Clustering by Microsoft Copilot
 Absolutely, here are more granular groupings of the columns:
 
 1. **Flight Information**: These columns contain specific information about flights.

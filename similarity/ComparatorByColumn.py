@@ -5,6 +5,7 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
+from constants import warning_enable
 from similarity.Comparator import DistanceFunction, Settings, cosine_sim, HausdorffDistanceMin
 from similarity.DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
 from similarity.Types import DataKind
@@ -27,10 +28,12 @@ class ComparatorType(ABC):
         :return:  tuple of bool and float, if columns are empty return True
         """
         if len(column1) == 0 and len(column2) == 0:
-            warnings.warn(f"Warning: {message} is not present in the dataframe.")
+            if warning_enable.get_status():
+                warnings.warn(f"Warning: {message} is not present in the dataframe.")
             return True, 0
         if (len(column1) == 0) != (len(column2) == 0):
-            warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
+            if warning_enable.get_status():
+                warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
             return True, 1
         return False, 0
 
@@ -113,7 +116,8 @@ class ColumnNamesEmbeddingsComparator(GeneralColumnComparator):
         :return: float number in range <0, 1> 0 exactly the same 1 completely different
         """
         if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
-            warnings.warn("Warning: column name embedding is not computed")
+            if warning_enable.get_status():
+                warnings.warn("Warning: column name embedding is not computed")
             return np.nan
         return 1 - cosine_sim(metadata1.column_name_embeddings[index1], metadata2.column_name_embeddings[index2])
 
@@ -131,7 +135,8 @@ class ColumnEmbeddingsComparator(GeneralColumnComparator):
         """
         if (metadata1.column_embeddings == {} or metadata2.column_embeddings == {} or
                 index1 not in metadata1.column_embeddings or index2 not in metadata2.column_embeddings):
-            warnings.warn("Warning: column embedding is not computed")
+            if warning_enable.get_status():
+                warnings.warn("Warning: column embedding is not computed")
             return np.nan
         return 1 - cosine_sim(metadata1.column_embeddings[index1], metadata2.column_embeddings[index2])
 

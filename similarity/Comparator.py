@@ -7,6 +7,7 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
+from constants import warning_enable
 from similarity.DataFrameMetadata import DataFrameMetadata
 from similarity.Types import DataKind
 
@@ -167,7 +168,6 @@ class CategoricalComparatorSimilar(CategoricalComparator):
 class ColumnEmbeddingComparator(ComparatorType):
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
                 settings: set[Settings]) -> pd.DataFrame:
-        ## todo originally it was used threshold here
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
         for id1, (column1, embedding1) in enumerate(metadata1.column_embeddings.items()):
@@ -207,7 +207,7 @@ class ColumnExactNamesComparator(ComparatorType):
         :param metadata2:
         :return: dataframe fill by 0 and 1
         """
-        if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
+        if (metadata1.column_names_clean == {} or metadata2.column_names_clean == {}) and warning_enable.get_status():
             warnings.warn("Warning: column_names_clean is not computed")
         result = pd.DataFrame()
         for idx1, name1 in enumerate(metadata1.column_names_clean.values()):
@@ -227,7 +227,7 @@ class ColumnNamesEmbeddingsComparator(ComparatorType):
         :param metadata2:
         :return: dataframe fill by distances between 0 and 1
         """
-        if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
+        if (metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
             warnings.warn("Warning: column name embedding is not computed")
 
         result = pd.DataFrame()
@@ -275,16 +275,22 @@ class KindComparator(ComparatorType):
         return tmp
 
     def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
-        res = pd.DataFrame()
+        res = []
         row_mins = []
-        for id1, embed1 in enumerate(embeddings1.items()):
-            for id2, embed2 in enumerate(embeddings2.items()):
-                res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
-            row_mins.append(min(res[id1]))
+        id1 = 0
+        for embed1 in embeddings1:
+            results = []
+            for embed2 in embeddings2:
+                result = 1 - cosine_sim(embed1, embed2)
+                results.append(result)
+            res.append(results)
+            row_mins.append(min(results))
+            id1 += 1
         column_mins = []
-        for _, column in res.items():
+        for_iter = pd.DataFrame(data=res)
+        for _, column in for_iter.items():
             column_mins.append(min(column))
-        return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
+        return max([mean(column_mins), mean(row_mins)])  # todo vysvetlit v textu
 
     def __are_columns_null(self, column1, column2, message) -> tuple[bool, pd.DataFrame]:
         """
@@ -295,10 +301,12 @@ class KindComparator(ComparatorType):
         :return:  tuple of bool and dataframe, if columns are empty return True
         """
         if len(column1) == 0 and len(column2) == 0:
-            warnings.warn(f"Warning: {message} is not present in the dataframe.")
+            if warning_enable.get_status():
+                warnings.warn(f"Warning: {message} is not present in the dataframe.")
             return True, pd.DataFrame([0])
         if (len(column1) == 0) != (len(column2) == 0):
-            warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
+            if warning_enable.get_status():
+                warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
     def compare_constants(self, metadata1, metadata2):

@@ -34,7 +34,7 @@ jobs:
 
   python-tests:
     env:
-      TEST_FILES: test/test_types.py test/test_metadata.py test/test_comparator.py
+      TEST_FILES: test/test_types.py test/test_metadata.py test/test_comparator.py test/test_column2VecCache.py
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:
@@ -56,7 +56,7 @@ jobs:
         run: coverage run --source='similarity,column2Vec' -m pytest $TEST_FILES
 
       - name: Show coverage
-        run: coverage report -m
+        run: coverage report -m --omit=".*.ipynb"
 
       - name: Create coverage file
         if: github.event_name == 'pull_request'

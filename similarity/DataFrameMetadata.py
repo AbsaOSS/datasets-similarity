@@ -131,6 +131,12 @@ class DataFrameMetadata:
             if name in columns:
                 return column_kind
 
+    def get_column_names_by_kind(self, *kinds):
+        columns = []
+        for t in kinds:
+            columns.extend(self.column_kind[t])
+        return columns
+
     def get_column_names_by_type(self, *types):
         if NONNUMERICAL in types:
             types = list(types)

@@ -6,8 +6,9 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from column2Vec.Column2Vec import column2vec_as_sentence, column2vec_as_sentence_clean, \
-    column2vec_as_sentence_clean_uniq, column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum
-from column2Vec.functions import get_data, get_clusters, compute_distances
+    column2vec_as_sentence_clean_uniq, column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum, \
+    cache
+from column2Vec.functions import get_nonnumerical_data, get_clusters, compute_distances
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import NONNUMERICAL
 
@@ -31,7 +32,7 @@ def get_vectors(function, data):
     count = 1
     for key in data:
         # print("Processing column: " + key + " " + str(round((count / len(data)) * 100, 2)) + "%")
-        result[key] = function(data[key], SentenceTransformer(MODEL))
+        result[key] = function(data[key], SentenceTransformer(MODEL), key)
         count += 1
     end = time.time()
     print(f"ELAPSED TIME :{end - start}")
@@ -62,7 +63,7 @@ class TestSimilarityOfVectors(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         files = [fileM2]
-        self.data = get_data(files)
+        self.data = get_nonnumerical_data(files)
         stop = 0
         for i in self.data:
             if stop == 0:
@@ -76,51 +77,51 @@ class TestSimilarityOfVectors(unittest.TestCase):
     def test_column2vec_as_sentence(self):
         model = SentenceTransformer(MODEL)
         self.assertTrue(
-            vectors_are_same(column2vec_as_sentence(self.first, model), column2vec_as_sentence(self.first, self.model)))
-        self.assertTrue(vectors_are_same(column2vec_as_sentence(self.second, model),
-                                         column2vec_as_sentence(self.second, self.model)))
+            vectors_are_same(column2vec_as_sentence(self.first, model, "a"), column2vec_as_sentence(self.first, self.model, "b")))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence(self.second, model, "c"),
+                                         column2vec_as_sentence(self.second, self.model, "d")))
         self.assertTrue(
-            vectors_are_same(column2vec_as_sentence(self.third, model), column2vec_as_sentence(self.third, self.model)))
+            vectors_are_same(column2vec_as_sentence(self.third, model, "e"), column2vec_as_sentence(self.third, self.model, "f")))
 
     def test_column2vec_as_sentence_clean(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.first, model),
-                                         column2vec_as_sentence_clean(self.first, self.model)))
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.second, model),
-                                         column2vec_as_sentence_clean(self.second, self.model)))
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.third, model),
-                                         column2vec_as_sentence_clean(self.third, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.first, model, "g"),
+                                         column2vec_as_sentence_clean(self.first, self.model, "h")))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.second, model, "i"),
+                                         column2vec_as_sentence_clean(self.second, self.model, "j")))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.third, model, "k"),
+                                         column2vec_as_sentence_clean(self.third, self.model, "l")))
 
     def test_column2vec_as_sentence_clean_uniq(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.first, model),
-                                         column2vec_as_sentence_clean_uniq(self.first, self.model)))
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.second, model),
-                                         column2vec_as_sentence_clean_uniq(self.second, self.model)))
-        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.third, model),
-                                         column2vec_as_sentence_clean_uniq(self.third, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.first, model, "m"),
+                                         column2vec_as_sentence_clean_uniq(self.first, self.model, "n")))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.second, model, "o"),
+                                         column2vec_as_sentence_clean_uniq(self.second, self.model, "p")))
+        self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.third, model, "q"),
+                                         column2vec_as_sentence_clean_uniq(self.third, self.model, "r")))
 
     def test_column2vec_avg(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_avg(self.first, model), column2vec_avg(self.first, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_avg(self.first, model, "v"), column2vec_avg(self.first, self.model, "s")))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.second, model), column2vec_avg(self.second, self.model)))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.third, model), column2vec_avg(self.third, self.model)))
 
     def test_column2vec_weighted_avg(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.first, model),
-                                         column2vec_weighted_avg(self.first, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.first, model, "u"),
+                                         column2vec_weighted_avg(self.first, self.model, "w")))
         # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.second, model), column2vec_weighted_avg(self.second, self.model)))
         # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.third, model), column2vec_weighted_avg(self.third, self.model)))
 
     def test_column2vec_sum(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_sum(self.first, model), column2vec_sum(self.first, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_sum(self.first, model, "x"), column2vec_sum(self.first, self.model, "y")))
 
     def test_column2vec_weighted_sum(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_weighted_sum(self.first, model),
-                                         column2vec_weighted_sum(self.first, self.model)))
+        self.assertTrue(vectors_are_same(column2vec_weighted_sum(self.first, model, "z"),
+                                         column2vec_weighted_sum(self.first, self.model, "ab")))
 
 
 class TestClustersAreAlwaysSame(unittest.TestCase):
@@ -148,7 +149,8 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_data(self.files)
+        self.data = get_nonnumerical_data(self.files)
+        cache.off()
 
     def test_column2vec_as_sentence(self):
         vectors_sentence = get_vectors(column2vec_as_sentence, self.data)
@@ -223,7 +225,8 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
         fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_data(self.files)
+        self.data = get_nonnumerical_data(self.files)
+        cache.off()
 
     def get_cluster_num(self, name):
         for number, names in self.clusters_MC_Copilot.items():

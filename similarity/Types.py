@@ -2,12 +2,15 @@
 This files contains all
 """
 import re
+import warnings
 from enum import Enum
 from typing import Any
 from dateutil.parser import parse, ParserError
 
 import numpy as np
 import pandas as pd
+
+from constants import warning_enable
 
 
 class TypeSettings:
@@ -305,9 +308,11 @@ def is_date(column: pd.Series) -> bool:
     :return:true for date
     """
 
+
     def is_str_date(word: str):
         try:
-            parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
+            with warnings.catch_warnings(action=warning_enable.get_timezone()):
+                parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
             return True
         except (ParserError, OverflowError) as e:
             element = str(word).strip()
