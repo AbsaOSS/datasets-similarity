@@ -28,11 +28,11 @@ class Cache:
         try:
             self.__cache = pd.io.parsers.read_csv(self.__file, index_col=0)
         except FileNotFoundError:
-            logger.info("CACHE: File not found.")
+            logger.warning("CACHE: File not found.")
         except pd.errors.EmptyDataError:
-            logger.info("CACHE: No data")
+            logger.warning("CACHE: No data")
         except pd.errors.ParserError:
-            logger.info("CACHE: Parser error")
+            logger.warning("CACHE: Parser error")
 
     def get_cache(self, key: str, function: str) -> list | None:
         """
