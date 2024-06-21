@@ -43,7 +43,7 @@ class TrainedModel:
     """
     Class encapsulating trained module
     """
-    __model = SentenceTransformer('bert-base-nli-mean-tokens')
+    __model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 
     def set_module(self, model: SentenceTransformer):
         """
