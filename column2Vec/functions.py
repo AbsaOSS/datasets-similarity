@@ -18,7 +18,7 @@ from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import NONNUMERICAL
 
 
-def get_nonnumerical_data(files: list[str]) -> dict[str, Any]:
+def get_nonnumerical_data(files: list[str]) -> dict[str, list]:
     """
     Reads all csv files (which name is in files). Creates metadata for them.
     Save only nonnumerical columns into dictionary. Key is a name of column.

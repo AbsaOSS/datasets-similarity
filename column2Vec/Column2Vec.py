@@ -52,7 +52,9 @@ class Cache:
             self.__read()
             self.__read_from_file = True
         if function in self.__cache.index and key in self.__cache.columns:
-            return json.loads(self.__cache.loc[function, key])  # json is faster than ast
+            tmp = self.__cache.loc[function, key]
+            if tmp != 'nan':
+                return json.loads(tmp) # json is faster than ast
         return None
 
     def save(self, key: str, function: str, embedding: Tensor | int):
@@ -254,7 +256,7 @@ def column2vec_sum(column: pd.Series, model: SentenceTransformer, key: str):
     """
     Convert a column to a vector
 
-    Convert each item in the column to a vector and return the average of all the vectors
+    Convert each item in the column to a vector and return the sum of all the vectors
 
     :param column: to be transformed
     :param model: for transforming to embedding
@@ -277,7 +279,7 @@ def column2vec_weighted_sum(column: pd.Series, model: SentenceTransformer, key: 
     """
     Convert a column to a vector.
 
-    Convert each item in the column to a vector and return the weighted average of all the vectors.
+    Convert each item in the column to a vector and return the weighted sum of all the vectors.
 
     :param column: to be transformed
     :param model: for transforming to embedding
