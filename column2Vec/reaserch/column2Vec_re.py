@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 
 import pandas as pd
 from sentence_transformers import SentenceTransformer
@@ -8,6 +9,7 @@ from column2Vec.Column2Vec import column2vec_as_sentence, column2vec_as_sentence
     column2vec_as_sentence_clean_uniq, column2vec_weighted_sum, column2vec_sum, column2vec_weighted_avg, column2vec_avg, \
     cache
 from column2Vec.functions import get_nonnumerical_data
+from column2Vec.reaserch.generate_report import generate_report, generate_time_report
 from config import configure
 from constants import warning_enable
 from similarity.Comparator import cosine_sim
@@ -16,11 +18,10 @@ FUNCTIONS = [column2vec_as_sentence, column2vec_as_sentence_clean, column2vec_as
              column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum]
 MODEL = 'paraphrase-multilingual-mpnet-base-v2'#'bert-base-nli-mean-tokens'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
+model = SentenceTransformer(MODEL)
 
 # otestovani stability pokazde stejne vysledky
 def stability_test(column1: pd.Series, function, key):
-    model = SentenceTransformer(MODEL)
 
     emb1 = function(column1, model, key)
     emb2 = function(column1, model, key+"s1")
@@ -30,27 +31,33 @@ def stability_test(column1: pd.Series, function, key):
     whole_first = cosine_sim(emb3, emb1)
     # all_same = emb1.any() == emb2 and emb3 == emb1
     if first_second != 1 or whole_second != 1 or whole_first != 1 : #or not all_same:
-        print(f"For {key}:\n is not stable\n")
+        return False, f"For {key}:\n is not stable\n"
+    return True, f"For {key}: is stable\n"
 
 
 # otestovani podobnosti sloupcu se stejnym vektorem
-def similarity_test():
+def similarity_test(column1: pd.Series, function, key: str):
     pass
 
 
 # otestovani ze nestejne sloupce(vektory) jsou dostatecne daleko
-def non_similar_test():
+def non_similar_test(column1: pd.Series, function, key: str):
     pass
 
-def time_test():
-    pass
+def time_test(column1: pd.Series, function, key: str):
+    cache.set_file("no_file.txt")
+    cache.clear_cache()
+    start = time.time()
+    function(column1, model, key)
+    end = time.time()
+    return True, (end - start)
+
 
 # sloupce ktere maji jen cast dat by meli byt stejne jako sloupce cele
-def partial_column_test(column1: pd.Series, function, key) -> (bool, str):
+def partial_column_test(column1: pd.Series, function, key: str) -> (bool, str):
     length = column1.size
     first_half = column1.head(int(length / 2))
     second_half = column1.tail(int(length / 2))
-    model = SentenceTransformer(MODEL)
 
     emb1 = function(column1, model, key)
     emb2 = function(first_half, model, key+str(1))
@@ -62,39 +69,40 @@ def partial_column_test(column1: pd.Series, function, key) -> (bool, str):
         print((f"For {key}, {function}:\n whole column and first half: {whole_first}\n "
                        f"whole column and second half: {whole_second}\n first half"
                        f" and second half: {first_second}\n"))
-        return False, (f"For {key}:\n whole column and first half: {whole_first}\n "
-                       f"whole column and second half: {whole_second}\n first half"
-                       f" and second half: {first_second}\n")
+        return False, (whole_first, whole_second, first_second)
     else:
         return True, f"For {key}:\n is stable\n"
 
 
 def test_func(data, test_type):
     i = 0
+    result = dict()
     for name in data.keys():
-        print(f"--- Start Column: {name} ---\n")
+        result[name] = dict()
+        # print(f"--- Start Column: {name} ---\n")
         # print("AS SENTENCE")
-        test_type(data[name], column2vec_as_sentence, name)
+        result[name]["SENTENCE"] = test_type(data[name], column2vec_as_sentence, name)
         # print("AS CLEAR SENTENCE")
-        test_type(data[name], column2vec_as_sentence_clean, name)
+        result[name]["CLEAR SENT."] = test_type(data[name], column2vec_as_sentence_clean, name)
         # print("AS CLEAR UNIQUE SENTENCE")
-        test_type(data[name], column2vec_as_sentence_clean_uniq, name)
+        result[name]["CLEAR UNIQ SENT."] = test_type(data[name], column2vec_as_sentence_clean_uniq, name)
         # print("AVERAGE")
-        test_type(data[name], column2vec_avg, name)
+        result[name]["AVERAGE"] = test_type(data[name], column2vec_avg, name)
         # print("WEIGHTED AVERAGE")
-        test_type(data[name], column2vec_weighted_avg, name)
+        result[name]["W. AVERAGE"] = test_type(data[name], column2vec_weighted_avg, name)
         # print("SUM")
-        test_type(data[name], column2vec_sum, name)
+        result[name]["SUM"] = test_type(data[name], column2vec_sum, name)
         # print("WEIGHTED SUM")
-        test_type(data[name], column2vec_weighted_sum, name)
+        result[name]["W. SUM"] = test_type(data[name], column2vec_weighted_sum, name)
         i += 1
         cache.save_persistently()
         cache.clear_cache()
+    return result
     # partitial_column_test()
     # print(f"vypsano: {i}, data {len(data)}")
 
 
-def run_fun():
+def read_data():
     try:
         with open('nonnumerical_data.pkl', 'rb') as f:
             data = pickle.load(f)
@@ -115,9 +123,13 @@ def run_fun():
 
         with open('nonnumerical_data.pkl', 'wb') as f:
             pickle.dump(data, f)
-    cache.set_file("cache.txt")
-    test_func(data, partial_column_test)
-    # test_func(data, stability_test)
+    return data
+def run_fun():
+    data = read_data()
+    cache.set_file("cache_remv.txt")
+    generate_time_report(test_func(data, time_test), "REP_time_test")
+    # generate_report(test_func(data, @ ), "REP_partial_column_test")
+    # generate_report(test_func(data, stability_test), "REP_stability_test")
 
 configure()
 warning_enable.change_status(True)

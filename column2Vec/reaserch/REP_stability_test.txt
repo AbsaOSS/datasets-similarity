@@ -1,0 +1,1197 @@
+--- Start Column: reg_state1 ---
+AS SENTENCE
+For reg_state1: is stable
+
+AS CLEAR SENTENCE
+For reg_state1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For reg_state1: is stable
+
+AVERAGE
+For reg_state1: is stable
+
+WEIGHTED AVERAGE
+For reg_state1: is stable
+
+SUM
+For reg_state1: is stable
+
+WEIGHTED SUM
+For reg_state1: is stable
+
+
+--- Start Column: reg_city1 ---
+AS SENTENCE
+For reg_city1: is stable
+
+AS CLEAR SENTENCE
+For reg_city1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For reg_city1: is stable
+
+AVERAGE
+For reg_city1: is stable
+
+WEIGHTED AVERAGE
+For reg_city1: is stable
+
+SUM
+For reg_city1: is stable
+
+WEIGHTED SUM
+For reg_city1: is stable
+
+
+--- Start Column: flight1 ---
+AS SENTENCE
+For flight1: is stable
+
+AS CLEAR SENTENCE
+For flight1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For flight1: is stable
+
+AVERAGE
+For flight1: is stable
+
+WEIGHTED AVERAGE
+For flight1: is stable
+
+SUM
+For flight1: is stable
+
+WEIGHTED SUM
+For flight1: is stable
+
+
+--- Start Column: tail_number1 ---
+AS SENTENCE
+For tail_number1: is stable
+
+AS CLEAR SENTENCE
+For tail_number1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For tail_number1: is stable
+
+AVERAGE
+For tail_number1: is stable
+
+WEIGHTED AVERAGE
+For tail_number1: is stable
+
+SUM
+For tail_number1: is stable
+
+WEIGHTED SUM
+For tail_number1: is stable
+
+
+--- Start Column: reg_expiration1 ---
+AS SENTENCE
+For reg_expiration1: is stable
+
+AS CLEAR SENTENCE
+For reg_expiration1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For reg_expiration1: is stable
+
+AVERAGE
+For reg_expiration1: is stable
+
+WEIGHTED AVERAGE
+For reg_expiration1: is stable
+
+SUM
+For reg_expiration1: is stable
+
+WEIGHTED SUM
+For reg_expiration1: is stable
+
+
+--- Start Column: reg_owner1 ---
+AS SENTENCE
+For reg_owner1: is stable
+
+AS CLEAR SENTENCE
+For reg_owner1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For reg_owner1: is stable
+
+AVERAGE
+For reg_owner1: is stable
+
+WEIGHTED AVERAGE
+For reg_owner1: is stable
+
+SUM
+For reg_owner1: is stable
+
+WEIGHTED SUM
+For reg_owner1: is stable
+
+
+--- Start Column: manufacturer1 ---
+AS SENTENCE
+For manufacturer1: is stable
+
+AS CLEAR SENTENCE
+For manufacturer1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For manufacturer1: is stable
+
+AVERAGE
+For manufacturer1: is stable
+
+WEIGHTED AVERAGE
+For manufacturer1: is stable
+
+SUM
+For manufacturer1: is stable
+
+WEIGHTED SUM
+For manufacturer1: is stable
+
+
+--- Start Column: model1 ---
+AS SENTENCE
+For model1: is stable
+
+AS CLEAR SENTENCE
+For model1: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For model1: is stable
+
+AVERAGE
+For model1: is stable
+
+WEIGHTED AVERAGE
+For model1: is stable
+
+SUM
+For model1: is stable
+
+WEIGHTED SUM
+For model1: is stable
+
+
+--- Start Column: Multi Engine2 ---
+AS SENTENCE
+For Multi Engine2: is stable
+
+AS CLEAR SENTENCE
+For Multi Engine2: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Multi Engine2: is stable
+
+AVERAGE
+For Multi Engine2: is stable
+
+WEIGHTED AVERAGE
+For Multi Engine2: is stable
+
+SUM
+For Multi Engine2: is stable
+
+WEIGHTED SUM
+For Multi Engine2: is stable
+
+
+--- Start Column: Engine Type2 ---
+AS SENTENCE
+For Engine Type2: is stable
+
+AS CLEAR SENTENCE
+For Engine Type2: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Engine Type2: is stable
+
+AVERAGE
+For Engine Type2: is stable
+
+WEIGHTED AVERAGE
+For Engine Type2: is stable
+
+SUM
+For Engine Type2: is stable
+
+WEIGHTED SUM
+For Engine Type2: is stable
+
+
+--- Start Column: TP mods2 ---
+AS SENTENCE
+For TP mods2: is stable
+
+AS CLEAR SENTENCE
+For TP mods2: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For TP mods2: is stable
+
+AVERAGE
+For TP mods2: is stable
+
+WEIGHTED AVERAGE
+For TP mods2: is stable
+
+SUM
+For TP mods2: is stable
+
+WEIGHTED SUM
+For TP mods2: is stable
+
+
+--- Start Column: Company2 ---
+AS SENTENCE
+For Company2: is stable
+
+AS CLEAR SENTENCE
+For Company2: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Company2: is stable
+
+AVERAGE
+For Company2: is stable
+
+WEIGHTED AVERAGE
+For Company2: is stable
+
+SUM
+For Company2: is stable
+
+WEIGHTED SUM
+For Company2: is stable
+
+
+--- Start Column: Model2 ---
+AS SENTENCE
+For Model2: is stable
+
+AS CLEAR SENTENCE
+For Model2: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Model2: is stable
+
+AVERAGE
+For Model2: is stable
+
+WEIGHTED AVERAGE
+For Model2: is stable
+
+SUM
+For Model2: is stable
+
+WEIGHTED SUM
+For Model2: is stable
+
+
+--- Start Column: make3 ---
+AS SENTENCE
+For make3: is stable
+
+AS CLEAR SENTENCE
+For make3: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For make3: is stable
+
+AVERAGE
+For make3: is stable
+
+WEIGHTED AVERAGE
+For make3: is stable
+
+SUM
+For make3: is stable
+
+WEIGHTED SUM
+For make3: is stable
+
+
+--- Start Column: gear3 ---
+AS SENTENCE
+For gear3: is stable
+
+AS CLEAR SENTENCE
+For gear3: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For gear3: is stable
+
+AVERAGE
+For gear3: is stable
+
+WEIGHTED AVERAGE
+For gear3: is stable
+
+SUM
+For gear3: is stable
+
+WEIGHTED SUM
+For gear3: is stable
+
+
+--- Start Column: model3 ---
+AS SENTENCE
+For model3: is stable
+
+AS CLEAR SENTENCE
+For model3: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For model3: is stable
+
+AVERAGE
+For model3: is stable
+
+WEIGHTED AVERAGE
+For model3: is stable
+
+SUM
+For model3: is stable
+
+WEIGHTED SUM
+For model3: is stable
+
+
+--- Start Column: offerType3 ---
+AS SENTENCE
+For offerType3: is stable
+
+AS CLEAR SENTENCE
+For offerType3: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For offerType3: is stable
+
+AVERAGE
+For offerType3: is stable
+
+WEIGHTED AVERAGE
+For offerType3: is stable
+
+SUM
+For offerType3: is stable
+
+WEIGHTED SUM
+For offerType3: is stable
+
+
+--- Start Column: fuel3 ---
+AS SENTENCE
+For fuel3: is stable
+
+AS CLEAR SENTENCE
+For fuel3: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For fuel3: is stable
+
+AVERAGE
+For fuel3: is stable
+
+WEIGHTED AVERAGE
+For fuel3: is stable
+
+SUM
+For fuel3: is stable
+
+WEIGHTED SUM
+For fuel3: is stable
+
+
+--- Start Column: fuel_type4 ---
+AS SENTENCE
+For fuel_type4: is stable
+
+AS CLEAR SENTENCE
+For fuel_type4: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For fuel_type4: is stable
+
+AVERAGE
+For fuel_type4: is stable
+
+WEIGHTED AVERAGE
+For fuel_type4: is stable
+
+SUM
+For fuel_type4: is stable
+
+WEIGHTED SUM
+For fuel_type4: is stable
+
+
+--- Start Column: transmission_type4 ---
+AS SENTENCE
+For transmission_type4: is stable
+
+AS CLEAR SENTENCE
+For transmission_type4: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For transmission_type4: is stable
+
+AVERAGE
+For transmission_type4: is stable
+
+WEIGHTED AVERAGE
+For transmission_type4: is stable
+
+SUM
+For transmission_type4: is stable
+
+WEIGHTED SUM
+For transmission_type4: is stable
+
+
+--- Start Column: car_name4 ---
+AS SENTENCE
+For car_name4: is stable
+
+AS CLEAR SENTENCE
+For car_name4: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For car_name4: is stable
+
+AVERAGE
+For car_name4: is stable
+
+WEIGHTED AVERAGE
+For car_name4: is stable
+
+SUM
+For car_name4: is stable
+
+WEIGHTED SUM
+For car_name4: is stable
+
+
+--- Start Column: body_type4 ---
+AS SENTENCE
+For body_type4: is stable
+
+AS CLEAR SENTENCE
+For body_type4: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For body_type4: is stable
+
+AVERAGE
+For body_type4: is stable
+
+WEIGHTED AVERAGE
+For body_type4: is stable
+
+SUM
+For body_type4: is stable
+
+WEIGHTED SUM
+For body_type4: is stable
+
+
+--- Start Column: vin5 ---
+AS SENTENCE
+For vin5: is stable
+
+AS CLEAR SENTENCE
+For vin5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For vin5: is stable
+
+AVERAGE
+For vin5: is stable
+
+WEIGHTED AVERAGE
+For vin5: is stable
+
+SUM
+For vin5: is stable
+
+WEIGHTED SUM
+For vin5: is stable
+
+
+--- Start Column: model5 ---
+AS SENTENCE
+For model5: is stable
+
+AS CLEAR SENTENCE
+For model5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For model5: is stable
+
+AVERAGE
+For model5: is stable
+
+WEIGHTED AVERAGE
+For model5: is stable
+
+SUM
+For model5: is stable
+
+WEIGHTED SUM
+For model5: is stable
+
+
+--- Start Column: brand5 ---
+AS SENTENCE
+For brand5: is stable
+
+AS CLEAR SENTENCE
+For brand5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For brand5: is stable
+
+AVERAGE
+For brand5: is stable
+
+WEIGHTED AVERAGE
+For brand5: is stable
+
+SUM
+For brand5: is stable
+
+WEIGHTED SUM
+For brand5: is stable
+
+
+--- Start Column: country5 ---
+AS SENTENCE
+For country5: is stable
+
+AS CLEAR SENTENCE
+For country5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For country5: is stable
+
+AVERAGE
+For country5: is stable
+
+WEIGHTED AVERAGE
+For country5: is stable
+
+SUM
+For country5: is stable
+
+WEIGHTED SUM
+For country5: is stable
+
+
+--- Start Column: condition5 ---
+AS SENTENCE
+For condition5: is stable
+
+AS CLEAR SENTENCE
+For condition5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For condition5: is stable
+
+AVERAGE
+For condition5: is stable
+
+WEIGHTED AVERAGE
+For condition5: is stable
+
+SUM
+For condition5: is stable
+
+WEIGHTED SUM
+For condition5: is stable
+
+
+--- Start Column: title_status5 ---
+AS SENTENCE
+For title_status5: is stable
+
+AS CLEAR SENTENCE
+For title_status5:
+ is not stable
+
+AS CLEAR UNIQUE SENTENCE
+For title_status5: is stable
+
+AVERAGE
+For title_status5: is stable
+
+WEIGHTED AVERAGE
+For title_status5: is stable
+
+SUM
+For title_status5: is stable
+
+WEIGHTED SUM
+For title_status5: is stable
+
+
+--- Start Column: color5 ---
+AS SENTENCE
+For color5: is stable
+
+AS CLEAR SENTENCE
+For color5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For color5: is stable
+
+AVERAGE
+For color5: is stable
+
+WEIGHTED AVERAGE
+For color5: is stable
+
+SUM
+For color5: is stable
+
+WEIGHTED SUM
+For color5: is stable
+
+
+--- Start Column: state5 ---
+AS SENTENCE
+For state5: is stable
+
+AS CLEAR SENTENCE
+For state5: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For state5: is stable
+
+AVERAGE
+For state5: is stable
+
+WEIGHTED AVERAGE
+For state5: is stable
+
+SUM
+For state5: is stable
+
+WEIGHTED SUM
+For state5: is stable
+
+
+--- Start Column: Poster_Link6 ---
+AS SENTENCE
+For Poster_Link6: is stable
+
+AS CLEAR SENTENCE
+For Poster_Link6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Poster_Link6: is stable
+
+AVERAGE
+For Poster_Link6: is stable
+
+WEIGHTED AVERAGE
+For Poster_Link6: is stable
+
+SUM
+For Poster_Link6: is stable
+
+WEIGHTED SUM
+For Poster_Link6: is stable
+
+
+--- Start Column: Certificate6 ---
+AS SENTENCE
+For Certificate6: is stable
+
+AS CLEAR SENTENCE
+For Certificate6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Certificate6: is stable
+
+AVERAGE
+For Certificate6: is stable
+
+WEIGHTED AVERAGE
+For Certificate6: is stable
+
+SUM
+For Certificate6: is stable
+
+WEIGHTED SUM
+For Certificate6: is stable
+
+
+--- Start Column: Gross6 ---
+AS SENTENCE
+For Gross6: is stable
+
+AS CLEAR SENTENCE
+For Gross6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Gross6: is stable
+
+AVERAGE
+For Gross6: is stable
+
+WEIGHTED AVERAGE
+For Gross6: is stable
+
+SUM
+For Gross6: is stable
+
+WEIGHTED SUM
+For Gross6: is stable
+
+
+--- Start Column: Star46 ---
+AS SENTENCE
+For Star46: is stable
+
+AS CLEAR SENTENCE
+For Star46: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Star46: is stable
+
+AVERAGE
+For Star46: is stable
+
+WEIGHTED AVERAGE
+For Star46: is stable
+
+SUM
+For Star46: is stable
+
+WEIGHTED SUM
+For Star46: is stable
+
+
+--- Start Column: Star26 ---
+AS SENTENCE
+For Star26: is stable
+
+AS CLEAR SENTENCE
+For Star26: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Star26: is stable
+
+AVERAGE
+For Star26: is stable
+
+WEIGHTED AVERAGE
+For Star26: is stable
+
+SUM
+For Star26: is stable
+
+WEIGHTED SUM
+For Star26: is stable
+
+
+--- Start Column: Star16 ---
+AS SENTENCE
+For Star16: is stable
+
+AS CLEAR SENTENCE
+For Star16: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Star16: is stable
+
+AVERAGE
+For Star16: is stable
+
+WEIGHTED AVERAGE
+For Star16: is stable
+
+SUM
+For Star16: is stable
+
+WEIGHTED SUM
+For Star16: is stable
+
+
+--- Start Column: Star36 ---
+AS SENTENCE
+For Star36: is stable
+
+AS CLEAR SENTENCE
+For Star36: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Star36: is stable
+
+AVERAGE
+For Star36: is stable
+
+WEIGHTED AVERAGE
+For Star36: is stable
+
+SUM
+For Star36: is stable
+
+WEIGHTED SUM
+For Star36: is stable
+
+
+--- Start Column: Series_Title6 ---
+AS SENTENCE
+For Series_Title6: is stable
+
+AS CLEAR SENTENCE
+For Series_Title6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Series_Title6: is stable
+
+AVERAGE
+For Series_Title6: is stable
+
+WEIGHTED AVERAGE
+For Series_Title6: is stable
+
+SUM
+For Series_Title6: is stable
+
+WEIGHTED SUM
+For Series_Title6: is stable
+
+
+--- Start Column: Overview6 ---
+AS SENTENCE
+For Overview6: is stable
+
+AS CLEAR SENTENCE
+For Overview6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Overview6: is stable
+
+AVERAGE
+For Overview6: is stable
+
+WEIGHTED AVERAGE
+For Overview6: is stable
+
+SUM
+For Overview6: is stable
+
+WEIGHTED SUM
+For Overview6: is stable
+
+
+--- Start Column: Director6 ---
+AS SENTENCE
+For Director6: is stable
+
+AS CLEAR SENTENCE
+For Director6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Director6: is stable
+
+AVERAGE
+For Director6: is stable
+
+WEIGHTED AVERAGE
+For Director6: is stable
+
+SUM
+For Director6: is stable
+
+WEIGHTED SUM
+For Director6: is stable
+
+
+--- Start Column: Genre6 ---
+AS SENTENCE
+For Genre6: is stable
+
+AS CLEAR SENTENCE
+For Genre6: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For Genre6: is stable
+
+AVERAGE
+For Genre6: is stable
+
+WEIGHTED AVERAGE
+For Genre6: is stable
+
+SUM
+For Genre6: is stable
+
+WEIGHTED SUM
+For Genre6: is stable
+
+
+--- Start Column: show_id7 ---
+AS SENTENCE
+For show_id7: is stable
+
+AS CLEAR SENTENCE
+For show_id7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For show_id7: is stable
+
+AVERAGE
+For show_id7: is stable
+
+WEIGHTED AVERAGE
+For show_id7: is stable
+
+SUM
+For show_id7: is stable
+
+WEIGHTED SUM
+For show_id7: is stable
+
+
+--- Start Column: director7 ---
+AS SENTENCE
+For director7: is stable
+
+AS CLEAR SENTENCE
+For director7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For director7: is stable
+
+AVERAGE
+For director7: is stable
+
+WEIGHTED AVERAGE
+For director7: is stable
+
+SUM
+For director7: is stable
+
+WEIGHTED SUM
+For director7: is stable
+
+
+--- Start Column: title7 ---
+AS SENTENCE
+For title7: is stable
+
+AS CLEAR SENTENCE
+For title7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For title7: is stable
+
+AVERAGE
+For title7: is stable
+
+WEIGHTED AVERAGE
+For title7: is stable
+
+SUM
+For title7: is stable
+
+WEIGHTED SUM
+For title7: is stable
+
+
+--- Start Column: description7 ---
+AS SENTENCE
+For description7: is stable
+
+AS CLEAR SENTENCE
+For description7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For description7: is stable
+
+AVERAGE
+For description7: is stable
+
+WEIGHTED AVERAGE
+For description7: is stable
+
+SUM
+For description7: is stable
+
+WEIGHTED SUM
+For description7: is stable
+
+
+--- Start Column: cast7 ---
+AS SENTENCE
+For cast7: is stable
+
+AS CLEAR SENTENCE
+For cast7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For cast7: is stable
+
+AVERAGE
+For cast7: is stable
+
+WEIGHTED AVERAGE
+For cast7: is stable
+
+SUM
+For cast7: is stable
+
+WEIGHTED SUM
+For cast7: is stable
+
+
+--- Start Column: country7 ---
+AS SENTENCE
+For country7: is stable
+
+AS CLEAR SENTENCE
+For country7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For country7: is stable
+
+AVERAGE
+For country7: is stable
+
+WEIGHTED AVERAGE
+For country7: is stable
+
+SUM
+For country7: is stable
+
+WEIGHTED SUM
+For country7: is stable
+
+
+--- Start Column: rating7 ---
+AS SENTENCE
+For rating7: is stable
+
+AS CLEAR SENTENCE
+For rating7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For rating7: is stable
+
+AVERAGE
+For rating7: is stable
+
+WEIGHTED AVERAGE
+For rating7: is stable
+
+SUM
+For rating7: is stable
+
+WEIGHTED SUM
+For rating7: is stable
+
+
+--- Start Column: type7 ---
+AS SENTENCE
+For type7: is stable
+
+AS CLEAR SENTENCE
+For type7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For type7: is stable
+
+AVERAGE
+For type7: is stable
+
+WEIGHTED AVERAGE
+For type7: is stable
+
+SUM
+For type7: is stable
+
+WEIGHTED SUM
+For type7: is stable
+
+
+--- Start Column: listed_in7 ---
+AS SENTENCE
+For listed_in7: is stable
+
+AS CLEAR SENTENCE
+For listed_in7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For listed_in7: is stable
+
+AVERAGE
+For listed_in7: is stable
+
+WEIGHTED AVERAGE
+For listed_in7: is stable
+
+SUM
+For listed_in7: is stable
+
+WEIGHTED SUM
+For listed_in7: is stable
+
+
+--- Start Column: duration7 ---
+AS SENTENCE
+For duration7: is stable
+
+AS CLEAR SENTENCE
+For duration7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For duration7: is stable
+
+AVERAGE
+For duration7: is stable
+
+WEIGHTED AVERAGE
+For duration7: is stable
+
+SUM
+For duration7: is stable
+
+WEIGHTED SUM
+For duration7: is stable
+
+
+--- Start Column: date_added7 ---
+AS SENTENCE
+For date_added7: is stable
+
+AS CLEAR SENTENCE
+For date_added7: is stable
+
+AS CLEAR UNIQUE SENTENCE
+For date_added7: is stable
+
+AVERAGE
+For date_added7: is stable
+
+WEIGHTED AVERAGE
+For date_added7: is stable
+
+SUM
+For date_added7: is stable
+
+WEIGHTED SUM
+For date_added7: is stable
+
+

@@ -4,6 +4,7 @@ This file contains column2Vec implementations.
 from __future__ import annotations
 
 import json
+import math
 import re
 import logging
 
@@ -53,8 +54,9 @@ class Cache:
             self.__read_from_file = True
         if function in self.__cache.index and key in self.__cache.columns:
             tmp = self.__cache.loc[function, key]
-            if tmp != 'nan':
+            if (tmp != 'nan' and tmp is not int) or not math.isnan(tmp):
                 return json.loads(tmp) # json is faster than ast
+        print(f"NO CACHE key: {key}, function: {function}")
         return None
 
     def save(self, key: str, function: str, embedding: Tensor | int):
