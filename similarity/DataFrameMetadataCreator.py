@@ -12,7 +12,7 @@ import pandas as pd
 
 from sentence_transformers import SentenceTransformer
 
-from column2Vec.Column2Vec import column2vec_as_sentence
+from column2Vec.impl.Column2Vec import column2vec_as_sentence
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
 from Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
