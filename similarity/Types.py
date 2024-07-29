@@ -313,7 +313,6 @@ def is_date(column: pd.Series) -> bool:
             parse(element, fuzzy=True)
             return True
         except (ParserError, OverflowError):
-            element = str(word).strip()
             one_or_two = r'(\d{1}|\d{2})'
             two_or_four = r'(\d{2}|\d{4})'
             months = ('(January|February|March|April|May|June|July|August|'
@@ -327,7 +326,6 @@ def is_date(column: pd.Series) -> bool:
             pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
             # 1999,4February 1999,4Feb
             pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),' + one_or_two + months
-
             # '99/12/31', '05/2/3' 00/2/3
             pattern = pattern + '|' + r'^' + two_or_four + r'/' + one_or_two + r'/' + one_or_two
             # 1995W05 2024-W50
@@ -338,6 +336,7 @@ def is_date(column: pd.Series) -> bool:
             pattern = pattern + '|' + r'^((2|1)\d{3}-\d{3})$|(^(2|1)\d{6})$'
             # epoch time 1911517200(2030 will be max for us)
             pattern = pattern + '|' + r'(^\d{1,10})$'
+
             return bool(re.match(pattern, element))
 
     return column.apply(lambda s: is_str_date(s)).all()
