@@ -311,7 +311,7 @@ def is_date(column: pd.Series) -> bool:
 
     def is_str_date(word: str):
         try:
-            with warnings.catch_warnings(action=warning_enable.get_timezone()):
+            with warnings.catch_warnings():
                 parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
             return True
         except (ParserError, OverflowError):
@@ -326,7 +326,18 @@ def is_date(column: pd.Series) -> bool:
             # 11. 4. 1999
             pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
             # 1999,4February 1999,4Feb
-            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months
+            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),' + one_or_two + months
+            #'99/12/31', '05/2/3' 00/2/3
+            pattern = pattern + '|' + r'^' + two_or_four + r'/' + one_or_two + r'/' + one_or_two
+            # 1995W05 2024-W50
+            pattern = pattern + '|' + r'^(\d{4}(W|-W)\d{2})'
+            # 1995W0512
+            # 2023-W03-2
+            pattern = pattern + '|' + r'(\d{4}(W|-W)\d{2}(-|)' + one_or_two + ')$'
+            # '1995-035', '1995035', '2024340'
+            pattern = pattern + '|' + r'^((2|1)\d{3}-\d{3})$|(^(2|1)\d{6})$'
+            # epoch time 1911517200(2030 will be max for us)
+            pattern = pattern + '|' + r'(^\d{1,10})$'
             return bool(re.match(pattern, element))
 
     return column.apply(lambda s: is_str_date(s)).all()
