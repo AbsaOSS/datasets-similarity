@@ -479,6 +479,7 @@ class TestDateTime(unittest.TestCase):
             'DDMon,YYYY': ['4Feb,1999', '31 Jan,1999', '3 Nov, 1999 '],
             'DDMonthYYYY': ['4February1999', '31January 1999', '3 November 1999 '],
             'DDMonYYYY': ['4Feb1999', '31Jan 1999', '3 Nov 1999 '],
+
             'YY/MM/DD': ['95/2/4', '99/12/31', '05/2/3', '00/2/3'],
             'DD-Mon-YYYY': ['04-Feb-1995', '03-APR-1999', '31-JUL-1999'],
             'DD-Month-YYYY': ['4-February-1995', '03-April-1999', '31-July-1999'],
@@ -487,6 +488,7 @@ class TestDateTime(unittest.TestCase):
             'YYYY-MM-DD': ['1995-02-04', '2000-12-31', '1999-01-03', '2024-07-29', '1997-10-01', '2024-11-30'],
             'YYYY-MM': ['1995-02', '2000-12', '1999-01', '2024-07', '1997-10', '2024-11'],
             'YYYYMMDD': ['19950204', '20001231', '19990103', '20240729', '19971001', '20241130'],
+
             'Week': ['1997-W01', '1997W01', '1995W05', '2023-W03', '2024-W50'],  # 1997-W01 or 1997W01 (first week of the year 1997)
             'Week_day': ['1997-W01-3', '1997W013', '1995W0512', '2023-W03-2', '2024-W50-1'],  # 1997-W01-3 or 1997W013 (#rd day of the first week of the year 1997) 1995-W05-12 or 1995W0512 (12th day of the fifth week of the year 1995)
             'Days': ['1995-035', '1995035', '2024340'],  # 1995-035 or 1995035 (35th day of the year 1995)
