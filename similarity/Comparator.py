@@ -2,8 +2,8 @@
 File contains Comparator class, ComparatorType classes and DistanceFunction class.
 Comparator is split to types comparator, all columns with same types are compare together
 """
-from __future__ import annotations
 
+from __future__ import annotations
 import math
 import warnings
 from abc import abstractmethod, ABC
@@ -175,7 +175,8 @@ class CategoricalComparatorSimilar(CategoricalComparator):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[int, float]:  # todo test some other methods
+    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[
+        int, float]:  # todo test some other methods
         # todo use Haufsdorfe distance ?
         res = 0.0
         count = 0
@@ -346,7 +347,8 @@ class KindComparator(ComparatorType):
         else:
             self.kind_weight = weight
 
-    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings], weight: int):
+    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings],
+                       weight: int):
         """
         Compute result from distance table
         """

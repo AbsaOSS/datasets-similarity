@@ -313,6 +313,7 @@ def is_date(column: pd.Series) -> bool:
             parse(element, fuzzy=True)
             return True
         except (ParserError, OverflowError):
+            element = str(word).strip()
             one_or_two = r'(\d{1}|\d{2})'
             two_or_four = r'(\d{2}|\d{4})'
             months = ('(January|February|March|April|May|June|July|August|'

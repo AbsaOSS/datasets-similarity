@@ -18,6 +18,9 @@ from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
 BY_COLUMN = True
 configure()
+BY_COLUMN = True
+
+
 def create_metadata(data):
     """
     This function creates metadata
