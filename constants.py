@@ -38,6 +38,7 @@ class WarningEnable:
         """
         return self.__timezone
 
+
 class TrainedModel:
     """
     Class encapsulating trained module

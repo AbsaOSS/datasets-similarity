@@ -25,7 +25,8 @@ def create_string_from_columns(database: list[pd.DataFrame], table_names: list[s
     For each column in each table in database it creates string from that column.
     :param database: all tables
     :param table_names: all names of tables
-    :return: list of strings representing column, list of string of the same length representing names of table for each column
+    :return: list of strings representing column, list of string of the
+             same length representing names of table for each column
     """
     sentences = []
     sentences_datasets = []

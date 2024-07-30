@@ -31,9 +31,9 @@ class TestSum(unittest.TestCase):
         # self.assertLessEqual(0.8, correct_count * len(res) / 100, "Message")
 
     def create_metadata(self):
-        database, names = load__csv_files_from_folder("../data") ## load data
-        metadata: dict[str, DataFrameMetadata] = dict() ## define metadata
-        for dataframe, name in zip(database, names): ## create the metadata
+        database, names = load__csv_files_from_folder("../data")  # load data
+        metadata: dict[str, DataFrameMetadata] = dict()  # define metadata
+        for dataframe, name in zip(database, names):  # create the metadata
             metadata[name] = DataFrameMetadataCreator(dataframe).compute_correlation(
                 0.5).create_column_embeddings().get_metadata()
         # to_hash = ""
@@ -49,7 +49,7 @@ class TestSum(unittest.TestCase):
     def test_cross_compare(self):
         metadata = self.create_metadata()
 
-        comparator = ComparatorForDatasets(metadata) # compare
+        comparator = ComparatorForDatasets(metadata)  # compare
         res = comparator.cross_compare()
         corr1 = self.print_correlation(res)
 
@@ -62,11 +62,6 @@ class TestSum(unittest.TestCase):
         print("Column names")
         res = comparator.cross_compare_column_names()
         corr1 = self.print_correlation(res)
-
-
-
-
-
 
 
 # if __name__ == '__main__':

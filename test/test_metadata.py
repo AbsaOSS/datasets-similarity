@@ -7,6 +7,7 @@ from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import (INT, HUMAN_GENERATED, ALPHABETIC, ALPHANUMERIC, NUMERICAL, NONNUMERICAL)
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 class TestGetColumnType(unittest.TestCase):
     def setUp(self):
         # database, names = f.load__csv_files_from_folder("../data")
@@ -122,13 +123,13 @@ class TestGetColumnType(unittest.TestCase):
         self.assertFalse('bool_TFtf' in self.metadata.numerical_metadata)
         self.assertFalse('constant_str' in self.metadata.numerical_metadata)
 
-        ## numerical metadata
+        # numerical metadata
         self.assertTrue(self.metadata.numerical_metadata['number_int'].max_value, 8)
         self.assertTrue(self.metadata.numerical_metadata['number_int'].min_value, 1)
         self.assertTrue(self.metadata.numerical_metadata['number_int'].range_size, 7)
         self.assertTrue(self.metadata.numerical_metadata['number_int'].same_value_length, True)
 
-        ## nonnumerical metadata
+        # nonnumerical metadata
         self.assertTrue(self.metadata.nonnumerical_metadata['bool_str'].longest, "WOMAN")
         self.assertTrue(self.metadata.nonnumerical_metadata['bool_str'].shortest, "MAN")
         self.assertTrue(self.metadata.nonnumerical_metadata['bool_str'].avg_length, 5)
@@ -153,7 +154,7 @@ class TestGetColumnType(unittest.TestCase):
 
         self.assertEqual(self.metadata.categorical_metadata, {})
 
-        ## id metadata
+        # id metadata
         self.assertTrue(self.metadata.kind_metadata['id_column_both'].longest, "AB1")
         self.assertTrue(self.metadata.kind_metadata['id_column_both'].shortest, "AB1")
         self.assertIsNone(self.metadata.kind_metadata['id_column_both'].value)
@@ -168,7 +169,7 @@ class TestGetColumnType(unittest.TestCase):
         self.assertFalse(self.metadata.kind_metadata['id_column'].nulls)
         self.assertTrue(self.metadata.kind_metadata['id_column'].ratio_max_length, 2 / 10)
 
-        ## constant metadata
+        # constant metadata
         self.assertIsNone(self.metadata.kind_metadata['constant_str'].longest)
         self.assertIsNone(self.metadata.kind_metadata['constant_str'].shortest)
         self.assertTrue(self.metadata.kind_metadata['constant_str'].value, tuple["MA"])
@@ -183,7 +184,7 @@ class TestGetColumnType(unittest.TestCase):
         self.assertFalse(self.metadata.kind_metadata['constant_number'].nulls)
         self.assertIsNone(self.metadata.kind_metadata['constant_number'].ratio_max_length)
 
-        ## bool metadata
+        # bool metadata
         self.assertIsNone(self.metadata.kind_metadata['bool_str'].longest)
         self.assertIsNone(self.metadata.kind_metadata['bool_str'].shortest)
         self.assertTrue(self.metadata.kind_metadata['bool_str'].value, tuple["WOMAN", "MAN"])

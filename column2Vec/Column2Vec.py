@@ -1,13 +1,16 @@
 """
 This file contains column2Vec implementations.
 """
+from __future__ import annotations
+
 import json
 import re
+import logging
 
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,19 +75,24 @@ class Cache:
         self.__cache.to_csv(self.__file, index=True)
 
     def off(self):
+        """sets off cache"""
         self.__off = True
 
     def on(self):
+        """sets on cache"""
         self.__off = False
 
     def set_file(self, file: str):
+        """sets file for cache"""
         self.__file = file
 
     def clear_cache(self):
+        """clear cache and set read_from_file to False"""
         self.__cache = self.__cache[0:0]
         self.__read_from_file = False
 
     def clear_persistent_cache(self):
+        """clear cache saved in file"""
         try:
             open(self.__file, 'w').close()
         except FileNotFoundError as e:
@@ -95,6 +103,7 @@ cache = Cache()
 
 
 def clean_text(text):
+    """ Cleans text, removes all characters except a-z and 0-9 """
     return re.sub("[^(0-9 |a-z)]", " ", str(text).lower())
 
 

@@ -3,7 +3,7 @@
 - [What is Datasets Similarity?](#what-is-datasets-similarity)
   - [Approach](#approach)
   - [Column2Vec](#column2Vec)
-  - [Types](#types)
+  - [Types and Kinds](#types-and-kinds)
   - [Applicability](#applicability)
 - [Structure](#structure)
 - [How to run](#how-to-run)
@@ -39,7 +39,7 @@ This implementation is only for comparing two tables.
 In both implementations, we first create metadata for each table.
 MetadataCreator creates the metadata and implementation of the creator
 is modular.
-After metadatas are created for both tables, they are used as
+After metadata are created for both tables, they are used as
 input for Comparator.
 Comparator compares metadata and it computes distance.
 We should test which one is better.

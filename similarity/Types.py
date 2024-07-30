@@ -314,7 +314,7 @@ def is_date(column: pd.Series) -> bool:
             with warnings.catch_warnings(action=warning_enable.get_timezone()):
                 parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
             return True
-        except (ParserError, OverflowError) as e:
+        except (ParserError, OverflowError):
             element = str(word).strip()
             one_or_two = r'(\d{1}|\d{2})'
             two_or_four = r'(\d{2}|\d{4})'

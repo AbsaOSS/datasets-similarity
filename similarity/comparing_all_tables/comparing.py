@@ -1,11 +1,12 @@
 import dataclasses
 from typing import Optional
+from itertools import compress
+from collections import defaultdict
 
 import numpy as np
 
 from similarity.DataFrameMetadata import DataFrameMetadata
-from collections import defaultdict
-from itertools import compress
+
 
 @dataclasses.dataclass
 class CategoricalSimilarity:
@@ -132,9 +133,9 @@ class ComparatorForDatasets:
         return result
 
     def compare_categorical(self):
-        for table_name, table in self.database.items():
+        for _, table in self.database.items():
             column_names = list(compress(table.column_names, table.column_categorical))
-            for name, to_compare in self.database.items():
+            for _, to_compare in self.database.items():
                 if table is not to_compare:
                     column_names_to_comp = list(compress(to_compare.column_names, to_compare.column_categorical))
                     for c_name in column_names:
