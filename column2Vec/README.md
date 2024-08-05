@@ -41,7 +41,7 @@ cache.clear_persistent_cache() # clears the cache file
 - **column2vec_sum** transforms every uniq element in column into vector and then sum it.
 - **column2vec_weighted_sum** transforms every element in column into vector and then sum it.
 
-> Inspired by [Michael J. Mior, Alexander G. Ororbia](https://arxiv.org/pdf/1903.08621)
+> Inspired by  "Column2Vec: Structural Understanding via Distributed Representations of Database Schemas" by Michael J. Mior, Alexander G. Ororbia [1903.08621](https://arxiv.org/pdf/1903.08621)
 
 File [**functions.py**](impl/functions.py) in folder [impl](impl) contains functions for using column2Vec.
 It contains functions:

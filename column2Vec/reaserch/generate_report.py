@@ -172,6 +172,33 @@ def generate_time_report(test_results: dict, file_name: str):
     plt.clf()
 
 
+def similar_and_not_similar_file(file_name: str, test_results: dict, columns_to_test: list):
+    """
+    Generates two files similar and not_similar
+    files contains list of columns for each column that are similar/not similar
+    """
+    with open(f"files/{file_name}similar.md", "w") as f_sim:
+        with open(f"files/{file_name}not_similar.md", "w") as f_not:
+            for function in test_results.keys():
+                f_sim.write(f"## Function: {function} \n")
+                f_not.write(f"## Function: {function} \n")
+                written_column = []
+                for column in test_results[function].keys():
+                    if column[0] not in columns_to_test or column[1] not in columns_to_test:
+                        continue
+                    if column[0] not in written_column:
+                        f_sim.write(f"\n### {column[0]}: \n")
+                        f_not.write(f"\n### {column[0]}: \n")
+                        written_column.append(column[0])
+                    if test_results[function][column] > 0.5:
+                        f_sim.write(f"{column[1]} ({test_results[function][column]}),  ")
+                    else:
+
+                        f_not.write(f"{column[1]} ({test_results[function][column]}),  ")
+                f_sim.write("\n")
+                f_not.write("\n")
+            f_sim.write("\n")
+            f_not.write("\n")
 def generate_sim_report(test_results: dict, file_name: str):
     columns_to_test = ["reg_state1", "reg_city1", "country5", "country7", "Star46", "Star16",
                        "make3", "car_name4", "condition5", "date_added7", "fuel_type4", "fuel3",
@@ -293,28 +320,7 @@ def generate_sim_report(test_results: dict, file_name: str):
         }
     }
 
-    # with open(f"files/{file_name}similar.md", "w") as f_sim:
-    #     with open(f"files/{file_name}not_similar.md", "w") as f_not:
-    #         for function in test_results.keys():
-    #             f_sim.write(f"## Function: {function} \n")
-    #             f_not.write(f"## Function: {function} \n")
-    #             written_column = []
-    #             for column in test_results[function].keys():
-    #                 if column[0] not in columns_to_test or column[1] not in columns_to_test:
-    #                     continue
-    #                 if column[0] not in written_column:
-    #                     f_sim.write(f"\n### {column[0]}: \n")
-    #                     f_not.write(f"\n### {column[0]}: \n")
-    #                     written_column.append(column[0])
-    #                 if test_results[function][column] > 0.5:
-    #                     f_sim.write(f"{column[1]} ({test_results[function][column]}),  ")
-    #                 else:
-    #
-    #                     f_not.write(f"{column[1]} ({test_results[function][column]}),  ")
-    #             f_sim.write("\n")
-    #             f_not.write("\n")
-    #         f_sim.write("\n")
-    #         f_not.write("\n")
+    similar_and_not_similar_file(file_name, test_results, columns_to_test)
 
     with open(f"files/{file_name}similar_and_not.md", "w") as f:
         for function in test_results.keys():

@@ -10,13 +10,19 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from column2Vec.impl.functions import get_nonnumerical_data
-from column2Vec.impl.Column2Vec import (column2vec_as_sentence, column2vec_as_sentence_clean,
-                                        column2vec_as_sentence_clean_uniq, column2vec_weighted_sum,
+from column2Vec.impl.Column2Vec import (column2vec_as_sentence,
+                                        column2vec_as_sentence_clean,
+                                        column2vec_as_sentence_clean_uniq,
+                                        column2vec_weighted_sum,
                                         column2vec_sum,
-                                        column2vec_weighted_avg, column2vec_avg, cache)
+                                        column2vec_weighted_avg,
+                                        column2vec_avg,
+                                        cache)
 
-from column2Vec.reaserch.generate_report import generate_time_report, generate_sim_report, generate_stability_report, \
-    generate_partial_column_report
+from column2Vec.reaserch.generate_report import (generate_time_report,
+                                                 generate_sim_report,
+                                                 generate_stability_report,
+                                                 generate_partial_column_report)
 from config import configure
 from constants import warning_enable
 from similarity.Comparator import cosine_sim
@@ -83,8 +89,6 @@ def time_test(column1: pd.Series, function, key: str) -> (bool, float):
     :param function: function to use
     :param key: key for cache
     """
-    # cache.set_file("no_file.txt")
-    # cache.clear_cache()
     cache.off()
     start = time.time()
     function(column1, model, key)
@@ -112,9 +116,6 @@ def partial_column_test(column1: pd.Series, function, key: str) -> (bool, str):
     whole_second = cosine_sim(emb1, emb2)
     whole_first = cosine_sim(emb3, emb1)
     if first_second != 1 or whole_second != 1 or whole_first != 1:
-        # print((f"For {key}, {function}:\n whole column and first half: {whole_first}\n "
-        #        f"whole column and second half: {whole_second}\n first half"
-        #        f" and second half: {first_second}\n"))
         return False, (whole_first, whole_second, first_second)
     else:
         return True, (whole_first, whole_second, first_second)
