@@ -171,7 +171,7 @@ class DataFrameMetadata:
         Get column names by type
         """
         if NONNUMERICAL in types:
-            types = list(types)
+            types = list(types) # todo check if the list is necessary
             types.extend([WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES])
         columns: list = []
         for t in types:

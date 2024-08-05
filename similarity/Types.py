@@ -93,7 +93,7 @@ def is_numerical(x: pd.Series) -> bool:
     """
     return (x.any() and
             (x.dtype in (np.float64, np.int64)) and not
-            (x.isnull().values.sum() / x.size > 0.9))
+            (len(x.isnull()) / x.size > 0.9))
 
 
 def is_int(x: pd.Series) -> bool:

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Optional, List
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -15,9 +15,9 @@ from sentence_transformers import SentenceTransformer
 from column2Vec.Column2Vec import column2vec_as_sentence
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
-from similarity.Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
-                              DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
-                              MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
+from Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
+                   DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
+                   MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
 
 
 class DataFrameMetadataCreator:
@@ -91,7 +91,7 @@ class DataFrameMetadataCreator:
                 return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
                                     None, None, True, None,  self.__get_model())
             return KindMetadata(tuple([column.dropna().unique()[0]]), None,
-                                    None, None, False, None,  self.__get_model())
+                                None, None, False, None,  self.__get_model())
         return None
 
     def __compute_type_metadata(self, type_: type[Type], column: pd.Series, name: str) -> None:
@@ -252,14 +252,14 @@ class DataFrameMetadataCreator:
         return self
 
     # Getters
-    def get_column_by_type(self, *types: type[Type]) -> List[str]:
+    def get_column_by_type(self, *types: type[Type]) -> pd.DataFrame:
         """
         :param types: of columns
         :return: dataframe with columns with specific types
         """
         return self.dataframe[self.metadata.get_column_names_by_type(*types)]
 
-    def get_column_by_kind(self, *kinds: DataKind) -> List[str]:
+    def get_column_by_kind(self, *kinds: DataKind) -> pd.DataFrame:
         """
         :param kinds: of columns
         :return: dataframe with columns with specific kind

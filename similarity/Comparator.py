@@ -2,6 +2,8 @@
 File contains Comparator class, ComparatorType classes and DistanceFunction class.
 Comparator is split to types comparator, all columns with same types are compare together
 """
+from __future__ import annotations
+
 import math
 import warnings
 from abc import abstractmethod, ABC
@@ -10,8 +12,9 @@ from statistics import mean
 
 import numpy as np
 import pandas as pd
+from torch import Tensor
 
-import DataFrameMetadata
+from DataFrameMetadata import DataFrameMetadata
 from Types import DataKind
 from constants import warning_enable
 
@@ -22,7 +25,7 @@ class Settings(Enum):
     NO_RATIO = 2
 
 
-def cosine_sim(u: list, v: list) -> float:  # todo move to functions.py?
+def cosine_sim(u: list | Tensor, v: list | Tensor) -> float:  # todo move to functions.py?
     """
     Compute cosine similarity (range 0 to 1) 1 teh same 0 completely different
     :param u: embeddings 1
@@ -115,7 +118,7 @@ class CategoricalComparator(ComparatorType):
             column_mins.append(min(column))
         return min([max(row_mins), max(column_mins)])
 
-    def __create_dist_matrix(self, embeddings1: list[float], embeddings2: list[float]) -> list[list[float]]:
+    def __create_dist_matrix(self, embeddings1: list[Tensor], embeddings2: list[Tensor]) -> list[list[float]]:
         """
         creates similarity matrix for embeddings
         :param embeddings1: embeddings for first column
@@ -163,7 +166,7 @@ class CategoricalComparatorSimilar(CategoricalComparator):
     Comparator for column category
     """
 
-    def __create_sim_matrix(self, embeddings1: list[float], embeddings2: list[float]) -> list[list[float]]:
+    def __create_sim_matrix(self, embeddings1: list[Tensor], embeddings2: list[Tensor]) -> list[list[float]]:
         simil_matrix = []
         for embed1 in embeddings1:
             siml_line = []
@@ -174,7 +177,7 @@ class CategoricalComparatorSimilar(CategoricalComparator):
 
     def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[int, float]:  # todo test some other methods
         # todo use Haufsdorfe distance ?
-        res = 0
+        res = 0.0
         count = 0
         trashold = 0.7  # todo set from outside
         for i in similarity_matrix:
@@ -339,7 +342,7 @@ class KindComparator(ComparatorType):
         else:
             self.compare_kind = compare_kind
         if weight is None:
-            self.kind_weight = {DataKind.BOOL: 1, DataKind.ID: 1, DataKind.CATEGORICAL: 1, DataKind.CONSTANT: 1}
+            self.kind_weight: dict = {DataKind.BOOL: 1, DataKind.ID: 1, DataKind.CATEGORICAL: 1, DataKind.CONSTANT: 1}
         else:
             self.kind_weight = weight
 
@@ -377,7 +380,7 @@ class KindComparator(ComparatorType):
             column_mins.append(min(column))
         return max([mean(column_mins), mean(row_mins)])  # todo vysvetlit v textu
 
-    def __are_columns_null(self, column1: list, column2: list, message: str) -> tuple[bool, pd.DataFrame]:
+    def __are_columns_null(self, column1: set, column2: set, message: str) -> tuple[bool, pd.DataFrame]:
         """
         Check if columns are empty
         :param column1:
@@ -495,8 +498,8 @@ class KindComparator(ComparatorType):
                     metadata1.kind_metadata[column1].distribution[0] / metadata1.kind_metadata[column1].distribution[1]
                     -
                     metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[1])
-                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[
-                    column2].value_embeddings is None:
+                if (metadata1.kind_metadata[column1].value_embeddings is None or
+                        metadata2.kind_metadata[column2].value_embeddings is None):
                     value_re.loc[column1, column2] = 0
                 else:
                     value_re.loc[column1, column2] = self.compute_embeddings_distance(
@@ -577,7 +580,7 @@ class Comparator:
         self.distance_function = distance_function
         return self
 
-    def set_settings(self, settings: list) -> 'Comparator':
+    def set_settings(self, settings: set) -> 'Comparator':
         """
         Set settings for comparing two tables
         """
