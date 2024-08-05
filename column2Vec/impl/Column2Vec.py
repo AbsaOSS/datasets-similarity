@@ -7,6 +7,7 @@ import json
 import math
 import re
 import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -28,7 +29,7 @@ class Cache:
     # enable/disable cache
     __off = False
     # default cache file
-    __file = "../generated/cache.txt"
+    __file = Path(__file__).parent.joinpath("../generated/cache.txt")
 
     def __read(self):
         try:
