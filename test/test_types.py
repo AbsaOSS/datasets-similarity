@@ -2,7 +2,6 @@ import os
 import unittest
 
 import pandas as pd
-from dateutil.parser import parse
 
 from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKind, is_constant, is_int, is_human_gen, \
     is_not_numerical, is_categorical, is_word, is_phrase, is_sentence, is_article, is_multiple, is_date, \
@@ -11,6 +10,7 @@ from similarity.Types import is_id, is_numerical, is_bool, get_data_kind, DataKi
     MULTIPLE_VALUES, PHRASE, SENTENCE, ARTICLE, INT, FLOAT, WORD, HUMAN_GENERATED, COMPUTER_GENERATED, UNDEFINED
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 class TestID(unittest.TestCase):
     def setUp(self):
@@ -460,13 +460,14 @@ class TestDataType(unittest.TestCase):
 
 class TestDateTime(unittest.TestCase):
     def setUp(self):
-        data = {
+        self.data = {
             'MM-DD-YYYY': ['11-04-1999', '12-31-1999', '01-03-1999'],
             'M-D-YY': ['11-4-99', '12-31-99', '1-3-99'],
             'MM.DD.YYYY': ['11.4.1999', '12.31.1999', '1.3.1999'],
             'MM.DD.YYYY_': ['11. 4. 1999', '12. 31. 1999', '1. 3. 1999'],
             'MM.DD.YY': ['11.04.99', '12.31.99', '01.03.99'],
-            'MM/DD/YY': ['11/04/99', '12/31/99', '01/03/99'],
+            'MM/DD/YY': ['11/04/99', '12/31/99', '01/03/99', '2/4/95'],
+            'DD/MM/YY': ['11/04/99', '31/12/99', '03/01/99', '4/2/95'],
             'MM/DD/YYYY': ['11/4/1999', '12/31/1999', '1/3/1999'],
             'YYYY,DDMon': ['1999,4Feb', '1999,31Jan', '1999,3Nov'],
             'YYYY,DDMonth': ['1999,4February', '1999,31January', '1999,3November'],
@@ -478,26 +479,46 @@ class TestDateTime(unittest.TestCase):
             'DDMon,YYYY': ['4Feb,1999', '31 Jan,1999', '3 Nov, 1999 '],
             'DDMonthYYYY': ['4February1999', '31January 1999', '3 November 1999 '],
             'DDMonYYYY': ['4Feb1999', '31Jan 1999', '3 Nov 1999 '],
+            'YY/MM/DD': ['95/2/4', '99/12/31', '05/2/3', '00/2/3'],
+            'DD-Mon-YYYY': ['04-Feb-1995', '03-APR-1999', '31-JUL-1999'],
+            'DD-Month-YYYY': ['4-February-1995', '03-April-1999', '31-July-1999'],
+
+            # ISO 8601 https://www.cl.cam.ac.uk/~mgk25/iso-time.html
+            'YYYY-MM-DD': ['1995-02-04', '2000-12-31', '1999-01-03', '2024-07-29', '1997-10-01', '2024-11-30'],
+            'YYYY-MM': ['1995-02', '2000-12', '1999-01', '2024-07', '1997-10', '2024-11'],
+            'YYYYMMDD': ['19950204', '20001231', '19990103', '20240729', '19971001', '20241130'],
+            'Week': ['1997-W01', '1997W01', '1995W05', '2023-W03', '2024-W50'],  # 1997-W01 or 1997W01 (first week of the year 1997)
+            'Week_day': ['1997-W01-3', '1997W013', '1995W0512', '2023-W03-2', '2024-W50-1'],  # 1997-W01-3 or 1997W013 (#rd day of the first week of the year 1997) 1995-W05-12 or 1995W0512 (12th day of the fifth week of the year 1995)
+            'Days': ['1995-035', '1995035', '2024340'],  # 1995-035 or 1995035 (35th day of the year 1995)
+            'Year': ['1995', '2000', '2024'],
+
+            # time and timezones
+            'Time_:': ['12:34', '23:59:59', '00:00:00', 'T12:34:12.123', 'T12:34:12', 'T03:24'],
+            'Time': ['T123412.123', 'T123412', 'T0324'],
+            'Time:zone': ['12:34:56Z', 'T144515Z', 'T12:30+02:00', 'T12:30−02:00', 'T12:30+02', 'T12:30-0200'],
+
+            'Time_and_date': ['1995-02-04T12:34', '2000-12-31T23:59:59', '1999-01-03T00:00:00',
+                              '2024-07-29T12:34:12.123', '1997-10-01T123412', '2024-11-30T0324'],
+            'Time_zone': ['1995-02-04T12:34:56Z', '2000-12-31T14:30Z', '1999-01-03T00:00:00Z',
+                          '2007-04-05T12:30−02:00'],
+            # EPOCH time - number of seconds from 1970-01-01T00:00:00Z
+            'epoch': ['649213200', '1722241808']  # 649213200 (1990/7/29) 1722241808 (2024/7/29)
         }
-        self.data = pd.DataFrame(data)
+        self.not_dates = {
+            'first': ['1999,4Monuary'],
+            'second': ['1999,4 Mon'],
+            'third': ['1995-02-0400'],
+            'fourth': ['1995-0350'],
+            'fifth': ['17222418000'],
+            'sixth': ['1722A41808']
+        }
 
     def test_date(self):
-        self.assertTrue(is_date(self.data['MM-DD-YYYY']))
-        self.assertTrue(is_date(self.data['M-D-YY']))
-        self.assertTrue(is_date(self.data['MM.DD.YYYY']))
-        self.assertTrue(is_date(self.data['MM.DD.YY']))
-        self.assertTrue(is_date(self.data['MM/DD/YY']))
-        self.assertTrue(is_date(self.data['MM/DD/YYYY']))
-        self.assertTrue(is_date(self.data['MonDD,YYYY']))
-        self.assertTrue(is_date(self.data['MonthDD,YYYY']))
-        self.assertTrue(is_date(self.data['DDMonYYYY']))
-        self.assertTrue(is_date(self.data['DDMonthYYYY']))
-        self.assertTrue(is_date(self.data['DDMon,YYYY']))
-        self.assertTrue(is_date(self.data['DDMonth,YYYY']))
-        self.assertTrue(is_date(self.data['YYYY,DD Mon']))
-        self.assertTrue(is_date(self.data['YYYY,DDMonth']))
-        self.assertTrue(is_date(self.data['MM.DD.YYYY_']))
-        self.assertTrue(is_date(self.data['YYYY,DDMon']))
+        for i in self.data:
+            print(f"{i} : {self.data[i]}\n")
+            self.assertTrue(is_date(pd.Series(self.data[i])))
+        for i in self.not_dates:
+            self.assertFalse(is_date(pd.Series(i)))
 
 
 class TestTypesComparing(unittest.TestCase):
@@ -535,6 +556,7 @@ class TestTypesComparing(unittest.TestCase):
         self.assertTrue(issubclass(ALPHABETIC, NONNUMERICAL))
         self.assertTrue(issubclass(ALL, NONNUMERICAL))
         self.assertTrue(issubclass(ALPHANUMERIC, NONNUMERICAL))
+
 
 if __name__ == '__main__':
     unittest.main()
