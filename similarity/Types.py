@@ -10,8 +10,6 @@ from dateutil.parser import parse, ParserError
 import numpy as np
 import pandas as pd
 
-from constants import warning_enable
-
 
 class TypeSettings:
     """
@@ -56,7 +54,7 @@ def is_bool(column: pd.Series) -> bool:
     try:
         lower = column.map(str.lower)
         return lower.nunique() == 2
-    except:
+    except TypeError:
         return column.nunique() == 2
 
 
@@ -299,6 +297,8 @@ def is_true_multiple(x: pd.Series) -> bool:
     return to_return.count(to_return[0]) == len(to_return)
 
 
+
+
 def is_date(column: pd.Series) -> bool:
     """
     Decide if type of column is date
@@ -307,26 +307,37 @@ def is_date(column: pd.Series) -> bool:
     :param column: series for decide
     :return:true for date
     """
-
-
-    def is_str_date(word: str):
+    def is_str_date(word: str) -> bool:
+        element = str(word).strip()
         try:
-            with warnings.catch_warnings(action=warning_enable.get_timezone()):
-                parse(str(word), fuzzy_with_tokens=True)  # todo add timezone
+            with warnings.catch_warnings():
+                parse(element, fuzzy=True)  # todo add timezone
             return True
-        except (ParserError, OverflowError) as e:
-            element = str(word).strip()
+        except (ParserError, OverflowError):
             one_or_two = r'(\d{1}|\d{2})'
             two_or_four = r'(\d{2}|\d{4})'
             months = ('(January|February|March|April|May|June|July|August|'
                       'September|October|November|December|Jan|Feb'
                       '|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)')
+            date_pattern = r'^(T(\d{6}|\d{4})(|.\d{3})(|Z))$'
+            pattern = date_pattern
             # + '$'  # 1999,4 Feb 1999,4 February
-            pattern = r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months
+            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months
             # 11. 4. 1999
             pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
             # 1999,4February 1999,4Feb
-            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2})' + months
+            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),' + one_or_two + months
+            # '99/12/31', '05/2/3' 00/2/3
+            pattern = pattern + '|' + r'^' + two_or_four + r'/' + one_or_two + r'/' + one_or_two
+            # 1995W05 2024-W50
+            pattern = pattern + '|' + r'^(\d{4}(W|-W)\d{2})'
+            # 1995W0512  2023-W03-2
+            pattern = pattern + '|' + r'(\d{4}(W|-W)\d{2}(-|)' + one_or_two + ')$'
+            # '1995-035', '1995035', '2024340'
+            pattern = pattern + '|' + r'^((2|1)\d{3}-\d{3})$|(^(2|1)\d{6})$'
+            # epoch time 1911517200(2030 will be max for us)
+            pattern = pattern + '|' + r'(^\d{1,10})$'
+
             return bool(re.match(pattern, element))
 
     return column.apply(lambda s: is_str_date(s)).all()
