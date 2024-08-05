@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 import pandas as pd
@@ -94,7 +94,7 @@ class DataFrameMetadataCreator:
                                     None, None, False, None,  self.__get_model())
         return None
 
-    def __compute_type_metadata(self, type_: Type, column: pd.Series, name: str) -> None:
+    def __compute_type_metadata(self, type_: type[Type], column: pd.Series, name: str) -> None:
         """
         Compute metadata for numerical and nonnumerical columns
         column.str.len().nunique() == 1 returns len for each element in series, then we count number of uniq values
@@ -225,7 +225,7 @@ class DataFrameMetadataCreator:
                               correlation_numerical.iloc[r[1]].name))))  # get names of rows and columns
         return self
 
-    def create_column_embeddings(self, types=None) -> 'DataFrameMetadataCreator':
+    def create_column_embeddings(self, types: list = None) -> 'DataFrameMetadataCreator':
         """
         Creates embeddings for Types.STRING, Types.TEXT, Types.UNDEFINED or another types according to types parameter
 
@@ -252,19 +252,19 @@ class DataFrameMetadataCreator:
         return self
 
     # Getters
-    def get_column_by_type(self, *types):
+    def get_column_by_type(self, *types: type[Type]) -> List[str]:
         """
         :param types: of columns
         :return: dataframe with columns with specific types
         """
-        return self.dataframe[self.metadata.get_column_names_by_type(types)]
+        return self.dataframe[self.metadata.get_column_names_by_type(*types)]
 
-    def get_column_by_kind(self, *kinds):
+    def get_column_by_kind(self, *kinds: DataKind) -> List[str]:
         """
         :param kinds: of columns
         :return: dataframe with columns with specific kind
         """
-        return self.dataframe[self.metadata.get_column_names_by_type(kinds)]
+        return self.dataframe[self.metadata.get_column_names_by_kind(*kinds)]
 
     def get_numerical_columns(self):
         """

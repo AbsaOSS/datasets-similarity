@@ -4,12 +4,16 @@ File contains Table metadata (DataFrameMetadata class) and other metadata classe
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Generator, Optional, Any
+from typing import Generator, Optional, Any, List
+
+from pandas import Series
+from torch import Tensor
+
 from Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL, NONNUMERICAL, \
     WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES
 
 
-def dumps(value):
+def dumps(value: list) -> list[Any] | list:
     """
     Convert Generator to list
     """
@@ -28,7 +32,7 @@ class CategoricalMetadata:
     category_embedding: embedding for each category
     """
 
-    def __init__(self, count: int, categories: list, categories_with_count, category_embedding):
+    def __init__(self, count: int, categories: list, categories_with_count: Series, category_embedding: list[Tensor]):
         self.count_categories = count
         self.categories = set(categories)
         self.categories_with_count = categories_with_count
@@ -120,7 +124,7 @@ class DataFrameMetadata:
         self.correlated_columns = set()  # todo
 
         # compute_*_type
-        self.type_column: dict[Type, set[str]] = defaultdict(set)
+        self.type_column: dict[type[Type], set[str]] = defaultdict(set)
         self.numerical_metadata: dict[str, NumericalMetadata] = defaultdict()
         self.nonnumerical_metadata: dict[str, NonnumericalMetadata] = defaultdict()
 
@@ -135,7 +139,7 @@ class DataFrameMetadata:
         # create_column_embeddings
         self.column_embeddings = {}
 
-    def get_column_type(self, name):
+    def get_column_type(self, name: str) -> type[Type] | None:
         """
         Get column type by column name
         """
@@ -144,7 +148,7 @@ class DataFrameMetadata:
                 return column_type
         return None
 
-    def get_column_kind(self, name):
+    def get_column_kind(self, name: str) -> DataKind | None:
         """
         Get column kind by column name
         """
@@ -153,23 +157,23 @@ class DataFrameMetadata:
                 return column_kind
         return None
 
-    def get_column_names_by_kind(self, *kinds):
+    def get_column_names_by_kind(self, *kinds: DataKind) -> List[str]:
         """
         Get column names by kind
         """
-        columns = []
+        columns: list = []
         for t in kinds:
             columns.extend(self.column_kind[t])
         return columns
 
-    def get_column_names_by_type(self, *types):
+    def get_column_names_by_type(self, *types: type[Type]) -> List[str]:
         """
         Get column names by type
         """
         if NONNUMERICAL in types:
             types = list(types)
             types.extend([WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES])
-        columns = []
+        columns: list = []
         for t in types:
             columns.extend(self.type_column[t])
         return columns

@@ -24,22 +24,22 @@ class SimilarityStruct:
     similarity: Optional[float] = None
     categorical_similarity: Optional[CategoricalSimilarity] = None
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity < other.similarity
 
-    def __le__(self, other):
+    def __le__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity <= other.similarity
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity == other.similarity
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity != other.similarity
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity > other.similarity
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'SimilarityStruct') -> bool:
         return self.similarity >= other.similarity
 
 
@@ -84,14 +84,14 @@ class SimilarityData:
         return most
 
 
-def most_frequent(list: list[(float, str)]) -> str:
+def most_frequent(list_: list[(float, str)]) -> str:
     """
     Gets names from list (second argument) then it returns most common name
-    :param list: of values and names
+    :param list_: of values and names
     :return: most common name
     """
     names = []
-    for i in list:
+    for i in list_:
         names.append(i[1])
 
     return max(set(names), key=names.count) # todo change if two names are pressent same nuber of times
@@ -107,7 +107,7 @@ class ComparatorForDatasets:
         self.similarity: dict[str, SimilarityData] = defaultdict()
         self.threshold = 0.7  # todo
 
-    def cosine(self, u, v):
+    def cosine(self, u: list , v: list) -> float:
         return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
 
     def cross_compare(self) -> dict:
@@ -144,7 +144,7 @@ class ComparatorForDatasets:
                             to_compare[c_name_compare]
 
 
-    def cross_compare_column_names(self):
+    def cross_compare_column_names(self) -> dict:
         """
         Method counts similarity for all tables by using column names
         :return:

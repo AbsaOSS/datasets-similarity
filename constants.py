@@ -32,7 +32,7 @@ class WarningEnable:
         """Change timezone warning to disable"""
         self.__timezone = "always"
 
-    def get_timezone(self):
+    def get_timezone(self) -> str:
         """
         :return: __timezone
         """

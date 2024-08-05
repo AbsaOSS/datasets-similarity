@@ -20,7 +20,7 @@ class ComparatorType(ABC):
     """
     Abstract class for comparators
     """
-    def __init__(self, weight=1):
+    def __init__(self, weight: int = 1):
         """
         Constructor for ComparatorType, sets weight for comparator
         """
@@ -31,7 +31,7 @@ class ComparatorType(ABC):
                 index2: int | str) -> float:
         """It should compare two columns"""
 
-    def _are_columns_null(self, column1, column2, message) -> tuple[bool, float]:
+    def _are_columns_null(self, column1: set, column2: set, message: str) -> tuple[bool, float]:
         """
         Check if columns are empty
         :param column1: to be compared
@@ -199,7 +199,7 @@ class ColumnKindComparator(SpecificColumnComparator):
         else:
             self.kind_weight = weight
 
-    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
+    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float: # todo add type
         """
         Creates table of distances between embeddings for each row  and computes mean
          of row and column minimums then pick max.
@@ -412,7 +412,7 @@ class ComparatorByColumn:
         sum_weight = sum([weight for _, weight in distances])
         return sum([distance * weight / sum_weight for distance, weight in distances])
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> float:
         """
         Compare two tables according to previously set properties.
         """

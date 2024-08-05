@@ -16,18 +16,17 @@ from Types import DataKind
 from constants import warning_enable
 
 
-
 class Settings(Enum):
     """Settings enum, if we want to use embeddings for columns, ratio between different comparators"""
     EMBEDDINGS = 1
     NO_RATIO = 2
 
 
-def cosine_sim(u, v) -> float:  # todo move to functions.py?
+def cosine_sim(u: list, v: list) -> float:  # todo move to functions.py?
     """
-    Compute cosine similarity (range 0 to 1) 1 teh same 0 completaly different
-    :param u:
-    :param v:
+    Compute cosine similarity (range 0 to 1) 1 teh same 0 completely different
+    :param u: embeddings 1
+    :param v: embeddings 2
     :return:
     """
     return round(np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v)), 3)  # todo change rounding to 4, 5 6 ...etc
@@ -36,8 +35,8 @@ def cosine_sim(u, v) -> float:  # todo move to functions.py?
 def get_ratio(count1: int, count2: int) -> float:
     """
     Compute ratio between two numbers. If one of the numbers is 0 return 1. Ratio is between 1 and 0.
-    :param count1: number
-    :param count2: number
+    :param count1: number 1
+    :param count2: number 2
     :return: ratio between 0 and 1
     """
     if count1 == 0 or count2 == 0:
@@ -49,6 +48,7 @@ def get_ratio(count1: int, count2: int) -> float:
 
 class DistanceFunction(ABC):
     """Abstract class for distance classes"""
+
     @abstractmethod
     def compute(self, distance_table: pd.DataFrame):
         """Method should compute overall distance from distance_table"""
@@ -56,6 +56,7 @@ class DistanceFunction(ABC):
 
 class HausdorffDistanceMin(DistanceFunction):
     """Hausdorff distance class"""
+
     def compute(self, distance_table: pd.DataFrame) -> float:
         """
         Compute Hausdorff distance with min function.
@@ -72,7 +73,7 @@ class HausdorffDistanceMin(DistanceFunction):
 class ComparatorType(ABC):
     """Abstract class for comparators"""
 
-    def __init__(self, weight=1):
+    def __init__(self, weight: int = 1):
         """
         Constructor for ComparatorType
         :param weight: weight of the comparator
@@ -101,7 +102,7 @@ class CategoricalComparator(ComparatorType):
     Categorical comparator class
     """
 
-    def __compute_distance(self, dist_matrix):  # Hausdorff
+    def __compute_distance(self, dist_matrix: list[list[float]]) -> float:  # Hausdorff
         """
         Compute distance from similarity matrix
         todo maybe switch to hausdorfdist??
@@ -114,7 +115,7 @@ class CategoricalComparator(ComparatorType):
             column_mins.append(min(column))
         return min([max(row_mins), max(column_mins)])
 
-    def __create_dist_matrix(self, embeddings1, embeddings2):
+    def __create_dist_matrix(self, embeddings1: list[float], embeddings2: list[float]) -> list[list[float]]:
         """
         creates similarity matrix for embeddings
         :param embeddings1: embeddings for first column
@@ -161,7 +162,8 @@ class CategoricalComparatorSimilar(CategoricalComparator):
     """
     Comparator for column category
     """
-    def __create_sim_matrix(self, embeddings1, embeddings2):
+
+    def __create_sim_matrix(self, embeddings1: list[float], embeddings2: list[float]) -> list[list[float]]:
         simil_matrix = []
         for embed1 in embeddings1:
             siml_line = []
@@ -170,7 +172,7 @@ class CategoricalComparatorSimilar(CategoricalComparator):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def __compute_similarity_score(self, similarity_matrix):  # todo test some other methods
+    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[int, float]:  # todo test some other methods
         # todo use Haufsdorfe distance ?
         res = 0
         count = 0
@@ -210,6 +212,7 @@ class ColumnEmbeddingComparator(ComparatorType):
     """
     Comparator for column values embeddings
     """
+
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
                 settings: set[Settings]) -> pd.DataFrame:
         """
@@ -298,7 +301,8 @@ class ColumnNamesEmbeddingsComparator(ComparatorType):
         :param settings: - not used
         :return: dataframe fill by distances between 0 and 1
         """
-        if (metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
+        if (
+                metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
             warnings.warn("Warning: column name embedding is not computed")
 
         return fill_result(metadata1, metadata2)
@@ -308,6 +312,7 @@ class IncompleteColumnsComparator(ComparatorType):
     """
     Comparator for incomplete columns
     """
+
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
                 settings: set[Settings]) -> pd.DataFrame:
         """
@@ -326,6 +331,7 @@ class KindComparator(ComparatorType):
     """
     Comparator for column kind
     """
+
     def __init__(self, compare_kind=None, weight: dict[DataKind.BOOL, int] = None):
         super().__init__(weight=1)
         if compare_kind is None:
@@ -337,7 +343,7 @@ class KindComparator(ComparatorType):
         else:
             self.kind_weight = weight
 
-    def compute_result(self, distance_table, distance_function, settings, weight):
+    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings], weight: int):
         """
         Compute result from distance table
         """
@@ -371,7 +377,7 @@ class KindComparator(ComparatorType):
             column_mins.append(min(column))
         return max([mean(column_mins), mean(row_mins)])  # todo vysvetlit v textu
 
-    def __are_columns_null(self, column1, column2, message) -> tuple[bool, pd.DataFrame]:
+    def __are_columns_null(self, column1: list, column2: list, message: str) -> tuple[bool, pd.DataFrame]:
         """
         Check if columns are empty
         :param column1:
@@ -389,7 +395,7 @@ class KindComparator(ComparatorType):
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
 
-    def compare_constants(self, metadata1, metadata2):
+    def compare_constants(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         """
         Compare all constant columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -400,7 +406,8 @@ class KindComparator(ComparatorType):
         """
         value_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
+                                            metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CONSTANT]:
@@ -426,7 +433,7 @@ class KindComparator(ComparatorType):
 
         return self.concat(nulls_re, value_re)
 
-    def compare_ids(self, metadata1, metadata2):
+    def compare_ids(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         """
         Compare all id columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -438,7 +445,8 @@ class KindComparator(ComparatorType):
         value_long_re = pd.DataFrame()
         value_short_re = pd.DataFrame()
         ratio_max_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],
+                                            "ID metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.ID]:
@@ -461,7 +469,7 @@ class KindComparator(ComparatorType):
 
         return self.concat(value_short_re, value_long_re, ratio_max_re, nulls_re)
 
-    def compare_bools(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+    def compare_bools(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         """
         Compare all boolean columns. Compare if they have the same distribution of True and False values.
         Compare if they contain nulls.
@@ -487,7 +495,8 @@ class KindComparator(ComparatorType):
                     metadata1.kind_metadata[column1].distribution[0] / metadata1.kind_metadata[column1].distribution[1]
                     -
                     metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[1])
-                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[column2].value_embeddings is None:
+                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[
+                    column2].value_embeddings is None:
                     value_re.loc[column1, column2] = 0
                 else:
                     value_re.loc[column1, column2] = self.compute_embeddings_distance(
@@ -495,7 +504,7 @@ class KindComparator(ComparatorType):
                         metadata2.kind_metadata[column2].value_embeddings)
         return self.concat(value_re, distr_re, nulls_re)
 
-    def compare_categorical(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+    def compare_categorical(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
         """
         Compare all categorical columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -555,6 +564,7 @@ class Comparator:
     """
     Comparator for comparing two tables
     """
+
     def __init__(self):
         self.comparator_type: list[ComparatorType] = []
         self.settings: set[Settings] = set()
@@ -574,7 +584,7 @@ class Comparator:
         self.settings = settings
         return self
 
-    def add_settings(self, setting) -> 'Comparator':
+    def add_settings(self, setting: Settings) -> 'Comparator':
         """
         Add setting for comparing two tables
         """
