@@ -155,6 +155,7 @@ You can compare two or more tables by running main.py.
 You can use both comparator and comparatorByColumn, change the comparator in compare_datasets
 The Result will be distance between tables.
 ```bash
+ pip install -r requirements.txt
  python main.py # for fix files
  python main.py data/imdb_top_1000.csv data/netflix_titles.csv # for specific files
 ```

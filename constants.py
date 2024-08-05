@@ -3,6 +3,8 @@ This file contains constants
 """
 from sentence_transformers import SentenceTransformer
 
+from config import configure
+
 
 class WarningEnable:
     """
@@ -42,7 +44,8 @@ class TrainedModel:
     """
     Class encapsulating trained module
     """
-    __model = SentenceTransformer('bert-base-nli-mean-tokens')
+    configure()
+    __model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 
     def set_module(self, model: SentenceTransformer):
         """

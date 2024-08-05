@@ -6,6 +6,7 @@ import sys
 
 import pandas as pd
 
+from config import configure
 from constants import warning_enable
 from similarity.Comparator import (Comparator, SizeComparator,
                                    IncompleteColumnsComparator, KindComparator,
@@ -15,7 +16,7 @@ from similarity.ComparatorByColumn import (ComparatorByColumn, SizeComparator,
                                            ColumnNamesEmbeddingsComparator)
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
-
+configure()
 def create_metadata(data):
     """
     This function creates metadata
@@ -50,6 +51,7 @@ def compare_datasets(path1, path2):
 
 
 if __name__ == '__main__':
+    configure()
     warning_enable.change_status(False)
     warning_enable.disable_timezone_warn()
     files = sys.argv[1:]

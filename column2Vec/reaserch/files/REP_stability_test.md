@@ -1,0 +1,37 @@
+# Stability test
+
+## SENT.
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## CLEAR SENT.
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## CL. UNIQ SENT.
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## AVG
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## W. AVG
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## SUM
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+
+## W. SUM
+**SCORE:** 52
+
+**PERCENTAGE:** 100%
+

@@ -11,7 +11,12 @@ Mostly html files representing
 It also contains cache file where could be stored created embeddings.
 Cashing is possible to switch of or switch on.
 
-File [**Column2Vec.py**](Column2Vec.py) contains 7 different implementations of column2Vec.
+Folder [**reaserch**](reaserch) is folder created for testing column2Vec functions.
+It contains folder [files](reaserch/files) with all generated and md files with results from test. 
+[column2Vec_re.py](reaserch/column2Vec_re.py) file with  statistics computation for functions. 
+[generate_report.py](reaserch/generate_report.py) file that contains functions to generate files stored in [files](reaserch/files).
+
+File [**Column2Vec.py**](impl/Column2Vec.py) in folder [impl](impl) contains 7 different implementations of column2Vec.
 All implementations could use cache.
 There is implemented run time cache and persistent cache stored in cache.txt in folder generated.
 To store cache persistently it is necessary to call:
@@ -36,9 +41,9 @@ cache.clear_persistent_cache() # clears the cache file
 - **column2vec_sum** transforms every uniq element in column into vector and then sum it.
 - **column2vec_weighted_sum** transforms every element in column into vector and then sum it.
 
-> Inspired by [Michael J. Mior, Alexander G. Ororbia](https://arxiv.org/pdf/1903.08621)
+> Inspired by  "Column2Vec: Structural Understanding via Distributed Representations of Database Schemas" by Michael J. Mior, Alexander G. Ororbia [1903.08621](https://arxiv.org/pdf/1903.08621)
 
-File [**functions.py**](functions.py) contains functions for using column2Vec.
+File [**functions.py**](impl/functions.py) in folder [impl](impl) contains functions for using column2Vec.
 It contains functions:
 - get_nonnumerical_data (returns string columns)
 - get_vectors (creates embeddings)
