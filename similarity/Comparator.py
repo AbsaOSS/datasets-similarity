@@ -2,8 +2,8 @@
 File contains Comparator class, ComparatorType classes and DistanceFunction class.
 Comparator is split to types comparator, all columns with same types are compare together
 """
-
 from __future__ import annotations
+
 import math
 import warnings
 from abc import abstractmethod, ABC
