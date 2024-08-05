@@ -10,6 +10,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
+from torch import Tensor
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class Cache:
             return json.loads(self.__cache.loc[function, key])  # json is faster than ast
         return None
 
-    def save(self, key: str, function: str, embedding: list):
+    def save(self, key: str, function: str, embedding: Tensor | int):
         """
         Saves cache
         :param key: Column name
@@ -107,7 +108,7 @@ def clean_text(text):
     return re.sub("[^(0-9 |a-z)]", " ", str(text).lower())
 
 
-def column2vec_as_sentence(column: pd.Series, model: SentenceTransformer, key: str) -> list:
+def column2vec_as_sentence(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
     """
     Convert a column to a vector
 
@@ -183,7 +184,7 @@ def column2vec_as_sentence_clean_uniq(column: pd.Series, model: SentenceTransfor
 
 
 def weighted_create_embed(column: pd.Series, model: SentenceTransformer, key: str,
-                          function_string: str) -> (list, list):
+                          function_string: str) -> tuple[list, list]:
     """
     Creates embedding, it could be used for both weighted impl.
     :param column: to be embedded
@@ -265,7 +266,7 @@ def column2vec_sum(column: pd.Series, model: SentenceTransformer, key: str):
         return res
 
     uniq_column = column.unique()
-    column_clean = pd.Series(uniq_column).apply(clean_text).values
+    column_clean = pd.Series(uniq_column).apply(clean_text).values.tolist()
     encoded_columns = model.encode(column_clean)
     to_ret = sum(encoded_columns)  # sum of values
     cache.save(key, function_string, to_ret)  # todo
