@@ -1,6 +1,8 @@
 """
 This file contains column2Vec implementations.
 """
+from __future__ import annotations
+
 import json
 import re
 
@@ -282,3 +284,9 @@ def column2vec_weighted_sum(column: pd.Series, model: SentenceTransformer, key: 
         to_ret += number * weight
     cache.save(key, function_string, to_ret)  # todo
     return to_ret
+
+
+def column2vec_simple(column: list, model: SentenceTransformer, key: str) -> list:
+    encoded_columns = model.encode(column)
+    cache.save(key, "simple", encoded_columns)
+    return encoded_columns

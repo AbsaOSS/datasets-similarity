@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 from typing import Optional
 from sentence_transformers import SentenceTransformer
+from torch import Tensor
 
-from column2Vec.Column2Vec import column2vec_as_sentence
+from column2Vec.Column2Vec import column2vec_as_sentence, column2vec_as_sentence_clean_uniq
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
 from similarity.Types import get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind, \
@@ -51,6 +52,7 @@ class DataFrameMetadataCreator:
                                            zip(dataframe.count(), list(dataframe.columns))}  # more than 30 % missing
 
         # todo correlated column
+        self.embedding_function = column2vec_as_sentence_clean_uniq
         # -----------------------------------------------------------------------------------
 
     def __normalize(self, num1: int, num2: int) -> tuple[int, int]:
@@ -62,7 +64,7 @@ class DataFrameMetadataCreator:
         """
         gcd = math.gcd(num1, num2)
         if num1 > num2:
-            return int(num2/gcd), int(num1/gcd)
+            return int(num2 / gcd), int(num1 / gcd)
         return int(num1 / gcd), int(num2 / gcd)
 
     def __compute_kind_metadata(self, kind: DataKind, column: pd.Series) -> KindMetadata:
@@ -76,15 +78,17 @@ class DataFrameMetadataCreator:
             null_values = True if column.nunique() != len(column) else False
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
-            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max()/column.size, self.__get_model())
+            return KindMetadata(None, None, longest, shortest, null_values,
+                                column.apply(str).map(len).max() / column.size, self.__get_model())
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
                 return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True, None,  self.__get_model())
+                                    None, None, True, None, self.__get_model())
             else:
-                return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None,  self.__get_model())
+                return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None,
+                                    self.__get_model())
 
     def __compute_type_metadata(self, type_: Type, column: pd.Series, name: str) -> None:
         """
@@ -117,6 +121,15 @@ class DataFrameMetadataCreator:
             self.model = SentenceTransformer('bert-base-nli-mean-tokens')
         return self.model
 
+    def __make_embeddings(self, column_name: str, column: list) -> Tensor:
+        """
+        :param column: column to be transformed
+        :param column_name: name of column to be transformed
+        :return: embeddings and weights
+        """
+        return self.embedding_function(column,
+                                       self.__get_model(), column_name)
+
     ## Setting Creator
 
     def set_model(self, model: SentenceTransformer) -> 'DataFrameMetadataCreator':
@@ -128,13 +141,23 @@ class DataFrameMetadataCreator:
         self.model = model
         return self
 
+    def set_embedding_function(self, function) -> 'DataFrameMetadataCreator':
+        """
+        Sets embedding function
+        :param function: to be set
+        :return: self DataFrameMetadataCreator
+        """
+        self.embedding_function = function
+        return self
+
     def compute_column_names_embeddings(self) -> 'DataFrameMetadataCreator':
         """
         Computes embeddings for all column names
 
         :return: self
         """
-        column_name_embeddings = self.__get_model().encode(list(self.metadata.column_names_clean.values()))
+        # column_name_embeddings = self.__get_model().encode(list(self.metadata.column_names_clean.values()))
+        column_name_embeddings = self.__make_embeddings("column_names_clean", list(self.metadata.column_names_clean.values()))
         for i, name in zip(column_name_embeddings, self.metadata.column_names):
             self.metadata.column_name_embeddings[name] = i
         return self
@@ -155,9 +178,8 @@ class DataFrameMetadataCreator:
                     CategoricalMetadata(count=self.dataframe[i].nunique(),
                                         categories=list(self.dataframe[i].unique()),
                                         categories_with_count=self.dataframe[i].value_counts(),
-                                        category_embedding=self.__get_model().encode(
-                                            list(map(str, self.dataframe[i].unique()
-                                                     ))))
+                                        category_embedding = self.__make_embeddings(i, list(map(str, self.dataframe[i].unique())))
+                                        )
         return self
 
     def compute_basic_types(self) -> 'DataFrameMetadataCreator':
@@ -223,13 +245,13 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         if types is None:
-            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC] ## todo
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC,
+                     ALPHABETIC]  ## todo
         sentences = []
         names = []
         for i in types:
             for column in self.metadata.type_column[i]:
-                self.metadata.column_embeddings[column] = column2vec_as_sentence(self.dataframe[column],
-                                                                                 self.__get_model(), column)
+                self.metadata.column_embeddings[column] = self.__make_embeddings(column, self.dataframe[column])
         #         sentences.append(str(self.dataframe[column].tolist())
         #                          .replace("\'", "")
         #                          .replace("]", "")
