@@ -199,7 +199,7 @@ def similar_and_not_similar_file(file_name: str, test_results: dict, columns_to_
             f_sim.write("\n")
             f_not.write("\n")
 
-
+            
 def generate_sim_report(test_results: dict, file_name: str):
     """
     Generates report from similarity test results with similarity score

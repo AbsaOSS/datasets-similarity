@@ -1,6 +1,7 @@
 """
 Comparator compares each couple of columns independently.
 """
+
 from __future__ import annotations
 
 import warnings

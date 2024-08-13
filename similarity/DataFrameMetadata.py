@@ -1,6 +1,7 @@
 """
 File contains Table metadata (DataFrameMetadata class) and other metadata classes (CategoricalMetadata, KindMetadata ...)
 """
+
 from __future__ import annotations
 
 from collections import defaultdict

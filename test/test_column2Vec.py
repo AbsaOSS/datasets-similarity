@@ -10,7 +10,6 @@ from column2Vec.impl.Column2Vec import (column2vec_as_sentence, column2vec_as_se
                                         column2vec_weighted_avg, column2vec_sum,
                                         column2vec_weighted_sum, cache)
 from column2Vec.impl.functions import get_nonnumerical_data, get_clusters, compute_distances
-
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import NONNUMERICAL
 
