@@ -310,8 +310,7 @@ def is_date(column: pd.Series) -> bool:
     def is_str_date(word: str) -> bool:
         element = str(word).strip()
         try:
-            with warnings.catch_warnings():
-                parse(element, fuzzy=True)  # todo add timezone
+            parse(element, fuzzy=True)
             return True
         except (ParserError, OverflowError):
             one_or_two = r'(\d{1}|\d{2})'
