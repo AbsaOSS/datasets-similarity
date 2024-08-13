@@ -1,6 +1,6 @@
+"""Configuration module."""
 # add configuration
 # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#usage
-import logging
 import os
 import certifi
 

@@ -39,9 +39,9 @@ def make_plot(result: dict, file_name: str) -> bool:
     :return: always True
     """
 
-    col_first = list()
-    col_second = list()
-    first_second = list()
+    col_first = []
+    col_second = []
+    first_second = []
 
     for key in result.keys():
         col_first.append(result[key][0])
@@ -93,9 +93,7 @@ def generate_stability_report(test_results: dict, file_name: str) -> bool:
             first = False
         len_column += 1
 
-
-
-    with (open(f"files/{file_name}.md", "w")as f):
+    with open(f"files/{file_name}.md", "w") as f:
         f.write("# Stability test\n\n")
         for column in test_results.keys():
             for test_type in test_results[column].keys():
@@ -105,7 +103,7 @@ def generate_stability_report(test_results: dict, file_name: str) -> bool:
         for i in result:
             f.write(f"## {i}\n")
             f.write(f"**SCORE:** {result[i]}\n\n")
-            f.write(f"**PERCENTAGE:** {round((result[i]/len_column)*100)}%\n\n")
+            f.write(f"**PERCENTAGE:** {round((result[i] / len_column) * 100)}%\n\n")
 
     print(f"REPORT GENERATED: {file_name}.md")
     return True
@@ -142,6 +140,7 @@ def generate_partial_column_report(test_results: dict, file_name: str) -> bool:
             f.write("\n")
     print(f"REPORT GENERATED: {file_name}.md")
     return True
+
 
 def generate_time_report(test_results: dict, file_name: str):
     """
@@ -199,7 +198,12 @@ def similar_and_not_similar_file(file_name: str, test_results: dict, columns_to_
                 f_not.write("\n")
             f_sim.write("\n")
             f_not.write("\n")
+
+
 def generate_sim_report(test_results: dict, file_name: str):
+    """
+    Generates report from similarity test results with similarity score
+    """
     columns_to_test = ["reg_state1", "reg_city1", "country5", "country7", "Star46", "Star16",
                        "make3", "car_name4", "condition5", "date_added7", "fuel_type4", "fuel3",
                        "flight1", "tail_number1"]
@@ -358,7 +362,3 @@ def generate_sim_report(test_results: dict, file_name: str):
                     f" \n not similar score **{not_score}**,"
                     f" \n max score **{count + sim_score + not_score}**,"
                     f" \n bad **{count}**\n\n")
-
-
-
-

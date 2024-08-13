@@ -1,3 +1,4 @@
+"""Comparator for comparing all tables together"""
 import dataclasses
 from typing import Optional
 from itertools import compress
@@ -10,6 +11,9 @@ from similarity.DataFrameMetadata import DataFrameMetadata
 
 @dataclasses.dataclass
 class CategoricalSimilarity:
+    """
+    Struct for categorical similarity
+    """
     categories_ratio: float
     count_similar: Optional[int] = None
     similarity_score: Optional[int] = None
@@ -56,6 +60,9 @@ class SimilarityData:
         self.similarity_columns: dict[str, list[SimilarityStruct]] = defaultdict(list)
 
     def add_to_similarity_columns(self, key: str, value: list[SimilarityStruct]):
+        """
+        Adds similarity to columns
+        """
         self.similarity_columns[key] = value
 
     def get_similar_columns(self, colum_name: str) -> list[SimilarityStruct]:
@@ -67,6 +74,9 @@ class SimilarityData:
         return self.similarity_columns[colum_name]
 
     def count_most_similar(self):
+        """
+        Method counts most similar table for each column
+        """
         dummy_table_sim = []
         for i in self.similarity_columns.values():
             if i:
@@ -107,7 +117,10 @@ class ComparatorForDatasets:
         self.similarity: dict[str, SimilarityData] = defaultdict()
         self.threshold = 0.7  # todo
 
-    def cosine(self, u: list , v: list) -> float:
+    def cosine(self, u: list, v: list) -> float:
+        """
+        Computes cosine similarity
+        """
         return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
 
     def cross_compare(self) -> dict:
@@ -133,6 +146,9 @@ class ComparatorForDatasets:
         return result
 
     def compare_categorical(self):
+        """
+        Method compares categorical columns
+        """
         for _, table in self.database.items():
             column_names = list(compress(table.column_names, table.column_categorical))
             for _, to_compare in self.database.items():

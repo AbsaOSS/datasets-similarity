@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 
 from streamlit_app import load_data, DATE_COLUMN
 data_load_state = st.text('Loading data...')
