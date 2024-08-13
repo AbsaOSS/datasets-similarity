@@ -1,4 +1,7 @@
 import argparse
+import logging
+
+from config import Configuration
 
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter):
@@ -51,17 +54,23 @@ def init_args() -> argparse.ArgumentParser:
 
 
 def parse_args(parser: argparse.ArgumentParser):
+    cache_file = "cache.txt"
+    save_cache = False
+    log_level = logging.INFO
     args = parser.parse_args()
     if args.input_files:
         print(f"Input files are {args.input_files}")
     if args.directory:
         print(f"Directory is {args.directory}")
     if args.cache_file:
+        cache_file = args.cache_file
         print(f"Cache file is {args.cache_file}")
     if args.save:
+        save_cache = True
         print("Cache will be saved")
     if args.off:
         print("Cache is turned off")
+    configuration = Configuration(log_level=log_level, cache_file=cache_file, cache_save_persistently=save_cache)
 
 
 if __name__ == "__main__":
