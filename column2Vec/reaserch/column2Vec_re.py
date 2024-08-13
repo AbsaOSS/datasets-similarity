@@ -76,8 +76,6 @@ def similarity_test(embeddings: dict) -> dict:
             for column2 in keys:
                 sim = cosine_sim(embeddings[column][function], embeddings[column2][function])
                 res[function][column, column2] = sim
-                # res[function][column2, column] = sim
-        # keys.remove(column)
     return res
 
 
