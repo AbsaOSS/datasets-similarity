@@ -259,13 +259,13 @@ class SizeComparator(ComparatorType):
         # todo if this is not working try this We will fill the whole table with this numer, distance function should compute the same number (todo test)
 
 
-def fill_result(metadata1, metadata2) -> pd.DataFrame:
+def fill_result(metadata1_names, metadata2_names) -> pd.DataFrame:
     """
     Fill result with 0 if the names are the same, otherwise fill with 1
     """
     result = pd.DataFrame()
-    for idx1, name1 in enumerate(metadata1.column_names_clean.values()):
-        for idx2, name2 in enumerate(metadata2.column_names_clean.values()):
+    for idx1, name1 in enumerate(metadata1_names.values()):
+        for idx2, name2 in enumerate(metadata2_names.values()):
             result.loc[idx1, idx2] = 0 if name1 == name2 else 1
     return result
 
@@ -287,7 +287,7 @@ class ColumnExactNamesComparator(ComparatorType):
         """
         if (metadata1.column_names_clean == {} or metadata2.column_names_clean == {}) and warning_enable.get_status():
             warnings.warn("Warning: column_names_clean is not computed")
-        return fill_result(metadata1, metadata2)
+        return fill_result(metadata1.column_names_clean, metadata2.column_names_clean)
 
 
 class ColumnNamesEmbeddingsComparator(ComparatorType):
@@ -305,11 +305,14 @@ class ColumnNamesEmbeddingsComparator(ComparatorType):
         :param settings: - not used
         :return: dataframe fill by distances between 0 and 1
         """
-        if (
-                metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
+        if (metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
             warnings.warn("Warning: column name embedding is not computed")
 
-        return fill_result(metadata1, metadata2)
+        result = pd.DataFrame()
+        for idx1, name1 in enumerate(metadata1.column_name_embeddings.values()):
+            for idx2, name2 in enumerate(metadata2.column_name_embeddings.values()):
+                result.loc[idx1, idx2] = 1 - cosine_sim(name1, name2)
+        return result
 
 
 class IncompleteColumnsComparator(ComparatorType):
@@ -328,7 +331,8 @@ class IncompleteColumnsComparator(ComparatorType):
         :param settings: - not used
         :return: dataframe full of 1 and 0
         """
-        return fill_result(metadata1, metadata2)
+        return fill_result(metadata1.column_incomplete, metadata2.column_incomplete)
+
 
 
 class KindComparator(ComparatorType):

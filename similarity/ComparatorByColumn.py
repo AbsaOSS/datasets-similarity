@@ -11,9 +11,9 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
-from Comparator import DistanceFunction, Settings, cosine_sim, HausdorffDistanceMin
-from DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
-from Types import DataKind
+from similarity.Comparator import DistanceFunction, Settings, cosine_sim, HausdorffDistanceMin
+from similarity.DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
+from similarity.Types import DataKind
 from constants import warning_enable
 
 
