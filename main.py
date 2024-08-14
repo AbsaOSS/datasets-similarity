@@ -19,6 +19,7 @@ from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 BY_COLUMN = True
 configure()
 
+
 def create_metadata(data):
     """
     This function creates metadata
@@ -41,15 +42,15 @@ def compare_datasets(path1, path2):
     data2 = pd.read_csv(path2)
     metadata1 = create_metadata(data1)
     metadata2 = create_metadata(data2)
-    comparator2 = (ComparatorByColumn().add_comparator_type(SizeComparatorByColumn()).
-                   add_comparator_type(IncompleteColumnsComparatorByColumn()).
-                   add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn()))
+    comparator_by_column = (ComparatorByColumn().add_comparator_type(SizeComparatorByColumn()).
+                            add_comparator_type(IncompleteColumnsComparatorByColumn()).
+                            add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn()))
     compartor = (Comparator().add_comparator_type(SizeComparator()).
                  add_comparator_type(IncompleteColumnsComparator()).
                  add_comparator_type(KindComparator()).
                  add_comparator_type(ColumnNamesEmbeddingsComparator()))
     if BY_COLUMN:
-        return comparator2.compare(metadata1, metadata2)
+        return comparator_by_column.compare(metadata1, metadata2)
     return compartor.compare(metadata1, metadata2)
 
 

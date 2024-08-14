@@ -64,15 +64,15 @@ class TestSimilarityOfVectors(unittest.TestCase):
         file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         files = [file_m2]
-        cls.data = get_nonnumerical_data(files)
+        data = get_nonnumerical_data(files)
         stop = 0
-        for i in cls.data:
+        for i in data:
             if stop == 0:
-                cls.first = cls.data[i]
+                cls.first = data[i]
             if stop == 1:
-                cls.second = cls.data[i]
+                cls.second = data[i]
             if stop == 2:
-                cls.third = cls.data[i]
+                cls.third = data[i]
             stop += 1
 
     def test_column2vec_as_sentence(self):
@@ -134,19 +134,6 @@ class TestSimilarityOfVectors(unittest.TestCase):
 class TestClustersAreAlwaysSame(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.clusters_MC_Copilot = {
-            1: ["flight", "tail_number"],
-            2: ["reg_expiration", "reg_owner", "vin", "title_status"],
-            3: ["manufacturer", "model", "make", "brand", "Model", "Company"],
-            4: ["Engine Type", "Multi Engine", "TP mods", "gear", "transmission_type", "fuel_type", "body_type"],
-            5: ["reg_state", "reg_city", "country", "state"],
-            6: ["offerType", "Gross"],
-            7: ["Series_Title", "Overview", "title", "description", "type", "listed_in"],
-            8: ["rating", "duration", "date_added"],
-            9: ["Poster_Link", "Director", "Star2", "Star3", "Star1", "Star4", "show_id", "cast", "director"],
-            10: ["condition", "color"],
-            11: ["Genre"]
-        }
         file_a1 = os.path.join(THIS_DIR, os.pardir, 'data/aircraft-data_nov_dec.csv')
         file_a2 = os.path.join(THIS_DIR, os.pardir, 'data/Airplane_Cleaned.csv')
         file_c1 = os.path.join(THIS_DIR, os.pardir, 'data/autoscout24-germany-dataset.csv')
@@ -155,8 +142,8 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
         file_m1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
         file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        cls.files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
-        cls.data = get_nonnumerical_data(cls.files)
+        files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
+        cls.data = get_nonnumerical_data(files)
         cache.off()
 
     def test_column2vec_as_sentence(self):
@@ -231,8 +218,8 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
         file_m1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
         file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        cls.files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
-        cls.data = get_nonnumerical_data(cls.files)
+        files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
+        cls.data = get_nonnumerical_data(files)
         cache.off()
 
     def get_cluster_num(self, name):
