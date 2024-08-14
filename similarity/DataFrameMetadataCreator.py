@@ -15,9 +15,9 @@ from sentence_transformers import SentenceTransformer
 from column2Vec.impl.Column2Vec import column2vec_as_sentence
 from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
     NonnumericalMetadata
-from Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
-                   DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
-                   MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
+from similarity.Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
+                              DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
+                              MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
 
 
 class DataFrameMetadataCreator:
@@ -68,7 +68,7 @@ class DataFrameMetadataCreator:
         """
         gcd = math.gcd(num1, num2)
         if num1 > num2:
-            return int(num2/gcd), int(num1/gcd)
+            return int(num2 / gcd), int(num1 / gcd)
         return int(num1 / gcd), int(num2 / gcd)
 
     def __compute_kind_metadata(self, kind: DataKind, column: pd.Series) -> KindMetadata | None:
@@ -83,15 +83,15 @@ class DataFrameMetadataCreator:
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
             return KindMetadata(None, None, longest, shortest, null_values,
-                                column.apply(str).map(len).max()/column.size, self.__get_model())
+                                column.apply(str).map(len).max() / column.size, self.__get_model())
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
                 return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True, None,  self.__get_model())
+                                    None, None, True, None, self.__get_model())
             return KindMetadata(tuple([column.dropna().unique()[0]]), None,
-                                None, None, False, None,  self.__get_model())
+                                None, None, False, None, self.__get_model())
         return None
 
     def __compute_type_metadata(self, type_: type[Type], column: pd.Series, name: str) -> None:

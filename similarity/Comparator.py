@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 from torch import Tensor
 
-from DataFrameMetadata import DataFrameMetadata
-from Types import DataKind
+from similarity.DataFrameMetadata import DataFrameMetadata
+from similarity.Types import DataKind
 from constants import warning_enable
 
 

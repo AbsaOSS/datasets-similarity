@@ -91,9 +91,9 @@ def is_numerical(x: pd.Series) -> bool:
     :param x: the type
     :return: true if it is numerical, otherwise false
     """
-    return (x.any() and
-            (x.dtype in (np.float64, np.int64)) and not
-            (len(x.isnull()) / x.size > 0.9))
+    return (x.any()
+            and (x.dtype in (np.float64, np.int64))
+            and not (x.isnull().values.sum() / x.size > 0.9))
 
 
 def is_int(x: pd.Series) -> bool:
