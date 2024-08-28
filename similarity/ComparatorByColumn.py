@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import warnings
 from abc import ABC, abstractmethod
 from statistics import mean
@@ -10,7 +12,8 @@ from similarity.Comparator import DistanceFunction, Settings, cosine_sim, Hausdo
 from similarity.DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
 from similarity.Types import DataKind
 
-class ComparatorType(ABC):
+
+class ComparatorTypeByColumn(ABC):
     def __init__(self, weight=1):
         self.weight = weight
 
@@ -38,21 +41,21 @@ class ComparatorType(ABC):
         return False, 0
 
 
-class TableComparator(ComparatorType):
+class TableComparator(ComparatorTypeByColumn):
     @abstractmethod
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str = 0,
                 index2: int | str = 0) -> float:
         pass
 
 
-class GeneralColumnComparator(ComparatorType):
+class GeneralColumnComparator(ComparatorTypeByColumn):
     @abstractmethod
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
                 index2: int | str) -> float:
         pass
 
 
-class SpecificColumnComparator(ComparatorType):
+class SpecificColumnComparator(ComparatorTypeByColumn):
     @abstractmethod
     def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
                 index2: int | str) -> float:
@@ -162,8 +165,8 @@ class ColumnKindComparator(SpecificColumnComparator):
         """
         res = pd.DataFrame()
         row_mins = []
-        for id1, embed1 in enumerate(embeddings1.items()):
-            for id2, embed2 in enumerate(embeddings2.items()):
+        for id1, embed1 in enumerate(embeddings1):
+            for id2, embed2 in enumerate(embeddings2):
                 res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
             row_mins.append(min(res[id1]))
         column_mins = []
@@ -280,29 +283,35 @@ class ColumnKindComparator(SpecificColumnComparator):
         if DataKind.BOOL in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.BOOL] and index2 in metadata2.column_kind[DataKind.BOOL]:
                 return self.compare_bools(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL],"Boolean column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.BOOL],
+                                               metadata2.column_kind[DataKind.BOOL], "Boolean column")
         if DataKind.ID in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.ID] and index2 in metadata2.column_kind[DataKind.ID]:
                 return self.compare_ids(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],"ID column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],
+                                               "ID column")
         if DataKind.CATEGORICAL in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[
                 DataKind.CATEGORICAL]:
-                return self.compare_categoricals(metadata1.categorical_metadata[index1], metadata2.categorical_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL],"Categorical column")
+                return self.compare_categoricals(metadata1.categorical_metadata[index1],
+                                                 metadata2.categorical_metadata[index2])
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL],
+                                               metadata2.column_kind[DataKind.CATEGORICAL], "Categorical column")
         if DataKind.CONSTANT in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[
                 DataKind.CONSTANT]:
                 return self.compare_constants(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT],"Constant column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
+                                               metadata2.column_kind[DataKind.CONSTANT], "Constant column")
 
         if are_nulls[0]:
             return are_nulls[1]
         return np.nan
 
+
 class ComparatorByColumn:
     def __init__(self):
-        self.comparator_type: list[ComparatorType] = []
+        self.comparator_type: list[ComparatorTypeByColumn] = []
         self.table_comparators: list[TableComparator] = []
         self.settings: set[Settings] = set()
         self.distance_function = HausdorffDistanceMin()
@@ -319,7 +328,7 @@ class ComparatorByColumn:
         self.settings.add(setting)
         return self
 
-    def add_comparator_type(self, comparator: ComparatorType) -> 'ComparatorByColumn':
+    def add_comparator_type(self, comparator: ComparatorTypeByColumn) -> 'ComparatorByColumn':
         # todo if comparator contains type and kind comparator change it to kind_and_tyep_comparator
         if isinstance(comparator, TableComparator):
             self.table_comparators.append(comparator)
@@ -358,5 +367,3 @@ class ComparatorByColumn:
             for dist in table_distances:
                 res += dist * dist
         return np.sqrt(res)
-
-

@@ -127,7 +127,7 @@ class DataFrameMetadataCreator:
         :param column_name: name of column to be transformed
         :return: embeddings and weights
         """
-        return self.embedding_function(column,
+        return self.embedding_function(pd.Series(column),
                                        self.__get_model(), column_name)
 
     ## Setting Creator
@@ -157,7 +157,8 @@ class DataFrameMetadataCreator:
         :return: self
         """
         # column_name_embeddings = self.__get_model().encode(list(self.metadata.column_names_clean.values()))
-        column_name_embeddings = self.__make_embeddings("column_names_clean", list(self.metadata.column_names_clean.values()))
+        column_name_embeddings = self.__make_embeddings("column_names_clean",
+                                                        list(self.metadata.column_names_clean.values()))
         for i, name in zip(column_name_embeddings, self.metadata.column_names):
             self.metadata.column_name_embeddings[name] = i
         return self
@@ -178,7 +179,8 @@ class DataFrameMetadataCreator:
                     CategoricalMetadata(count=self.dataframe[i].nunique(),
                                         categories=list(self.dataframe[i].unique()),
                                         categories_with_count=self.dataframe[i].value_counts(),
-                                        category_embedding = self.__make_embeddings(i, list(map(str, self.dataframe[i].unique())))
+                                        category_embedding=self.__make_embeddings(i, list(
+                                            map(str, self.dataframe[i].unique())))
                                         )
         return self
 
