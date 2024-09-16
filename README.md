@@ -190,5 +190,25 @@ Or you can run all the tests by running this:
 **Please be aware that some tests in the test_column2Vec 
 module may take a long time.**
 
+### Static tests
+For static tests, we use pylint and black.
+#### Pylint
+You can run it by using this command:
+```bash
+pylint $(git ls-files '*.py')
+# or for specific file
+pylint similarity/metadata_creator.py
+```
+You can change pylint settings in [.pylintrc](.pylintrc) file.
+
+#### Black
+You can run it by using this command:
+```bash
+black $(git ls-files '*.py')
+# or for specific file
+black similarity/metadata_creator.py
+```
+You can change black settings in [pyproject.toml](pyproject.toml) file.
+
 ## How to contribute
 Please see our [**Contribution Guidelines**](CONTRIBUTING.md).
