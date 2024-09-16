@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  analysis:
-    name: Pylint Analysis
+  static-analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -26,11 +26,11 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          pylint \
-#            --fail-under=6.0 \
-#            --ignore-patterns=test_.*?py \
-#            --max-line-length=180 \
-            $(git ls-files '*.py')
+          pylint $(git ls-files '*.py')
+
+      - name: Check code format with Black
+        run: |
+          black --check $(git ls-files '*.py')
 
   python-tests:
     env:
@@ -77,25 +77,3 @@ jobs:
           name: coverage
           path: coverage.xml
           retention-days: 1
-
-  code-format-check:
-    name: Black Format Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.1.5
-
-      - name: Set up Python
-        uses: actions/setup-python@v5.1.0
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Check code format with Black
-        id: check-format
-        run: |
-          black --check $(git ls-files '*.py')
