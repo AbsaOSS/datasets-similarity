@@ -1,6 +1,7 @@
 """
 This file contains column2Vec implementations.
 """
+
 from __future__ import annotations
 
 import json
@@ -22,6 +23,7 @@ class Cache:
     """
     Class for cashing column2Vec
     """
+
     # loaded cache
     __cache = pd.DataFrame()
     # False if the file containing cache was not read yet
@@ -56,12 +58,17 @@ class Cache:
             self.__read_from_file = True
         if function in self.__cache.index and key in self.__cache.columns:
             tmp = self.__cache.loc[function, key]
-            if (tmp != 'nan' and tmp is not int) or (tmp is int and not math.isnan(tmp)):
-                return json.loads(tmp) # json is faster than ast
+            if (tmp != "nan" and tmp is not int) or (tmp is int and not math.isnan(tmp)):
+                return json.loads(tmp)  # json is faster than ast
         print(f"NO CACHE key: {key}, function: {function}")
         return None
 
-    def save(self, key: str, function: str, embedding: Tensor):
+    def save(
+        self,
+        key: str,
+        function: str,
+        embedding: Tensor,
+    ):
         """
         Saves cache
         :param key: Column name
@@ -101,7 +108,7 @@ class Cache:
     def clear_persistent_cache(self):
         """clear cache saved in file"""
         try:
-            open(self.__file, 'w').close()
+            open(self.__file, "w").close()
         except FileNotFoundError as e:
             print(e)
 
@@ -114,7 +121,11 @@ def clean_text(text):
     return re.sub("[^(0-9 |a-z)]", " ", str(text).lower())
 
 
-def column2vec_as_sentence(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_as_sentence(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -129,14 +140,18 @@ def column2vec_as_sentence(column: pd.Series, model: SentenceTransformer, key: s
     if res is not None:
         return res
 
-    sentence = [str(column.tolist()).replace("\'", "").replace("]", "").replace("[", "")]
+    sentence = [str(column.tolist()).replace("'", "").replace("]", "").replace("[", "")]
     embedding = model.encode(sentence)[0]
 
     cache.save(key, function_string, embedding)
     return embedding
 
 
-def column2vec_as_sentence_clean(column: pd.Series, model: SentenceTransformer, key: str)-> Tensor:
+def column2vec_as_sentence_clean(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -161,7 +176,11 @@ def column2vec_as_sentence_clean(column: pd.Series, model: SentenceTransformer, 
     return embedding
 
 
-def column2vec_as_sentence_clean_uniq(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_as_sentence_clean_uniq(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -209,7 +228,11 @@ def weighted_create_embed(column: pd.Series, model: SentenceTransformer, key: st
     return model.encode(column_clean), weights
 
 
-def column2vec_avg(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_avg(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -231,7 +254,11 @@ def column2vec_avg(column: pd.Series, model: SentenceTransformer, key: str) -> T
     return to_ret
 
 
-def column2vec_weighted_avg(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_weighted_avg(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -256,7 +283,11 @@ def column2vec_weighted_avg(column: pd.Series, model: SentenceTransformer, key: 
     return to_ret
 
 
-def column2vec_sum(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_sum(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector
 
@@ -279,7 +310,11 @@ def column2vec_sum(column: pd.Series, model: SentenceTransformer, key: str) -> T
     return to_ret
 
 
-def column2vec_weighted_sum(column: pd.Series, model: SentenceTransformer, key: str) -> Tensor:
+def column2vec_weighted_sum(
+    column: pd.Series,
+    model: SentenceTransformer,
+    key: str,
+) -> Tensor:
     """
     Convert a column to a vector.
 

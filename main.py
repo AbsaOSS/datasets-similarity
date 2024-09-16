@@ -2,6 +2,7 @@
 The main.py contains example usage.
 You can run program to compare tables by main
 """
+
 import sys
 
 import pandas as pd
@@ -25,9 +26,7 @@ def create_metadata(data):
     This function creates metadata
     :return created metadata
     """
-    return (DataFrameMetadataCreator(data).
-            compute_advanced_structural_types().
-            compute_column_kind().compute_column_names_embeddings()).get_metadata()
+    return (DataFrameMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
 
 
 def compare_datasets(path1, path2):
@@ -54,7 +53,8 @@ def compare_datasets(path1, path2):
     return compartor.compare(metadata1, metadata2)
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     configure()
     warning_enable.change_status(False)
     warning_enable.disable_timezone_warn()
@@ -66,5 +66,8 @@ if __name__ == '__main__':
                 distance = compare_datasets(file1, file2)
                 print(f"{file1} |< >| {file2} = {distance}")
     if len(files) == 0:
-        distance = compare_datasets('data/netflix_titles.csv', 'data/imdb_top_1000.csv')
+        distance = compare_datasets(
+            "data/netflix_titles.csv",
+            "data/imdb_top_1000.csv",
+        )
         print(f"'data/netflix_titles.csv' |< >| 'data/imdb_top_1000.csv' = {distance}")

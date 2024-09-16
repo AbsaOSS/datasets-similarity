@@ -54,9 +54,16 @@ class KindMetadata:
     todo format (uuid, rodc, visa/mastercard ...)
     """
 
-    def __init__(self, value: Optional[tuple], distribution: Optional[tuple[int, ...]],
-                 longest: Optional[Any], shortest: Optional[Any], null_values: Optional[bool],
-                 ratio_max_length: Optional[float], model):
+    def __init__(
+        self,
+        value: Optional[tuple],
+        distribution: Optional[tuple[int, ...]],
+        longest: Optional[Any],
+        shortest: Optional[Any],
+        null_values: Optional[bool],
+        ratio_max_length: Optional[float],
+        model,
+    ):
         self.kind_metadata = None
         self.value = value
         self.value_embeddings = None if value is None or value[0] is not str else model.encode(list(value))
@@ -72,7 +79,6 @@ class KindMetadata:
         return (f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
                 f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})")
 
-
 class NonnumericalMetadata:
     """
     Metadata for nonnumerical columns
@@ -82,7 +88,12 @@ class NonnumericalMetadata:
     It should also store bigrams, trigrams ...
     """
 
-    def __init__(self, longest: str, shortest: str, avg_length: int):
+    def __init__(
+        self,
+        longest: str,
+        shortest: str,
+        avg_length: int,
+    ):
         self.longest = longest
         self.shortest = shortest
         self.avg_length = avg_length
@@ -100,7 +111,12 @@ class NumericalMetadata:
     It should also store distribution
     """
 
-    def __init__(self, min_value: float | int, max_value: float | int, same_value_length: bool):
+    def __init__(
+        self,
+        min_value: float | int,
+        max_value: float | int,
+        same_value_length: bool,
+    ):
         self.min_value = min_value
         self.max_value = max_value
         self.range_size = max_value - min_value

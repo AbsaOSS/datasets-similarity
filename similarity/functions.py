@@ -1,6 +1,7 @@
 """
 This module contains helpful functions
 """
+
 import os
 
 import pandas as pd
@@ -20,7 +21,6 @@ def load__csv_files_from_folder(folder: str) -> tuple[list[pd.DataFrame], list[s
             names.append(file.replace(".csv", ""))
     return data, names
 
-
 def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> tuple[list[str], list[str]]:
     """
     For each column in each table in database it creates string from that column.
@@ -33,7 +33,6 @@ def create_string_from_columns(database: list[pd.DataFrame], table_names: list[s
     sentences_datasets = []
     for table, name in zip(database, table_names):
         for column in table.columns:
-            sentences.append(
-                str(table[column].tolist()).replace("\'", "").replace("]", "").replace("[", ""))  # column to string
+            sentences.append(str(table[column].tolist()).replace("'", "").replace("]", "").replace("[", ""))  # column to string
             sentences_datasets.append(name)
     return sentences, sentences_datasets

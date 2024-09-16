@@ -17,6 +17,7 @@ from similarity.Types import DataKind
 from constants import warning_enable
 
 
+
 class ComparatorType(ABC):
     """
     Abstract class for comparators
@@ -157,7 +158,10 @@ class ColumnNamesEmbeddingsComparator(GeneralColumnComparator):
             if warning_enable.get_status():
                 warnings.warn("Warning: column name embedding is not computed")
             return np.nan
-        return 1 - cosine_sim(metadata1.column_name_embeddings[index1], metadata2.column_name_embeddings[index2])
+        return 1 - cosine_sim(
+            metadata1.column_name_embeddings[index1],
+            metadata2.column_name_embeddings[index2],
+        )
 
 
 class ColumnEmbeddingsComparator(GeneralColumnComparator):
@@ -174,12 +178,14 @@ class ColumnEmbeddingsComparator(GeneralColumnComparator):
         :param metadata2: second dataframe metadata
         :return: float number in range <0, 1> 0 exactly the same 1 completely different
         """
-        if (metadata1.column_embeddings == {} or metadata2.column_embeddings == {} or
-                index1 not in metadata1.column_embeddings or index2 not in metadata2.column_embeddings):
+        if metadata1.column_embeddings == {} or metadata2.column_embeddings == {} or index1 not in metadata1.column_embeddings or index2 not in metadata2.column_embeddings:
             if warning_enable.get_status():
                 warnings.warn("Warning: column embedding is not computed")
             return np.nan
-        return 1 - cosine_sim(metadata1.column_embeddings[index1], metadata2.column_embeddings[index2])
+        return 1 - cosine_sim(
+            metadata1.column_embeddings[index1],
+            metadata2.column_embeddings[index2],
+        )
 
 
 class ColumnKindComparator(SpecificColumnComparator):
@@ -192,7 +198,12 @@ class ColumnKindComparator(SpecificColumnComparator):
         """
         super().__init__(weight=1)
         if compare_kind is None:
-            self.compare_kind = [DataKind.BOOL, DataKind.ID, DataKind.CATEGORICAL, DataKind.CONSTANT]
+            self.compare_kind = [
+                DataKind.BOOL,
+                DataKind.ID,
+                DataKind.CATEGORICAL,
+                DataKind.CONSTANT,
+            ]
         else:
             self.compare_kind = compare_kind
         if weight is None:
@@ -219,7 +230,11 @@ class ColumnKindComparator(SpecificColumnComparator):
             column_mins.append(min(column))
         return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
 
-    def compare_bools(self, metadata1: KindMetadata, metadata2: KindMetadata) -> float:
+    def compare_bools(
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
+    ) -> float:
         """
         Compare two boolean columns. Compare if they have the same distribution of True and False values.
         Compare if they contain nulls.
@@ -230,15 +245,23 @@ class ColumnKindComparator(SpecificColumnComparator):
         :return: float number in range <0, 1>
         """
         nulls = 0 if metadata1.nulls == metadata2.nulls else 1
-        distr = abs(
-            metadata1.distribution[0] / metadata1.distribution[1] - metadata2.distribution[0] / metadata2.distribution[
-                1])
+        distr = abs(metadata1.distribution[0] / metadata1.distribution[1] - metadata2.distribution[0] / metadata2.distribution[1])
         if metadata1.value_embeddings is None or metadata2.value_embeddings is None:
             return (nulls + distr) / 2
-        return (nulls + distr + self.compute_embeddings_distance(metadata1.value_embeddings,
-                                                                 metadata2.value_embeddings)) / 3
+        return (
+            nulls
+            + distr
+            + self.compute_embeddings_distance(
+                metadata1.value_embeddings,
+                metadata2.value_embeddings,
+            )
+        ) / 3
 
-    def compare_categoricals(self, metadata1: CategoricalMetadata, metadata2: CategoricalMetadata) -> float:
+    def compare_categoricals(
+        self,
+        metadata1: CategoricalMetadata,
+        metadata2: CategoricalMetadata,
+    ) -> float:
         """
         Compare two categorical columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -247,7 +270,10 @@ class ColumnKindComparator(SpecificColumnComparator):
         :param metadata2: for column2
         :return: float number in range <0, 1>
         """
-        value_re = self.compute_embeddings_distance(metadata1.category_embedding, metadata2.category_embedding)
+        value_re = self.compute_embeddings_distance(
+            metadata1.category_embedding,
+            metadata2.category_embedding,
+        )
         count1 = metadata1.count_categories
         count2 = metadata2.count_categories
         count_re = count1 / count2 if count1 < count2 else count2 / count1
@@ -256,7 +282,11 @@ class ColumnKindComparator(SpecificColumnComparator):
         # compare the difference between the two dictionaries
         return (value_re + count_re) / 2
 
-    def compare_constants(self, metadata1: KindMetadata, metadata2: KindMetadata) -> float:
+    def compare_constants(
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
+    ) -> float:
         """
         Compare two constant columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -269,7 +299,10 @@ class ColumnKindComparator(SpecificColumnComparator):
         if metadata1.value_embeddings is None or metadata2.value_embeddings is None:
             value: float = 0 if metadata1.value == metadata2.value else 1
         else:
-            value = 1 - cosine_sim(metadata1.value_embeddings, metadata2.value_embeddings)
+            value = 1 - cosine_sim(
+                metadata1.value_embeddings,
+                metadata2.value_embeddings,
+            )
         # if nulls are equal and exist
         if nulls == 0 and metadata1.nulls:
             ratio1 = metadata1.distribution[0] / metadata1.distribution[1]
@@ -277,7 +310,11 @@ class ColumnKindComparator(SpecificColumnComparator):
             nulls = abs(ratio1 - ratio2)  # compute difference between distribution
         return (nulls + value) / 2
 
-    def compare_ids(self, metadata1: KindMetadata, metadata2: KindMetadata) -> float:
+    def compare_ids(
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
+    ) -> float:
         """
         Compare two id columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -291,11 +328,17 @@ class ColumnKindComparator(SpecificColumnComparator):
         embeddings2_shortest = metadata2.shortest_embeddings
 
         if embeddings1_longest is not None and embeddings2_longest is not None:
-            value_long_re = 1 - cosine_sim(embeddings1_longest, embeddings2_longest)
+            value_long_re = 1 - cosine_sim(
+                embeddings1_longest,
+                embeddings2_longest,
+            )
         else:
             value_long_re = 0 if metadata1.longest == metadata2.longest else 1
         if embeddings1_shortest is not None and embeddings2_shortest is not None:
-            value_short_re = 1 - cosine_sim(embeddings1_shortest, embeddings2_shortest)
+            value_short_re = 1 - cosine_sim(
+                embeddings1_shortest,
+                embeddings2_shortest,
+            )
         else:
             value_short_re = 0 if metadata1.shortest == metadata2.shortest else 1
 
@@ -426,8 +469,17 @@ class ComparatorByColumn:
                 for column2 in metadata2.column_names:
                     comparators_distances = []
                     for comparator in self.comparator_type:
-                        comparators_distances.append((comparator.compare(metadata1, metadata2, column1, column2),
-                                                      comparator.weight))
+                        comparators_distances.append(
+                            (
+                                comparator.compare(
+                                    metadata1,
+                                    metadata2,
+                                    column1,
+                                    column2,
+                                ),
+                                comparator.weight,
+                            )
+                        )
                     distances.loc[column1, column2] = self.weightwed_avg(comparators_distances)
             res = self.distance_function.compute(distances)
             res = res * res

@@ -1,6 +1,7 @@
 """
 Functions usefull for column2Vec.
 """
+
 import time
 from typing import Any
 from collections.abc import Callable
@@ -8,17 +9,23 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import (
+    SentenceTransformer,
+)
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 
 from constants import trained_model
 from similarity.Comparator import cosine_sim
-from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
+from similarity.DataFrameMetadataCreator import (
+    DataFrameMetadataCreator,
+)
 from similarity.Types import NONNUMERICAL
 
 
-def get_nonnumerical_data(files: list[str]) -> dict[str, list]:
+def get_nonnumerical_data(
+    files: list[str],
+) -> dict[str, list]:
     """
     Reads all csv files (which name is in files). Creates metadata for them.
     Save only nonnumerical columns into dictionary. Key is a name of column.
@@ -31,9 +38,7 @@ def get_nonnumerical_data(files: list[str]) -> dict[str, list]:
     for i in files:
         index += 1
         data = pd.read_csv(i)
-        metadata_creator = (DataFrameMetadataCreator(data).
-                            compute_advanced_structural_types().
-                            compute_column_kind())
+        metadata_creator = DataFrameMetadataCreator(data).compute_advanced_structural_types().compute_column_kind()
         metadata1 = metadata_creator.get_metadata()
         column_names = metadata1.get_column_names_by_type(NONNUMERICAL)
         for name in column_names:
@@ -42,8 +47,13 @@ def get_nonnumerical_data(files: list[str]) -> dict[str, list]:
     return result
 
 
-def get_vectors(function: Callable[[pd.Series, SentenceTransformer, str], list],
-                data: dict[str, Any]) -> dict[str, Any]:
+def get_vectors(
+    function: Callable[
+        [pd.Series, SentenceTransformer, str],
+        list,
+    ],
+    data: dict[str, Any],
+) -> dict[str, Any]:
     """
     Creates embedding vectors from column by using one of
      the column2Vec implementations.
@@ -58,14 +68,21 @@ def get_vectors(function: Callable[[pd.Series, SentenceTransformer, str], list],
     count = 1
     for key in data:
         print("Processing column: " + key + " " + str(round((count / len(data)) * 100, 2)) + "%")
-        result[key] = function(data[key], trained_model.get_module(), key)
+        result[key] = function(
+            data[key],
+            trained_model.get_module(),
+            key,
+        )
         count += 1
     end = time.time()
     print(f"ELAPSED TIME :{end - start}")
     return result
 
 
-def get_clusters(vectors_to_cluster: pd.DataFrame, n_clusters: int) -> list[list[str]]:
+def get_clusters(
+    vectors_to_cluster: pd.DataFrame,
+    n_clusters: int,
+) -> list[list[str]]:
     """
     Creates clusters by KMeans for given vectors.
 
@@ -80,7 +97,10 @@ def get_clusters(vectors_to_cluster: pd.DataFrame, n_clusters: int) -> list[list
     clusters = [[]] * n_clusters
     for i in range(n_clusters):
         names = []
-        for cluster, name in zip(kmeans.labels_, vectors_to_cluster.keys()):
+        for cluster, name in zip(
+            kmeans.labels_,
+            vectors_to_cluster.keys(),
+        ):
             if cluster == i:
                 names.append(name)
         clusters[i] = names
@@ -104,12 +124,18 @@ def plot_clusters(vectors_to_plot: pd.DataFrame, title: str):
     tsne = TSNE(n_components=2, random_state=0)
     reduced_vectors = tsne.fit_transform(list_of_vectors)
 
-    df = pd.DataFrame(reduced_vectors, columns=['x', 'y'])
-    df['names'] = vectors_to_plot.keys()
+    df = pd.DataFrame(reduced_vectors, columns=["x", "y"])
+    df["names"] = vectors_to_plot.keys()
     # The cluster labels are returned in kmeans.labels_
-    df['cluster'] = kmeans.labels_
+    df["cluster"] = kmeans.labels_
 
-    fig = px.scatter(df, x='x', y='y', color='cluster', hover_data=['names'])
+    fig = px.scatter(
+        df,
+        x="x",
+        y="y",
+        color="cluster",
+        hover_data=["names"],
+    )
     fig.update_layout(title=title)
     fig.write_html(title.replace(" ", "_") + ".html")
     fig.show()

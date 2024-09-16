@@ -1,7 +1,10 @@
 """
 This file contains constants
 """
-from sentence_transformers import SentenceTransformer
+
+from sentence_transformers import (
+    SentenceTransformer,
+)
 
 from config import configure
 
@@ -10,6 +13,7 @@ class WarningEnable:
     """
     Class for warnings
     """
+
     __enable = True  # warning will be thrown if it is not True
     __timezone = "always"
 
@@ -45,8 +49,9 @@ class TrainedModel:
     """
     Class encapsulating trained module
     """
+
     configure()
-    __model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
+    __model = SentenceTransformer("paraphrase-multilingual-mpnet-base-v2")
 
     def set_module(self, model: SentenceTransformer):
         """
