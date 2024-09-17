@@ -178,8 +178,12 @@ class ColumnEmbeddingsComparator(GeneralColumnComparator):
         :param metadata2: second dataframe metadata
         :return: float number in range <0, 1> 0 exactly the same 1 completely different
         """
-        if (metadata1.column_embeddings == {} or metadata2.column_embeddings == {}
-            or index1 not in metadata1.column_embeddings or index2 not in metadata2.column_embeddings):
+        if (
+            metadata1.column_embeddings == {}
+            or metadata2.column_embeddings == {}
+            or index1 not in metadata1.column_embeddings
+            or index2 not in metadata2.column_embeddings
+        ):
             if warning_enable.get_status():
                 warnings.warn("Warning: column embedding is not computed")
             return np.nan

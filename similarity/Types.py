@@ -323,9 +323,11 @@ def is_date(column: pd.Series) -> bool:
         except (ParserError, OverflowError):
             one_or_two = r"(\d{1}|\d{2})"
             two_or_four = r"(\d{2}|\d{4})"
-            months = "(January|February|March|April|May|June|July|August|"\
-                     "September|October|November|December|Jan|Feb"\
-                     "|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)"
+            months = (
+                "(January|February|March|April|May|June|July|August|"
+                "September|October|November|December|Jan|Feb"
+                "|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)"
+            )
             date_pattern = r"^(T(\d{6}|\d{4})(|.\d{3})(|Z))$"
             pattern = date_pattern
             # + '$'  # 1999,4 Feb 1999,4 February
