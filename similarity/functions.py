@@ -21,6 +21,7 @@ def load__csv_files_from_folder(folder: str) -> tuple[list[pd.DataFrame], list[s
             names.append(file.replace(".csv", ""))
     return data, names
 
+
 def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> tuple[list[str], list[str]]:
     """
     For each column in each table in database it creates string from that column.

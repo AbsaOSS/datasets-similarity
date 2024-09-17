@@ -10,8 +10,24 @@ from typing import Generator, Optional, Any, List
 from pandas import Series
 from torch import Tensor
 
-from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL, NONNUMERICAL, \
-    WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES
+from similarity.Types import (
+    DataKind,
+    Type,
+    COMPUTER_GENERATED,
+    HUMAN_GENERATED,
+    INT,
+    FLOAT,
+    NUMERICAL,
+    NONNUMERICAL,
+    WORD,
+    ALPHABETIC,
+    ALPHANUMERIC,
+    ALL,
+    SENTENCE,
+    ARTICLE,
+    PHRASE,
+    MULTIPLE_VALUES,
+)
 
 
 def dumps(value: list) -> list[Any] | list:
@@ -76,8 +92,11 @@ class KindMetadata:
         self.ratio_max_length = ratio_max_length
 
     def __str__(self):
-        return (f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
-                f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})")
+        return (
+            f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
+            f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})"
+        )
+
 
 class NonnumericalMetadata:
     """
@@ -124,14 +143,17 @@ class NumericalMetadata:
         # todo distribution !!!!!!
 
     def __str__(self):
-        return (f"NumericalMetadata(min_value={self.min_value}, max_value={self.max_value},"
-                f" range_size={self.range_size}, same_value_length={self.same_value_length})")
+        return (
+            f"NumericalMetadata(min_value={self.min_value}, max_value={self.max_value},"
+            f" range_size={self.range_size}, same_value_length={self.same_value_length})"
+        )
 
 
 class DataFrameMetadata:
     """
     Metadata for Table
     """
+
     def __init__(self):
         # default
         self.size = int
@@ -199,7 +221,4 @@ class DataFrameMetadata:
         """
         Get column names for numerical column
         """
-        return self.get_column_names_by_type(NUMERICAL, FLOAT,
-                                             INT,
-                                             HUMAN_GENERATED,
-                                             COMPUTER_GENERATED)
+        return self.get_column_names_by_type(NUMERICAL, FLOAT, INT, HUMAN_GENERATED, COMPUTER_GENERATED)

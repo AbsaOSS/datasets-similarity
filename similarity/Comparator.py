@@ -2,6 +2,7 @@
 File contains Comparator class, ComparatorType classes and DistanceFunction class.
 Comparator is split to types comparator, all columns with same types are compare together
 """
+
 from __future__ import annotations
 
 import math
@@ -22,6 +23,7 @@ from constants import warning_enable
 
 class Settings(Enum):
     """Settings enum, if we want to use embeddings for columns, ratio between different comparators"""
+
     EMBEDDINGS = 1
     NO_RATIO = 2
 
@@ -88,10 +90,8 @@ class ComparatorType(ABC):
         self.weight = weight
 
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata,
-                distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """This method should compare two tables and return distance table"""
-
 
     def concat(self, *data_frames: pd.DataFrame) -> pd.DataFrame:
         """
@@ -148,8 +148,7 @@ class CategoricalComparator(ComparatorType):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
-                settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """
         Compare two categorical columns
          the distance is between 0 and 1
@@ -177,8 +176,7 @@ class CategoricalComparator(ComparatorType):
                 dist = self.__compute_distance(simil_matrix)
                 ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)
                 result.loc[id1, id2] = dist * ratio
-                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1],
-                                                             metadata2.column_name_embeddings[column2])
+                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
         # todo p value or correlation
         return self.concat(result, name_distance)
 
@@ -202,8 +200,7 @@ class CategoricalComparatorSimilar(CategoricalComparator):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[
-        int, float]:  # todo test some other methods
+    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[int, float]:  # todo test some other methods
         # todo use Haufsdorfe distance ?
         res = 0.0
         count = 0
@@ -214,8 +211,7 @@ class CategoricalComparatorSimilar(CategoricalComparator):
             res += max(i)
         return count, res / len(similarity_matrix) * (count / len(similarity_matrix))
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
-                settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """
         Compare categorical columns, if the columns are similar
         :param distance_function: - not used
@@ -228,13 +224,11 @@ class CategoricalComparatorSimilar(CategoricalComparator):
         name_distance = pd.DataFrame()
         for id1, (column1, categorical1) in enumerate(metadata1.categorical_metadata.items()):
             for id2, (column2, categorical2) in enumerate(metadata2.categorical_metadata.items()):
-                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding,
-                                                        categorical2.category_embedding)
+                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding, categorical2.category_embedding)
                 _, score = self.__compute_similarity_score(simil_matrix)
                 ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)  # todo 1-ratio???
                 result.loc[id1, id2] = 1 - (score * ratio)
-                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1],
-                                                             metadata2.column_name_embeddings[column2])
+                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
         # todo p value or correlation
         return self.concat(result, name_distance)
 
@@ -244,8 +238,7 @@ class ColumnEmbeddingComparator(ComparatorType):
     Comparator for column values embeddings
     """
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
-                settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """
         Compare embeddings of columns
         :param distance_function: - not used
@@ -370,8 +363,7 @@ class IncompleteColumnsComparator(ComparatorType):
     Comparator for incomplete columns
     """
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
-                settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """
         Compare if two columns are complete or incomplete, if both have same outcome (True False)
          the distance is 0 otherwise is 1
@@ -382,7 +374,6 @@ class IncompleteColumnsComparator(ComparatorType):
         :return: dataframe full of 1 and 0
         """
         return fill_result(metadata1.column_incomplete, metadata2.column_incomplete)
-
 
 
 class KindComparator(ComparatorType):
@@ -406,8 +397,7 @@ class KindComparator(ComparatorType):
         else:
             self.kind_weight = weight
 
-    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings],
-                       weight: int):
+    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings], weight: int):
         """
         Compute result from distance table
         """
@@ -473,8 +463,7 @@ class KindComparator(ComparatorType):
         """
         value_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
-                                            metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CONSTANT]:
@@ -515,15 +504,14 @@ class KindComparator(ComparatorType):
         value_long_re = pd.DataFrame()
         value_short_re = pd.DataFrame()
         ratio_max_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],
-                                            "ID metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.ID]:
             for column2 in metadata2.column_kind[DataKind.ID]:
-                for value_re, attribute in [(value_long_re, 'longest'), (value_short_re, 'shortest')]:
-                    embeddings1 = getattr(metadata1.kind_metadata[column1], f'{attribute}_embeddings')
-                    embeddings2 = getattr(metadata2.kind_metadata[column2], f'{attribute}_embeddings')
+                for value_re, attribute in [(value_long_re, "longest"), (value_short_re, "shortest")]:
+                    embeddings1 = getattr(metadata1.kind_metadata[column1], f"{attribute}_embeddings")
+                    embeddings2 = getattr(metadata2.kind_metadata[column2], f"{attribute}_embeddings")
                     attribute1 = getattr(metadata1.kind_metadata[column1], attribute)
                     attribute2 = getattr(metadata2.kind_metadata[column2], attribute)
 
@@ -557,9 +545,7 @@ class KindComparator(ComparatorType):
         value_re = pd.DataFrame()
         distr_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.BOOL],
-                                            metadata2.column_kind[DataKind.BOOL],
-                                            "Boolean metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL], "Boolean metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.BOOL]:
@@ -567,15 +553,14 @@ class KindComparator(ComparatorType):
                 nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[column2].nulls else 1
                 distr_re.loc[column1, column2] = abs(
                     metadata1.kind_metadata[column1].distribution[0] / metadata1.kind_metadata[column1].distribution[1]
-                    -
-                    metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[1])
-                if (metadata1.kind_metadata[column1].value_embeddings is None or
-                        metadata2.kind_metadata[column2].value_embeddings is None):
+                    - metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[1]
+                )
+                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[column2].value_embeddings is None:
                     value_re.loc[column1, column2] = 0
                 else:
                     value_re.loc[column1, column2] = self.compute_embeddings_distance(
-                        metadata1.kind_metadata[column1].value_embeddings,
-                        metadata2.kind_metadata[column2].value_embeddings)
+                        metadata1.kind_metadata[column1].value_embeddings, metadata2.kind_metadata[column2].value_embeddings
+                    )
         return self.concat(value_re, distr_re, nulls_re)
 
     def compare_categorical(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
@@ -589,16 +574,14 @@ class KindComparator(ComparatorType):
         """
         value_re = pd.DataFrame()
         count_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL],
-                                            metadata2.column_kind[DataKind.CATEGORICAL],
-                                            "Categorical metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL], "Categorical metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CATEGORICAL]:
             for column2 in metadata2.column_kind[DataKind.CATEGORICAL]:
                 value_re.loc[column1, column2] = self.compute_embeddings_distance(
-                    metadata1.categorical_metadata[column1].category_embedding,
-                    metadata2.categorical_metadata[column2].category_embedding)
+                    metadata1.categorical_metadata[column1].category_embedding, metadata2.categorical_metadata[column2].category_embedding
+                )
                 count1 = metadata1.categorical_metadata[column1].count_categories
                 count2 = metadata2.categorical_metadata[column2].count_categories
                 count_re.loc[column1, column2] = count1 / count2 if count1 < count2 else count2 / count1
@@ -607,8 +590,7 @@ class KindComparator(ComparatorType):
                 # compare the difference between the two dictionaries
         return self.concat(value_re, count_re)
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction,
-                settings: set[Settings]) -> pd.DataFrame:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, distance_function: DistanceFunction, settings: set[Settings]) -> pd.DataFrame:
         """
         Compare kind columns
         :param distance_function: - to use for computing distance
@@ -663,30 +645,30 @@ class Comparator:
         self.settings: set[Settings] = set()
         self.distance_function = HausdorffDistanceMin()
 
-    def set_distance_function(self, distance_function: DistanceFunction) -> 'Comparator':
+    def set_distance_function(self, distance_function: DistanceFunction) -> "Comparator":
         """
         Set distance function for comparing two tables
         """
         self.distance_function = distance_function
         return self
 
-    def set_settings(self, settings: set) -> 'Comparator':
+    def set_settings(self, settings: set) -> "Comparator":
         """
         Set settings for comparing two tables
         """
         self.settings = settings
         return self
 
-    def add_settings(self, setting: Settings) -> 'Comparator':
+    def add_settings(self, setting: Settings) -> "Comparator":
         """
         Add setting for comparing two tables
         """
         self.settings.add(setting)
         return self
 
-    def add_comparator_type(self, comparator: ComparatorType) -> 'Comparator':
+    def add_comparator_type(self, comparator: ComparatorType) -> "Comparator":
         """
-         Add comparator
+        Add comparator
         """
         self.comparator_type.append(comparator)
         return self

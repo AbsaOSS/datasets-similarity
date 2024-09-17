@@ -1,6 +1,7 @@
 """
 DataFrameMetadataCreator is a class that creates metadata for given Table.
 """
+
 from __future__ import annotations
 
 import math
@@ -13,11 +14,26 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from column2Vec.impl.Column2Vec import column2vec_as_sentence
-from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
-    NonnumericalMetadata
-from similarity.Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
-                              DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
-                              MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
+from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata
+from similarity.Types import (
+    get_basic_type,
+    get_advanced_type,
+    get_advanced_structural_type,
+    get_data_kind,
+    DataKind,
+    series_to_numeric,
+    Type,
+    NUMERICAL,
+    NONNUMERICAL,
+    UNDEFINED,
+    WORD,
+    ALL,
+    MULTIPLE_VALUES,
+    PHRASE,
+    ARTICLE,
+    ALPHANUMERIC,
+    ALPHABETIC,
+)
 
 
 class DataFrameMetadataCreator:
@@ -97,16 +113,13 @@ class DataFrameMetadataCreator:
             null_values = True if column.nunique() != len(column) else False
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
-            return KindMetadata(None, None, longest, shortest, null_values,
-                                column.apply(str).map(len).max() / column.size, self.__get_model())
+            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max() / column.size, self.__get_model())
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
-                return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True, None, self.__get_model())
-            return KindMetadata(tuple([column.dropna().unique()[0]]), None,
-                                None, None, False, None, self.__get_model())
+                return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count), None, None, True, None, self.__get_model())
+            return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None, self.__get_model())
         return None
 
     def __compute_type_metadata(self, type_: type[Type], column: pd.Series, name: str) -> None:
@@ -253,15 +266,16 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         correlation_numerical = self.get_numerical_columns().corr()
-        res = [(i, j) for i, j in zip(*np.where(np.abs(correlation_numerical.values) > strong_correlation))
-               if i != j]  # get pairs from matrics with bigger value then strong_correlation
+        res = [
+            (i, j) for i, j in zip(*np.where(np.abs(correlation_numerical.values) > strong_correlation)) if i != j
+        ]  # get pairs from matrics with bigger value then strong_correlation
         for r in res:
             self.metadata.correlated_columns.add(
-                tuple(sorted((correlation_numerical.columns[r[0]],
-                              correlation_numerical.iloc[r[1]].name))))  # get names of rows and columns
+                tuple(sorted((correlation_numerical.columns[r[0]], correlation_numerical.iloc[r[1]].name)))
+            )  # get names of rows and columns
         return self
 
-    def create_column_embeddings(self, types: list = None) -> 'DataFrameMetadataCreator':
+    def create_column_embeddings(self, types: list = None) -> "DataFrameMetadataCreator":
         """
         Creates embeddings for Types.STRING, Types.TEXT, Types.UNDEFINED or another types according to types parameter
 
@@ -269,8 +283,7 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         if types is None:
-            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES,
-                     PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]  # todo
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]  # todo
         # sentences = []
         # names = []
         for i in types:

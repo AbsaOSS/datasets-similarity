@@ -1,4 +1,5 @@
 """Comparator for comparing all tables together"""
+
 import dataclasses
 from typing import Optional
 from itertools import compress
@@ -14,6 +15,7 @@ class CategoricalSimilarity:
     """
     Struct for categorical similarity
     """
+
     categories_ratio: float
     count_similar: Optional[int] = None
     similarity_score: Optional[int] = None
@@ -30,22 +32,22 @@ class SimilarityStruct:
     similarity: Optional[float] = None
     categorical_similarity: Optional[CategoricalSimilarity] = None
 
-    def __lt__(self, other: 'SimilarityStruct') -> bool:
+    def __lt__(self, other: "SimilarityStruct") -> bool:
         return self.similarity < other.similarity
 
-    def __le__(self, other: 'SimilarityStruct') -> bool:
+    def __le__(self, other: "SimilarityStruct") -> bool:
         return self.similarity <= other.similarity
 
-    def __eq__(self, other: 'SimilarityStruct') -> bool:
+    def __eq__(self, other: "SimilarityStruct") -> bool:
         return self.similarity == other.similarity
 
-    def __ne__(self, other: 'SimilarityStruct') -> bool:
+    def __ne__(self, other: "SimilarityStruct") -> bool:
         return self.similarity != other.similarity
 
-    def __gt__(self, other: 'SimilarityStruct') -> bool:
+    def __gt__(self, other: "SimilarityStruct") -> bool:
         return self.similarity > other.similarity
 
-    def __ge__(self, other: 'SimilarityStruct') -> bool:
+    def __ge__(self, other: "SimilarityStruct") -> bool:
         return self.similarity >= other.similarity
 
 
@@ -198,7 +200,6 @@ class ComparatorForDatasets:
                         for c_name_compare in column_names_to_comp:
                             table[c_name]
                             to_compare[c_name_compare]
-
 
     def cross_compare_column_names(self) -> dict:
         """

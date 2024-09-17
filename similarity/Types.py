@@ -244,11 +244,11 @@ def is_sentence(x: pd.Series) -> bool:
     :param x:  series for decide
     :return:  true for sentence
     """
+
     def is_str_sentence(word: str) -> bool:
-        return (((word.endswith(".") or word.endswith("!")
-                  or word.endswith("?")) and word.count(".") <= 1
-                 and word.count("!") <= 1 and word.count("?") <= 1)
-                and re.search("^[A-Z]", word))
+        return (
+            (word.endswith(".") or word.endswith("!") or word.endswith("?")) and word.count(".") <= 1 and word.count("!") <= 1 and word.count("?") <= 1
+        ) and re.search("^[A-Z]", word)
 
     return x.apply(lambda s: is_str_sentence(s)).all()
 
@@ -272,12 +272,10 @@ def is_multiple(x: pd.Series) -> bool:
     """
 
     def is_str_multiple(word: str) -> bool:
-        regex = re.compile('[a-zA-Z0-9]')
-        word_clean = regex.sub('', word)
+        regex = re.compile("[a-zA-Z0-9]")
+        word_clean = regex.sub("", word)
         res = "".join(dict.fromkeys(word_clean))
-        return ((word.count(res) == word_clean.count(res)
-                 and word_clean.count(res) > 0)
-                or res == '' and res != ' ')
+        return (word.count(res) == word_clean.count(res) and word_clean.count(res) > 0) or res == "" and res != " "
 
     return x.apply(lambda s: is_str_multiple(s)).all()
 
@@ -292,8 +290,8 @@ def is_true_multiple(x: pd.Series) -> bool:
     """
 
     def is_str_multiple(word: str) -> str:
-        regex = re.compile('[a-zA-Z0-9]')
-        word_clean = regex.sub('', word)
+        regex = re.compile("[a-zA-Z0-9]")
+        word_clean = regex.sub("", word)
         res = "".join(dict.fromkeys(word_clean))
         return res
 

@@ -117,7 +117,7 @@ cache = Cache()
 
 
 def clean_text(text):
-    """ Cleans text, removes all characters except a-z and 0-9 """
+    """Cleans text, removes all characters except a-z and 0-9"""
     return re.sub("[^(0-9 |a-z)]", " ", str(text).lower())
 
 
@@ -208,8 +208,7 @@ def column2vec_as_sentence_clean_uniq(
     return embedding
 
 
-def weighted_create_embed(column: pd.Series, model: SentenceTransformer, key: str,
-                          function_string: str) -> tuple[list, list]:
+def weighted_create_embed(column: pd.Series, model: SentenceTransformer, key: str, function_string: str) -> tuple[list, list]:
     """
     Creates embedding, it could be used for both weighted impl.
     :param column: to be embedded
