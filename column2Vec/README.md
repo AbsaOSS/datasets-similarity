@@ -11,10 +11,10 @@ Mostly html files representing
 It also contains cache file where could be stored created embeddings.
 Cashing is possible to switch of or switch on.
 
-Folder [**reaserch**](reaserch) is folder created for testing column2Vec functions.
-It contains folder [files](reaserch/files) with all generated and md files with results from test. 
-[column2Vec_re.py](reaserch/column2Vec_re.py) file with  statistics computation for functions. 
-[generate_report.py](reaserch/generate_report.py) file that contains functions to generate files stored in [files](reaserch/files).
+Folder [**research**](research) is folder created for testing column2Vec functions.
+It contains folder [files](research/files) with all generated and md files with results from test. 
+[column2Vec_re.py](research/column2Vec_re.py) file with  statistics computation for functions. 
+[generate_report.py](research/generate_report.py) file that contains functions to generate files stored in [files](research/files).
 
 File [**Column2Vec.py**](impl/Column2Vec.py) in folder [impl](impl) contains 7 different implementations of column2Vec.
 All implementations could use cache.

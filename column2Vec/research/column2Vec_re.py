@@ -27,7 +27,7 @@ from column2Vec.impl.Column2Vec import (
     cache,
 )
 
-from column2Vec.reaserch.generate_report import (
+from column2Vec.research.generate_report import (
     generate_time_report,
     generate_sim_report,
     generate_stability_report,

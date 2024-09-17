@@ -53,7 +53,6 @@ def compare_datasets(path1, path2):
     return compartor.compare(metadata1, metadata2)
 
 
-
 if __name__ == "__main__":
     configure()
     warning_enable.change_status(False)

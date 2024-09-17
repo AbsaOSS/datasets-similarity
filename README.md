@@ -186,6 +186,8 @@ Or you can run all the tests by running this:
  python -m unittest
  #or
  pytest
+ # or for specific file
+ pytest test/test_types.py 
 ```
 **Please be aware that some tests in the test_column2Vec 
 module may take a long time.**
