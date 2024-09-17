@@ -140,7 +140,6 @@ Explaining kinds:
 - Folder **images** contains images for README.md
 
 ---
-**.github** folder contains GitHub workflows.
 
 **column2Vec** folder contains all files for [column2Vec](#column2Vec) feature.
 More about the structure of this folder can be found [here](column2Vec/README.md/#structure).
@@ -191,6 +190,8 @@ Or you can run all the tests by running this:
 ```
 **Please be aware that some tests in the test_column2Vec 
 module may take a long time.**
+
+```80 passed, 2 skipped, 500 warnings in 1887.83s (0:31:27)```
 
 ### Static tests
 For static tests, we use pylint and black.

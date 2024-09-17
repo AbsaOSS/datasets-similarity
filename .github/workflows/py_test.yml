@@ -21,12 +21,28 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
           pip install pylint
 
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py')
+
+  format-check:
+    name: Format check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install black
 
       - name: Check code format with Black
         run: |
