@@ -6,12 +6,12 @@ from __future__ import annotations
 import json
 import math
 import re
+import logging
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-import logging
 
 from torch import Tensor
 
@@ -82,19 +82,24 @@ class Cache:
         self.__cache.to_csv(self.__file, index=True)
 
     def off(self):
+        """sets off cache"""
         self.__off = True
 
     def on(self):
+        """sets on cache"""
         self.__off = False
 
     def set_file(self, file: str):
+        """sets file for cache"""
         self.__file = file
 
     def clear_cache(self):
+        """clear cache and set read_from_file to False"""
         self.__cache = self.__cache[0:0]
         self.__read_from_file = False
 
     def clear_persistent_cache(self):
+        """clear cache saved in file"""
         try:
             open(self.__file, 'w').close()
         except FileNotFoundError as e:
@@ -105,6 +110,7 @@ cache = Cache()
 
 
 def clean_text(text):
+    """ Cleans text, removes all characters except a-z and 0-9 """
     return re.sub("[^(0-9 |a-z)]", " ", str(text).lower())
 
 
@@ -184,7 +190,7 @@ def column2vec_as_sentence_clean_uniq(column: pd.Series, model: SentenceTransfor
 
 
 def weighted_create_embed(column: pd.Series, model: SentenceTransformer, key: str,
-                          function_string: str) -> (list, list):
+                          function_string: str) -> tuple[list, list]:
     """
     Creates embedding, it could be used for both weighted impl.
     :param column: to be embedded
@@ -266,7 +272,7 @@ def column2vec_sum(column: pd.Series, model: SentenceTransformer, key: str) -> T
         return res
 
     uniq_column = column.unique()
-    column_clean = pd.Series(uniq_column).apply(clean_text).values
+    column_clean = pd.Series(uniq_column).apply(clean_text).values.tolist()
     encoded_columns = model.encode(column_clean)
     to_ret = sum(encoded_columns)  # sum of values
     cache.save(key, function_string, to_ret)  # todo

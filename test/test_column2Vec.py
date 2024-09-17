@@ -5,15 +5,16 @@ import time
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from column2Vec.impl.Column2Vec import column2vec_as_sentence, column2vec_as_sentence_clean, \
-    column2vec_as_sentence_clean_uniq, column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum, \
-    cache
+from column2Vec.impl.Column2Vec import (column2vec_as_sentence, column2vec_as_sentence_clean,
+                                        column2vec_as_sentence_clean_uniq, column2vec_avg,
+                                        column2vec_weighted_avg, column2vec_sum,
+                                        column2vec_weighted_sum, cache)
 from column2Vec.impl.functions import get_nonnumerical_data, get_clusters, compute_distances
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 from similarity.Types import NONNUMERICAL
 
 SKIP_CLUSTERS = True
-SKIP_SIMILLAR = False
+SKIP_SIMILAR = False
 # MODEL = 'all-mpnet-base-v2'  # bert-base-nli-mean-tokens
 MODEL = 'bert-base-nli-mean-tokens'  #
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -58,30 +59,32 @@ def get_data(files):
 
 class TestSimilarityOfVectors(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.model = SentenceTransformer(MODEL)
-        fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
+    def setUpClass(cls):
+        cls.model = SentenceTransformer(MODEL)
+        file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        files = [fileM2]
-        self.data = get_nonnumerical_data(files)
+        files = [file_m2]
+        data = get_nonnumerical_data(files)
         stop = 0
-        for i in self.data:
+        for i in data:
             if stop == 0:
-                self.first = self.data[i]
+                cls.first = data[i]
             if stop == 1:
-                self.second = self.data[i]
+                cls.second = data[i]
             if stop == 2:
-                self.third = self.data[i]
+                cls.third = data[i]
             stop += 1
 
     def test_column2vec_as_sentence(self):
         model = SentenceTransformer(MODEL)
         self.assertTrue(
-            vectors_are_same(column2vec_as_sentence(self.first, model, "a"), column2vec_as_sentence(self.first, self.model, "b")))
+            vectors_are_same(column2vec_as_sentence(self.first, model, "a"),
+                             column2vec_as_sentence(self.first, self.model, "b")))
         self.assertTrue(vectors_are_same(column2vec_as_sentence(self.second, model, "c"),
                                          column2vec_as_sentence(self.second, self.model, "d")))
         self.assertTrue(
-            vectors_are_same(column2vec_as_sentence(self.third, model, "e"), column2vec_as_sentence(self.third, self.model, "f")))
+            vectors_are_same(column2vec_as_sentence(self.third, model, "e"),
+                             column2vec_as_sentence(self.third, self.model, "f")))
 
     def test_column2vec_as_sentence_clean(self):
         model = SentenceTransformer(MODEL)
@@ -103,7 +106,8 @@ class TestSimilarityOfVectors(unittest.TestCase):
 
     def test_column2vec_avg(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_avg(self.first, model, "v"), column2vec_avg(self.first, self.model, "s")))
+        self.assertTrue(vectors_are_same(column2vec_avg(self.first, model, "v"),
+                                         column2vec_avg(self.first, self.model, "s")))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.second, model), column2vec_avg(self.second, self.model)))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.third, model), column2vec_avg(self.third, self.model)))
 
@@ -111,12 +115,15 @@ class TestSimilarityOfVectors(unittest.TestCase):
         model = SentenceTransformer(MODEL)
         self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.first, model, "u"),
                                          column2vec_weighted_avg(self.first, self.model, "w")))
-        # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.second, model), column2vec_weighted_avg(self.second, self.model)))
-        # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.third, model), column2vec_weighted_avg(self.third, self.model)))
+        # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.second, model),
+        # column2vec_weighted_avg(self.second, self.model)))
+        # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.third, model),
+        # column2vec_weighted_avg(self.third, self.model)))
 
     def test_column2vec_sum(self):
         model = SentenceTransformer(MODEL)
-        self.assertTrue(vectors_are_same(column2vec_sum(self.first, model, "x"), column2vec_sum(self.first, self.model, "y")))
+        self.assertTrue(vectors_are_same(column2vec_sum(self.first, model, "x"),
+                                         column2vec_sum(self.first, self.model, "y")))
 
     def test_column2vec_weighted_sum(self):
         model = SentenceTransformer(MODEL)
@@ -126,30 +133,17 @@ class TestSimilarityOfVectors(unittest.TestCase):
 
 class TestClustersAreAlwaysSame(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.clusters_MC_Copilot = {
-            1: ["flight", "tail_number"],
-            2: ["reg_expiration", "reg_owner", "vin", "title_status"],
-            3: ["manufacturer", "model", "make", "brand", "Model", "Company"],
-            4: ["Engine Type", "Multi Engine", "TP mods", "gear", "transmission_type", "fuel_type", "body_type"],
-            5: ["reg_state", "reg_city", "country", "state"],
-            6: ["offerType", "Gross"],
-            7: ["Series_Title", "Overview", "title", "description", "type", "listed_in"],
-            8: ["rating", "duration", "date_added"],
-            9: ["Poster_Link", "Director", "Star2", "Star3", "Star1", "Star4", "show_id", "cast", "director"],
-            10: ["condition", "color"],
-            11: ["Genre"]
-        }
-        fileA1 = os.path.join(THIS_DIR, os.pardir, 'data/aircraft-data_nov_dec.csv')
-        fileA2 = os.path.join(THIS_DIR, os.pardir, 'data/Airplane_Cleaned.csv')
-        fileC1 = os.path.join(THIS_DIR, os.pardir, 'data/autoscout24-germany-dataset.csv')
-        fileC2 = os.path.join(THIS_DIR, os.pardir, 'data/CARS_1.csv')
-        fileC3 = os.path.join(THIS_DIR, os.pardir, 'data/USA_cars_datasets.csv')
-        fileM1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
-        fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
+    def setUpClass(cls):
+        file_a1 = os.path.join(THIS_DIR, os.pardir, 'data/aircraft-data_nov_dec.csv')
+        file_a2 = os.path.join(THIS_DIR, os.pardir, 'data/Airplane_Cleaned.csv')
+        file_c1 = os.path.join(THIS_DIR, os.pardir, 'data/autoscout24-germany-dataset.csv')
+        file_c2 = os.path.join(THIS_DIR, os.pardir, 'data/CARS_1.csv')
+        file_c3 = os.path.join(THIS_DIR, os.pardir, 'data/USA_cars_datasets.csv')
+        file_m1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
+        file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_nonnumerical_data(self.files)
+        files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
+        cls.data = get_nonnumerical_data(files)
         cache.off()
 
     def test_column2vec_as_sentence(self):
@@ -179,7 +173,7 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
         self.assertTrue(vectors_are_same(clusters1, clusters3))
         self.assertTrue(vectors_are_same(clusters3, clusters2))
 
-    @unittest.skipIf(SKIP_CLUSTERS == True, "Skipping test_column2vec_avg ...")
+    @unittest.skipIf(SKIP_CLUSTERS, "Skipping test_column2vec_avg ...")
     def test_column2vec_avg(self):
         vectors_sentence = get_vectors(column2vec_avg, self.data)
         clusters1 = get_clusters(vectors_sentence, 11)
@@ -189,7 +183,7 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
         self.assertTrue(vectors_are_same(clusters1, clusters3))
         self.assertTrue(vectors_are_same(clusters3, clusters2))
 
-    @unittest.skipIf(SKIP_CLUSTERS == True, "Skipping test_column2vec_weighted_avg ...")
+    @unittest.skipIf(SKIP_CLUSTERS, "Skipping test_column2vec_weighted_avg ...")
     def test_column2vec_weighted_avg(self):
         vectors_sentence = get_vectors(column2vec_weighted_avg, self.data)
         clusters1 = get_clusters(vectors_sentence, 11)
@@ -202,8 +196,8 @@ class TestClustersAreAlwaysSame(unittest.TestCase):
 
 class TestSimilarColumnsCopilot(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self.clusters_MC_Copilot = {
+    def setUpClass(cls):
+        cls.clusters_MC_Copilot = {
             1: ["flight", "tail_number"],
             2: ["reg_expiration", "reg_owner", "vin", "title_status"],
             3: ["manufacturer", "model", "make", "brand", "Model", "Company"],
@@ -216,16 +210,16 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
             10: ["condition", "color"],
             11: ["Genre"]
         }
-        fileA1 = os.path.join(THIS_DIR, os.pardir, 'data/aircraft-data_nov_dec.csv')
-        fileA2 = os.path.join(THIS_DIR, os.pardir, 'data/Airplane_Cleaned.csv')
-        fileC1 = os.path.join(THIS_DIR, os.pardir, 'data/autoscout24-germany-dataset.csv')
-        fileC2 = os.path.join(THIS_DIR, os.pardir, 'data/CARS_1.csv')
-        fileC3 = os.path.join(THIS_DIR, os.pardir, 'data/USA_cars_datasets.csv')
-        fileM1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
-        fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
+        file_a1 = os.path.join(THIS_DIR, os.pardir, 'data/aircraft-data_nov_dec.csv')
+        file_a2 = os.path.join(THIS_DIR, os.pardir, 'data/Airplane_Cleaned.csv')
+        file_c1 = os.path.join(THIS_DIR, os.pardir, 'data/autoscout24-germany-dataset.csv')
+        file_c2 = os.path.join(THIS_DIR, os.pardir, 'data/CARS_1.csv')
+        file_c3 = os.path.join(THIS_DIR, os.pardir, 'data/USA_cars_datasets.csv')
+        file_m1 = os.path.join(THIS_DIR, os.pardir, 'data/imdb_top_1000.csv')
+        file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        self.files = [fileA1, fileA2, fileC1, fileC2, fileC3, fileM1, fileM2]
-        self.data = get_nonnumerical_data(self.files)
+        files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
+        cls.data = get_nonnumerical_data(files)
         cache.off()
 
     def get_cluster_num(self, name):
@@ -238,7 +232,7 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
     def print_accuracy(self, distances, name):
         overall = 0
         for key, row in distances.items():
-            sorted_array = dict(sorted(row.items(), key=lambda item: item[1]))
+            sorted_array = dict(sorted(row.items(), key=lambda a: a[1]))
 
             nearest_elements = list(sorted_array.keys())
             nearest_num = list(sorted_array.values())
@@ -272,25 +266,25 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "AS SENTENCE CLEAN UNIQ")
 
-    @unittest.skipIf(SKIP_SIMILLAR == True, "Skipping test_column2vec_avg ...")
+    @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_avg ...")
     def test_column2vec_avg(self):
         vectors_sentence = get_vectors(column2vec_avg, self.data)
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "AVG")
 
-    @unittest.skipIf(SKIP_SIMILLAR == True, "Skipping test_column2vec_weighted_avg ...")
+    @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_weighted_avg ...")
     def test_column2vec_weighted_avg(self):
         vectors_sentence = get_vectors(column2vec_weighted_avg, self.data)
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "WEIGHTED AVG")
 
-    @unittest.skipIf(SKIP_SIMILLAR == True, "Skipping test_column2vec_avg ...")
+    @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_avg ...")
     def test_column2vec_sum(self):
         vectors_sentence = get_vectors(column2vec_sum, self.data)
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "SUM")
 
-    @unittest.skipIf(SKIP_SIMILLAR == True, "Skipping test_column2vec_weighted_avg ...")
+    @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_weighted_avg ...")
     def test_column2vec_weighted_sum(self):
         vectors_sentence = get_vectors(column2vec_weighted_sum, self.data)
         distances = compute_distances(vectors_sentence)

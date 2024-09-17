@@ -1,3 +1,7 @@
+"""
+Comparator compares each couple of columns independently.
+"""
+
 from __future__ import annotations
 
 import warnings
@@ -7,26 +11,33 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
-from constants import warning_enable
 from similarity.Comparator import DistanceFunction, Settings, cosine_sim, HausdorffDistanceMin
 from similarity.DataFrameMetadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
 from similarity.Types import DataKind
+from constants import warning_enable
+
 
 class ComparatorType(ABC):
-    def __init__(self, weight=1):
+    """
+    Abstract class for comparators
+    """
+    def __init__(self, weight: int = 1):
+        """
+        Constructor for ComparatorType, sets weight for comparator
+        """
         self.weight = weight
 
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
-        pass
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
+        """It should compare two columns"""
 
-    def _are_columns_null(self, column1, column2, message) -> tuple[bool, float]:
+    def _are_columns_null(self, column1: set, column2: set, message: str) -> tuple[bool, float]:
         """
         Check if columns are empty
-        :param column1:
-        :param column2:
-        :param message:
+        :param column1: to be compared
+        :param column2: to be compared
+        :param message: kind type
         :return:  tuple of bool and float, if columns are empty return True
         """
         if len(column1) == 0 and len(column2) == 0:
@@ -41,29 +52,45 @@ class ComparatorType(ABC):
 
 
 class TableComparator(ComparatorType):
+    """
+    Abstract class for table comparators it should compare features of whole table
+    """
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str = 0,
-                index2: int | str = 0) -> float:
-        pass
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str = "",
+                index2: str = "") -> float:
+        """
+        Compare two tables for table features.
+        """
 
 
 class GeneralColumnComparator(ComparatorType):
+    """
+    Comparator for simple comparison
+    """
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
-        pass
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
+        """
+        Compare two columns
+        """
 
 
 class SpecificColumnComparator(ComparatorType):
+    """
+    Comparator for advanced comparison
+    """
     @abstractmethod
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
-        pass
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
+        """compare two columns"""
 
 
 class SizeComparator(TableComparator):
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str = 0,
-                index2: int | str = 0) -> float:
+    """
+    Comparator of size of two tables
+    """
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str = "",
+                index2: str = "") -> float:
         """
         Compare the size of the two dataframes. If sizes are the same distance is 0, else distance is 1 - % of max size.
         :param index1: in this case is not used
@@ -78,8 +105,11 @@ class SizeComparator(TableComparator):
 
 
 class IncompleteColumnsComparator(GeneralColumnComparator):
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
+    """
+    Comparator for incomplete columns
+    """
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
         """
         Compare if two columns are complete or incomplete. If both are complete,
          or both are incomplete distance is 0, else distance is 1.
@@ -93,8 +123,11 @@ class IncompleteColumnsComparator(GeneralColumnComparator):
 
 
 class ColumnExactNamesComparator(GeneralColumnComparator):
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
+    """
+    Comparator for exact column names
+    """
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
         """
         Compare if two columns have the same name. If both have the same name distance is 0, else distance is 1.
         :param index2: name or id of column in metadata2
@@ -107,8 +140,11 @@ class ColumnExactNamesComparator(GeneralColumnComparator):
 
 
 class ColumnNamesEmbeddingsComparator(GeneralColumnComparator):
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
+    """
+    Comparator for column names embeddings
+    """
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
         """
         Compare if two columns have similar name. Computes cosine distance for embeddings.
         :param index2: name or id of column in metadata2
@@ -125,8 +161,11 @@ class ColumnNamesEmbeddingsComparator(GeneralColumnComparator):
 
 
 class ColumnEmbeddingsComparator(GeneralColumnComparator):
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
+    """
+    Comparator for column values embeddings
+    """
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
         """
         Compare embeddings for two columns. Computes cosine distance for embeddings.
         :param index2: name or id of column in metadata2
@@ -144,20 +183,27 @@ class ColumnEmbeddingsComparator(GeneralColumnComparator):
 
 
 class ColumnKindComparator(SpecificColumnComparator):
+    """
+    Comparator for column kind
+    """
     def __init__(self, compare_kind=None, weight: dict[DataKind, int] = None):
+        """
+        Constructor for ColumnKindComparator, sets which kinds should be compared and weight for each kind
+        """
         super().__init__(weight=1)
         if compare_kind is None:
             self.compare_kind = [DataKind.BOOL, DataKind.ID, DataKind.CATEGORICAL, DataKind.CONSTANT]
         else:
             self.compare_kind = compare_kind
         if weight is None:
-            self.kind_weight = {DataKind.BOOL: 1, DataKind.ID: 1, DataKind.CATEGORICAL: 1, DataKind.CONSTANT: 1}
+            self.kind_weight: dict = {DataKind.BOOL: 1, DataKind.ID: 1, DataKind.CATEGORICAL: 1, DataKind.CONSTANT: 1}
         else:
             self.kind_weight = weight
 
-    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
+    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float: # todo add type
         """
-        Creates table of distances between embeddings for each row  and computes mean of row and column minimums then pick max.
+        Creates table of distances between embeddings for each row  and computes mean
+         of row and column minimums then pick max.
         :param embeddings1: values for column1
         :param embeddings2: values for column2
         :return: float from 0 to 1
@@ -221,7 +267,7 @@ class ColumnKindComparator(SpecificColumnComparator):
         """
         nulls = 0 if metadata1.nulls == metadata2.nulls else 1
         if metadata1.value_embeddings is None or metadata2.value_embeddings is None:
-            value = 0 if metadata1.value == metadata2.value else 1
+            value: float = 0 if metadata1.value == metadata2.value else 1
         else:
             value = 1 - cosine_sim(metadata1.value_embeddings, metadata2.value_embeddings)
         # if nulls are equal and exist
@@ -257,8 +303,8 @@ class ColumnKindComparator(SpecificColumnComparator):
         ratio_max_re = abs(metadata1.ratio_max_length - metadata2.ratio_max_length)
         return (value_short_re + value_long_re + nulls_re + ratio_max_re) / 4
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: int | str,
-                index2: int | str) -> float:
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+                index2: str) -> float:
         """
         Compare if two columns have the same kind. If both have the same kind distance is 0, else distance is 1.
         :param index2: name or id of column in metadata2
@@ -279,49 +325,77 @@ class ColumnKindComparator(SpecificColumnComparator):
         return np.nan
 
         """
+        are_nulls = (False, 0.0)
         if DataKind.BOOL in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.BOOL] and index2 in metadata2.column_kind[DataKind.BOOL]:
                 return self.compare_bools(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL],"Boolean column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.BOOL],
+                                               metadata2.column_kind[DataKind.BOOL],
+                                               "Boolean column")
         if DataKind.ID in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.ID] and index2 in metadata2.column_kind[DataKind.ID]:
                 return self.compare_ids(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],"ID column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.ID],
+                                               metadata2.column_kind[DataKind.ID],
+                                               "ID column")
         if DataKind.CATEGORICAL in self.compare_kind:
-            if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[
-                DataKind.CATEGORICAL]:
+            if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[DataKind.CATEGORICAL]:
                 return self.compare_categoricals(metadata1.categorical_metadata[index1], metadata2.categorical_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL],"Categorical column")
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL],
+                                               metadata2.column_kind[DataKind.CATEGORICAL],
+                                               "Categorical column")
+
         if DataKind.CONSTANT in self.compare_kind:
-            if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[
-                DataKind.CONSTANT]:
+            if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[DataKind.CONSTANT]:
                 return self.compare_constants(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT],"Constant column")
+
+            are_nulls = self._are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
+                                               metadata2.column_kind[DataKind.CONSTANT],
+                                               "Constant column")
 
         if are_nulls[0]:
             return are_nulls[1]
         return np.nan
 
+
 class ComparatorByColumn:
+    """
+    Comparator for comparing two tables
+    """
     def __init__(self):
+        """
+        Constructor for ComparatorByColumn
+        """
         self.comparator_type: list[ComparatorType] = []
         self.table_comparators: list[TableComparator] = []
         self.settings: set[Settings] = set()
         self.distance_function = HausdorffDistanceMin()
 
     def set_distance_function(self, distance_function: DistanceFunction) -> 'ComparatorByColumn':
+        """
+        Set distance function for comparing two tables
+        """
         self.distance_function = distance_function
         return self
 
-    def set_settings(self, settings: list) -> 'ComparatorByColumn':
+    def set_settings(self, settings: set[Settings]) -> 'ComparatorByColumn':
+        """
+        Set settings for comparing two tables
+        """
         self.settings = settings
         return self
 
-    def add_settings(self, setting) -> 'ComparatorByColumn':
+    def add_settings(self, setting: Settings) -> 'ComparatorByColumn':
+        """
+        Add another setting for comparing two tables
+        """
         self.settings.add(setting)
         return self
 
     def add_comparator_type(self, comparator: ComparatorType) -> 'ComparatorByColumn':
+        """
+        Add comparator
+        """
         # todo if comparator contains type and kind comparator change it to kind_and_tyep_comparator
         if isinstance(comparator, TableComparator):
             self.table_comparators.append(comparator)
@@ -335,11 +409,14 @@ class ComparatorByColumn:
         :param distances: list of tuples (distance, weight)
         :return: weighted average
         """
-        ##todo pokud je neco z toho none
+        # todo if something is none
         sum_weight = sum([weight for _, weight in distances])
         return sum([distance * weight / sum_weight for distance, weight in distances])
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata):
+    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> float:
+        """
+        Compare two tables according to previously set properties.
+        """
         table_distances = []
         distances = pd.DataFrame()
         for comparator in self.table_comparators:
@@ -360,5 +437,3 @@ class ComparatorByColumn:
             for dist in table_distances:
                 res += dist * dist
         return np.sqrt(res)
-
-

@@ -8,7 +8,7 @@ from similarity.Comparator import HausdorffDistanceMin, SizeComparator, get_rati
 from similarity.ComparatorByColumn import (ComparatorByColumn, SizeComparator as SizeComparatorByColumn,
                                            IncompleteColumnsComparator as IncompleteColumnsComparatorByColumn,
                                            ColumnNamesEmbeddingsComparator as ColumnNamesEmbeddingsComparatorByColumn,
-                                            ColumnExactNamesComparator as ColumnExactNamesComparatorByColumn,
+                                           ColumnExactNamesComparator as ColumnExactNamesComparatorByColumn,
                                            ColumnKindComparator, ColumnEmbeddingsComparator
                                            )
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
@@ -246,6 +246,7 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.assertEqual(
             self.compartor.compare(self.metadata1, self.metadata1), 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names), 0)
+
     def test_kind_CATEGORICAL_compare(self):
         self.compartor.add_comparator_type(ColumnKindComparator([DataKind.CATEGORICAL]))
         self.assertEqual(
@@ -268,7 +269,6 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1), 0)
         self.compartor.add_settings(Settings.NO_RATIO)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1), 0)
-
 
 
 if __name__ == '__main__':

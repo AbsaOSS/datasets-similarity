@@ -66,10 +66,10 @@ def similarity_test(embeddings: dict) -> dict:
     :param embeddings: embeddings of columns
     """
     keys = list(embeddings.keys())
-    res = dict()
+    res = {}
     # Initialize nested dictionaries for each function
     for function in embeddings[list(embeddings.keys())[0]].keys():
-        res[function] = dict()
+        res[function] = {}
 
     for column in embeddings.keys():
         for function in embeddings[column].keys():
@@ -115,8 +115,7 @@ def partial_column_test(column1: pd.Series, function, key: str) -> (bool, str):
     whole_first = cosine_sim(emb3, emb1)
     if first_second != 1 or whole_second != 1 or whole_first != 1:
         return False, (whole_first, whole_second, first_second)
-    else:
-        return True, (whole_first, whole_second, first_second)
+    return True, (whole_first, whole_second, first_second)
 
 
 def test_func(data: dict, test_type: callable) -> dict:
@@ -127,9 +126,9 @@ def test_func(data: dict, test_type: callable) -> dict:
     :return: dict of test results
     """
     i = 0
-    result = dict()
+    result = {}
     for name in data.keys():
-        result[name] = dict()
+        result[name] = {}
         result[name]["SENT."] = test_type(data[name], column2vec_as_sentence, name)
         result[name]["CLEAR SENT."] = test_type(data[name], column2vec_as_sentence_clean, name)
         result[name]["CL. UNIQ SENT."] = test_type(data[name], column2vec_as_sentence_clean_uniq, name)
@@ -180,9 +179,9 @@ def run_fun():
     data = read_data()
     cache.set_file("files/cache.txt")
     generate_time_report(test_func(data, time_test), "REP_time_test")
-    # generate_sim_report(similarity_test(test_func(data, count_embedding)), "REP_")
-    # generate_partial_column_report(test_func(data, partial_column_test), "REP_partial_column_test")
-    # generate_stability_report(test_func(data, stability_test), "REP_stability_test")
+    generate_sim_report(similarity_test(test_func(data, count_embedding)), "REP_")
+    generate_partial_column_report(test_func(data, partial_column_test), "REP_partial_column_test")
+    generate_stability_report(test_func(data, stability_test), "REP_stability_test")
 
 
 configure()

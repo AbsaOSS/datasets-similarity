@@ -17,26 +17,28 @@ from column2Vec.impl.functions import get_nonnumerical_data
 MODEL = 'bert-base-nli-mean-tokens'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def time_measure_function(func, text: list, model, key: str):
     start = time.time()
     func(text, model, key)
     end = time.time()
     return end - start
 
+
 class TestRunCache(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.model = SentenceTransformer(MODEL)
-        fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
+    def setUpClass(cls):
+        cls.model = SentenceTransformer(MODEL)
+        file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        files = [fileM2]
-        self.data = get_nonnumerical_data(files)
-        for i in self.data:
-            self.first = self.data[i].head(100)
+        files = [file_m2]
+        cls.data = get_nonnumerical_data(files)
+        for i in cls.data:
+            cls.first = cls.data[i].head(100)
             break
         cache.set_file("generated/test.csv")
-        self.model = SentenceTransformer(MODEL)
+        cls.model = SentenceTransformer(MODEL)
 
     def setUp(self):
         cache.clear_cache()
@@ -54,7 +56,6 @@ class TestRunCache(unittest.TestCase):
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
-
 
     def test_column2vec_as_sentence_clean(self):
 
@@ -93,7 +94,6 @@ class TestRunCache(unittest.TestCase):
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
-
     def test_column2vec_weighted_avg(self):
 
         first = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
@@ -106,7 +106,6 @@ class TestRunCache(unittest.TestCase):
 
         self.assertGreater(first, second)
         self.assertGreater(third, second)
-
 
     def test_column2vec_sum(self):
 
@@ -121,7 +120,6 @@ class TestRunCache(unittest.TestCase):
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
-
     def test_column2vec_weighted_sum(self):
 
         first = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
@@ -135,25 +133,26 @@ class TestRunCache(unittest.TestCase):
 
         self.assertGreater(first, second)
         self.assertGreater(third, second)
+
 
 class TestPersistentCache(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.model = SentenceTransformer(MODEL)
-        fileM2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
+    def setUpClass(cls):
+        cls.model = SentenceTransformer(MODEL)
+        file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
-        files = [fileM2]
-        self.data = get_nonnumerical_data(files)
+        files = [file_m2]
+        cls.data = get_nonnumerical_data(files)
         skip = True
-        for i in self.data:
+        for i in cls.data:
             if skip:
                 skip = False
                 continue
-            self.first = self.data[i].head(100)
+            cls.first = cls.data[i].head(100)
             break
         cache.set_file("cache_test.csv")
-        self.model = SentenceTransformer(MODEL)
+        cls.model = SentenceTransformer(MODEL)
 
     def setUp(self):
         cache.clear_cache()
@@ -173,7 +172,6 @@ class TestPersistentCache(unittest.TestCase):
         print(f"{first} : {second} : {third}")
         self.assertGreater(first, second)
         self.assertGreater(third, second)
-
 
     def test_column2vec_as_sentence_clean(self):
 
@@ -218,7 +216,6 @@ class TestPersistentCache(unittest.TestCase):
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
-
     def test_column2vec_weighted_avg(self):
 
         first = time_measure_function(column2vec_weighted_avg, self.first, self.model, "a")
@@ -233,7 +230,6 @@ class TestPersistentCache(unittest.TestCase):
 
         self.assertGreater(first, second)
         self.assertGreater(third, second)
-
 
     def test_column2vec_sum(self):
 
@@ -250,7 +246,6 @@ class TestPersistentCache(unittest.TestCase):
         self.assertGreater(first, second)
         self.assertGreater(third, second)
 
-
     def test_column2vec_weighted_sum(self):
 
         first = time_measure_function(column2vec_weighted_sum, self.first, self.model, "a")
@@ -266,6 +261,7 @@ class TestPersistentCache(unittest.TestCase):
 
         self.assertGreater(first, second)
         self.assertGreater(third, second)
+
 
 if __name__ == '__main__':
     unittest.main()

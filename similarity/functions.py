@@ -2,10 +2,11 @@
 This module contains helpful functions
 """
 import os
+
 import pandas as pd
 
 
-def load__csv_files_from_folder(folder: str) -> (list[pd.DataFrame], list[str]):
+def load__csv_files_from_folder(folder: str) -> tuple[list[pd.DataFrame], list[str]]:
     """
     it loads cvs files from folder and returns list of loaded dataframe and list of names
     :param folder: from which we load the files
@@ -20,12 +21,13 @@ def load__csv_files_from_folder(folder: str) -> (list[pd.DataFrame], list[str]):
     return data, names
 
 
-def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> (list[str], list[str]):
+def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> tuple[list[str], list[str]]:
     """
     For each column in each table in database it creates string from that column.
     :param database: all tables
     :param table_names: all names of tables
-    :return: list of strings representing column, list of string of the same length representing names of table for each column
+    :return: list of strings representing column, list of string of the
+             same length representing names of table for each column
     """
     sentences = []
     sentences_datasets = []
