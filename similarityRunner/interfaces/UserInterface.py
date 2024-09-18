@@ -1,6 +1,7 @@
 """
 File contains UserInterface interface
 """
+
 import abc
 
 from models.user_models import SimilarityOutput

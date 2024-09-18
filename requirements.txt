@@ -60,7 +60,6 @@ scipy==1.14.1
 sentence-transformers==3.1.0
 six==1.16.0
 smmap==5.0.1
-streamlit==1.38.0
 sympy==1.13.2
 tenacity==9.0.0
 threadpoolctl==3.5.0

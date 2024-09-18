@@ -1,6 +1,7 @@
 """
 File contains Connector interface
 """
+
 import abc
 
 from models.connector_models import ConnectorSettings, Output, ConnectorOutput
