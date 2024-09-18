@@ -1,35 +1,52 @@
 """
 This file is used for testing the column2Vec functions.
 """
+
 import os
 import pickle
 import time
+
 # import streamlit as st
 
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import (
+    SentenceTransformer,
+)
 
-from column2Vec.impl.functions import get_nonnumerical_data
-from column2Vec.impl.Column2Vec import (column2vec_as_sentence,
-                                        column2vec_as_sentence_clean,
-                                        column2vec_as_sentence_clean_uniq,
-                                        column2vec_weighted_sum,
-                                        column2vec_sum,
-                                        column2vec_weighted_avg,
-                                        column2vec_avg,
-                                        cache)
+from column2Vec.impl.functions import (
+    get_nonnumerical_data,
+)
+from column2Vec.impl.Column2Vec import (
+    column2vec_as_sentence,
+    column2vec_as_sentence_clean,
+    column2vec_as_sentence_clean_uniq,
+    column2vec_weighted_sum,
+    column2vec_sum,
+    column2vec_weighted_avg,
+    column2vec_avg,
+    cache,
+)
 
-from column2Vec.reaserch.generate_report import (generate_time_report,
-                                                 generate_sim_report,
-                                                 generate_stability_report,
-                                                 generate_partial_column_report)
+from column2Vec.research.generate_report import (
+    generate_time_report,
+    generate_sim_report,
+    generate_stability_report,
+    generate_partial_column_report,
+)
 from config import configure
 from constants import warning_enable
 from similarity.Comparator import cosine_sim
 
-FUNCTIONS = [column2vec_as_sentence, column2vec_as_sentence_clean, column2vec_as_sentence_clean_uniq,
-             column2vec_avg, column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum]
-MODEL = 'paraphrase-multilingual-mpnet-base-v2'  # 'bert-base-nli-mean-tokens'
+FUNCTIONS = [
+    column2vec_as_sentence,
+    column2vec_as_sentence_clean,
+    column2vec_as_sentence_clean_uniq,
+    column2vec_avg,
+    column2vec_weighted_avg,
+    column2vec_sum,
+    column2vec_weighted_sum,
+]
+MODEL = "paraphrase-multilingual-mpnet-base-v2"  # 'bert-base-nli-mean-tokens'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 model = SentenceTransformer(MODEL)
 
@@ -55,7 +72,10 @@ def stability_test(column1: pd.Series, function, key: str) -> (bool, str):
     whole_second = cosine_sim(emb1, emb2)
     whole_first = cosine_sim(emb3, emb1)
     if first_second != 1 or whole_second != 1 or whole_first != 1:
-        return False, f"For {key}:\n is not stable\n"
+        return (
+            False,
+            f"For {key}:\n is not stable\n",
+        )
     return True, f"For {key}: is stable\n"
 
 
@@ -74,7 +94,10 @@ def similarity_test(embeddings: dict) -> dict:
     for column in embeddings.keys():
         for function in embeddings[column].keys():
             for column2 in keys:
-                sim = cosine_sim(embeddings[column][function], embeddings[column2][function])
+                sim = cosine_sim(
+                    embeddings[column][function],
+                    embeddings[column2][function],
+                )
                 res[function][column, column2] = sim
     return res
 
@@ -133,9 +156,17 @@ def test_func(data: dict, test_type: callable) -> dict:
         result[name]["CLEAR SENT."] = test_type(data[name], column2vec_as_sentence_clean, name)
         result[name]["CL. UNIQ SENT."] = test_type(data[name], column2vec_as_sentence_clean_uniq, name)
         result[name]["AVG"] = test_type(data[name], column2vec_avg, name)
-        result[name]["W. AVG"] = test_type(data[name], column2vec_weighted_avg, name)
+        result[name]["W. AVG"] = test_type(
+            data[name],
+            column2vec_weighted_avg,
+            name,
+        )
         result[name]["SUM"] = test_type(data[name], column2vec_sum, name)
-        result[name]["W. SUM"] = test_type(data[name], column2vec_weighted_sum, name)
+        result[name]["W. SUM"] = test_type(
+            data[name],
+            column2vec_weighted_sum,
+            name,
+        )
         i += 1
         cache.save_persistently()
         cache.clear_cache()
@@ -149,23 +180,59 @@ def read_data() -> dict:
     :return: dict of nonnumerical data
     """
     try:
-        with open('files/nonnumerical_data.pkl', 'rb') as f:
+        with open("files/nonnumerical_data.pkl", "rb") as f:
             data = pickle.load(f)
         print("FILE READ")
     except FileNotFoundError:
         print("GENERATING")
-        file_a1 = os.path.join(THIS_DIR, os.pardir, '../data/aircraft-data_nov_dec.csv')
-        file_a2 = os.path.join(THIS_DIR, os.pardir, '../data/Airplane_Cleaned.csv')
-        file_c1 = os.path.join(THIS_DIR, os.pardir, '../data/autoscout24-germany-dataset.csv')
-        file_c2 = os.path.join(THIS_DIR, os.pardir, '../data/CARS_1.csv')
-        file_c3 = os.path.join(THIS_DIR, os.pardir, '../data/USA_cars_datasets.csv')
-        file_m1 = os.path.join(THIS_DIR, os.pardir, '../data/imdb_top_1000.csv')
-        file_m2 = os.path.join(THIS_DIR, os.pardir, '../data/netflix_titles.csv')
+        file_a1 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/aircraft-data_nov_dec.csv",
+        )
+        file_a2 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/Airplane_Cleaned.csv",
+        )
+        file_c1 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/autoscout24-germany-dataset.csv",
+        )
+        file_c2 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/CARS_1.csv",
+        )
+        file_c3 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/USA_cars_datasets.csv",
+        )
+        file_m1 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/imdb_top_1000.csv",
+        )
+        file_m2 = os.path.join(
+            THIS_DIR,
+            os.pardir,
+            "../data/netflix_titles.csv",
+        )
 
-        files = [file_a1, file_a2, file_c1, file_c2, file_c3, file_m1, file_m2]
+        files = [
+            file_a1,
+            file_a2,
+            file_c1,
+            file_c2,
+            file_c3,
+            file_m1,
+            file_m2,
+        ]
         data = get_nonnumerical_data(files)
 
-        with open('files/nonnumerical_data.pkl', 'wb') as f:
+        with open("files/nonnumerical_data.pkl", "wb") as f:
             pickle.dump(data, f)
     return data
 
@@ -178,10 +245,13 @@ def run_fun():
     # data_load_state = st.text('Loading data...')
     data = read_data()
     cache.set_file("files/cache.txt")
-    generate_time_report(test_func(data, time_test), "REP_time_test")
-    generate_sim_report(similarity_test(test_func(data, count_embedding)), "REP_")
-    generate_partial_column_report(test_func(data, partial_column_test), "REP_partial_column_test")
-    generate_stability_report(test_func(data, stability_test), "REP_stability_test")
+    generate_time_report(
+        test_func(data, time_test),
+        "REP_time_test",
+    )
+    # generate_sim_report(similarity_test(test_func(data, count_embedding)), "REP_")
+    # generate_partial_column_report(test_func(data, partial_column_test), "REP_partial_column_test")
+    # generate_stability_report(test_func(data, stability_test), "REP_stability_test")
 
 
 configure()

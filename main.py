@@ -2,18 +2,20 @@
 The main.py contains example usage.
 You can run program to compare tables by main
 """
+
 import sys
 
 import pandas as pd
 
 from config import configure
 from constants import warning_enable
-from similarity.Comparator import (Comparator, SizeComparator,
-                                   IncompleteColumnsComparator, KindComparator,
-                                   ColumnNamesEmbeddingsComparator)
-from similarity.ComparatorByColumn import (ComparatorByColumn, SizeComparator as SizeComparatorByColumn,
-                                           IncompleteColumnsComparator as IncompleteColumnsComparatorByColumn,
-                                           ColumnNamesEmbeddingsComparator as ColumnNamesEmbeddingsComparatorByColumn)
+from similarity.Comparator import Comparator, SizeComparator, IncompleteColumnsComparator, KindComparator, ColumnNamesEmbeddingsComparator
+from similarity.ComparatorByColumn import (
+    ComparatorByColumn,
+    SizeComparator as SizeComparatorByColumn,
+    IncompleteColumnsComparator as IncompleteColumnsComparatorByColumn,
+    ColumnNamesEmbeddingsComparator as ColumnNamesEmbeddingsComparatorByColumn,
+)
 from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
 
 BY_COLUMN = True
@@ -25,9 +27,7 @@ def create_metadata(data):
     This function creates metadata
     :return created metadata
     """
-    return (DataFrameMetadataCreator(data).
-            compute_advanced_structural_types().
-            compute_column_kind().compute_column_names_embeddings()).get_metadata()
+    return (DataFrameMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
 
 
 def compare_datasets(path1, path2):
@@ -42,19 +42,25 @@ def compare_datasets(path1, path2):
     data2 = pd.read_csv(path2)
     metadata1 = create_metadata(data1)
     metadata2 = create_metadata(data2)
-    comparator_by_column = (ComparatorByColumn().add_comparator_type(SizeComparatorByColumn()).
-                            add_comparator_type(IncompleteColumnsComparatorByColumn()).
-                            add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn()))
-    compartor = (Comparator().add_comparator_type(SizeComparator()).
-                 add_comparator_type(IncompleteColumnsComparator()).
-                 add_comparator_type(KindComparator()).
-                 add_comparator_type(ColumnNamesEmbeddingsComparator()))
+    comparator_by_column = (
+        ComparatorByColumn()
+        .add_comparator_type(SizeComparatorByColumn())
+        .add_comparator_type(IncompleteColumnsComparatorByColumn())
+        .add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
+    )
+    compartor = (
+        Comparator()
+        .add_comparator_type(SizeComparator())
+        .add_comparator_type(IncompleteColumnsComparator())
+        .add_comparator_type(KindComparator())
+        .add_comparator_type(ColumnNamesEmbeddingsComparator())
+    )
     if BY_COLUMN:
         return comparator_by_column.compare(metadata1, metadata2)
     return compartor.compare(metadata1, metadata2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     configure()
     warning_enable.change_status(False)
     warning_enable.disable_timezone_warn()
@@ -66,5 +72,8 @@ if __name__ == '__main__':
                 distance = compare_datasets(file1, file2)
                 print(f"{file1} |< >| {file2} = {distance}")
     if len(files) == 0:
-        distance = compare_datasets('data/netflix_titles.csv', 'data/imdb_top_1000.csv')
+        distance = compare_datasets(
+            "data/netflix_titles.csv",
+            "data/imdb_top_1000.csv",
+        )
         print(f"'data/netflix_titles.csv' |< >| 'data/imdb_top_1000.csv' = {distance}")

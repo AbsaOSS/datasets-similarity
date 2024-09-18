@@ -1,6 +1,7 @@
 """
 DataFrameMetadataCreator is a class that creates metadata for given Table.
 """
+
 from __future__ import annotations
 
 import math
@@ -13,11 +14,26 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from column2Vec.impl.Column2Vec import column2vec_as_sentence
-from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, \
-    NonnumericalMetadata
-from similarity.Types import (get_basic_type, get_advanced_type, get_advanced_structural_type, get_data_kind,
-                              DataKind, series_to_numeric, Type, NUMERICAL, NONNUMERICAL, UNDEFINED, WORD, ALL,
-                              MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC)
+from similarity.DataFrameMetadata import DataFrameMetadata, CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata
+from similarity.Types import (
+    get_basic_type,
+    get_advanced_type,
+    get_advanced_structural_type,
+    get_data_kind,
+    DataKind,
+    series_to_numeric,
+    Type,
+    NUMERICAL,
+    NONNUMERICAL,
+    UNDEFINED,
+    WORD,
+    ALL,
+    MULTIPLE_VALUES,
+    PHRASE,
+    ARTICLE,
+    ALPHANUMERIC,
+    ALPHABETIC,
+)
 
 
 class DataFrameMetadataCreator:
@@ -47,14 +63,18 @@ class DataFrameMetadataCreator:
         """
         self.dataframe = dataframe
         self.metadata = DataFrameMetadata()
-        self.model: Optional[SentenceTransformer] = SentenceTransformer('bert-base-nli-mean-tokens')
+        self.model: Optional[SentenceTransformer] = SentenceTransformer("bert-base-nli-mean-tokens")
         self.metadata.size = dataframe.shape[0]
         self.metadata.column_names = list(dataframe.columns)
-        self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in
-                                            self.metadata.column_names}
+        self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in self.metadata.column_names}
 
-        self.metadata.column_incomplete = {name: i < self.metadata.size * 0.7 for i, name in
-                                           zip(dataframe.count(), list(dataframe.columns))}  # more than 30 % missing
+        self.metadata.column_incomplete = {
+            name: i < self.metadata.size * 0.7
+            for i, name in zip(
+                dataframe.count(),
+                list(dataframe.columns),
+            )
+        }  # more than 30 % missing
 
         # todo correlated column
         # -----------------------------------------------------------------------------------
@@ -75,23 +95,31 @@ class DataFrameMetadataCreator:
         if kind == DataKind.BOOL:
             count = column.value_counts()
             null_values = True if len(column) != count.iloc[0] + count.iloc[1] else False
-            return KindMetadata(tuple([count.keys()[0], count.keys()[1]]),
-                                self.__normalize(count.iloc[0], count.iloc[1]),
-                                None, None, null_values, None, self.__get_model())
+            return KindMetadata(
+                tuple(
+                    [
+                        count.keys()[0],
+                        count.keys()[1],
+                    ]
+                ),
+                self.__normalize(count.iloc[0], count.iloc[1]),
+                None,
+                None,
+                null_values,
+                None,
+                self.__get_model(),
+            )
         if kind == DataKind.ID:
             null_values = True if column.nunique() != len(column) else False
             longest = column[column.apply(str).map(len).argmax()]
             shortest = column[column.apply(str).map(len).argmin()]
-            return KindMetadata(None, None, longest, shortest, null_values,
-                                column.apply(str).map(len).max() / column.size, self.__get_model())
+            return KindMetadata(None, None, longest, shortest, null_values, column.apply(str).map(len).max() / column.size, self.__get_model())
         if kind == DataKind.CONSTANT:
             count = column.value_counts().iloc[0]
             length = len(column)
             if length != count:
-                return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count),
-                                    None, None, True, None, self.__get_model())
-            return KindMetadata(tuple([column.dropna().unique()[0]]), None,
-                                None, None, False, None, self.__get_model())
+                return KindMetadata(tuple([column.dropna().unique()[0]]), self.__normalize(count, length - count), None, None, True, None, self.__get_model())
+            return KindMetadata(tuple([column.dropna().unique()[0]]), None, None, None, False, None, self.__get_model())
         return None
 
     def __compute_type_metadata(self, type_: type[Type], column: pd.Series, name: str) -> None:
@@ -108,13 +136,15 @@ class DataFrameMetadataCreator:
         if issubclass(type_, NUMERICAL):
             column = series_to_numeric(column)
             self.metadata.numerical_metadata[name] = NumericalMetadata(
-                column.min(), column.max(), (column.astype(str).str.len().nunique() == 1)
+                column.min(),
+                column.max(),
+                (column.astype(str).str.len().nunique() == 1),
             )
         elif issubclass(type_, NONNUMERICAL):
             self.metadata.nonnumerical_metadata[name] = NonnumericalMetadata(
                 column[column.astype(str).str.len().idxmax()],  # longest string
                 column[column.astype(str).str.len().idxmin()],  # shortest string
-                int(column.astype(str).str.len().mean())
+                int(column.astype(str).str.len().mean()),
             )
 
     def __get_model(self) -> SentenceTransformer:
@@ -122,12 +152,12 @@ class DataFrameMetadataCreator:
         :return: embedding model if exists or creates new one
         """
         if not self.model:
-            self.model = SentenceTransformer('bert-base-nli-mean-tokens')
+            self.model = SentenceTransformer("bert-base-nli-mean-tokens")
         return self.model
 
     # Setting Creator
 
-    def set_model(self, model: SentenceTransformer) -> 'DataFrameMetadataCreator':
+    def set_model(self, model: SentenceTransformer) -> "DataFrameMetadataCreator":
         """
         Sets model
         :param model: to be set
@@ -136,18 +166,25 @@ class DataFrameMetadataCreator:
         self.model = model
         return self
 
-    def compute_column_names_embeddings(self) -> 'DataFrameMetadataCreator':
+    def compute_column_names_embeddings(
+        self,
+    ) -> "DataFrameMetadataCreator":
         """
         Computes embeddings for all column names
 
         :return: self
         """
         column_name_embeddings = self.__get_model().encode(list(self.metadata.column_names_clean.values()))
-        for i, name in zip(column_name_embeddings, self.metadata.column_names):
+        for i, name in zip(
+            column_name_embeddings,
+            self.metadata.column_names,
+        ):
             self.metadata.column_name_embeddings[name] = i
         return self
 
-    def compute_column_kind(self) -> 'DataFrameMetadataCreator':
+    def compute_column_kind(
+        self,
+    ) -> "DataFrameMetadataCreator":
         """
         This will compute columns kinds (id, bool, undefined, constant, categorical) and kind metadata
         and categorical metadata
@@ -159,16 +196,24 @@ class DataFrameMetadataCreator:
             self.metadata.column_kind[kind].add(i)
             self.metadata.kind_metadata[i] = self.__compute_kind_metadata(kind, self.dataframe[i])
             if kind == DataKind.CATEGORICAL:
-                self.metadata.categorical_metadata[i] = \
-                    CategoricalMetadata(count=self.dataframe[i].nunique(),
-                                        categories=list(self.dataframe[i].unique()),
-                                        categories_with_count=self.dataframe[i].value_counts(),
-                                        category_embedding=self.__get_model().encode(
-                                            list(map(str, self.dataframe[i].unique()
-                                                     ))))
+                self.metadata.categorical_metadata[i] = CategoricalMetadata(
+                    count=self.dataframe[i].nunique(),
+                    categories=list(self.dataframe[i].unique()),
+                    categories_with_count=self.dataframe[i].value_counts(),
+                    category_embedding=self.__get_model().encode(
+                        list(
+                            map(
+                                str,
+                                self.dataframe[i].unique(),
+                            )
+                        )
+                    ),
+                )
         return self
 
-    def compute_basic_types(self) -> 'DataFrameMetadataCreator':
+    def compute_basic_types(
+        self,
+    ) -> "DataFrameMetadataCreator":
         """
         Computes types of columns only numerical, date, not numerical and undefined
         computes metadata
@@ -181,7 +226,9 @@ class DataFrameMetadataCreator:
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
-    def compute_advanced_types(self) -> 'DataFrameMetadataCreator':
+    def compute_advanced_types(
+        self,
+    ) -> "DataFrameMetadataCreator":
         """
         Computes types of columns. Indicates types int, float, date, text
         computes metadata
@@ -194,7 +241,9 @@ class DataFrameMetadataCreator:
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
-    def compute_advanced_structural_types(self) -> 'DataFrameMetadataCreator':
+    def compute_advanced_structural_types(
+        self,
+    ) -> "DataFrameMetadataCreator":
         """
         Compute types of columns. Indicates type of column int, float - human, computer,
          date, text - word, sentence, phrase article, multiple computes metadata
@@ -207,7 +256,7 @@ class DataFrameMetadataCreator:
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
-    def compute_correlation(self, strong_correlation: float) -> 'DataFrameMetadataCreator':
+    def compute_correlation(self, strong_correlation: float) -> "DataFrameMetadataCreator":
         """
         todo
         Compute correlation for numerical columns and saves it to correlated_columns
@@ -217,15 +266,16 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         correlation_numerical = self.get_numerical_columns().corr()
-        res = [(i, j) for i, j in zip(*np.where(np.abs(correlation_numerical.values) > strong_correlation))
-               if i != j]  # get pairs from matrics with bigger value then strong_correlation
+        res = [
+            (i, j) for i, j in zip(*np.where(np.abs(correlation_numerical.values) > strong_correlation)) if i != j
+        ]  # get pairs from matrics with bigger value then strong_correlation
         for r in res:
             self.metadata.correlated_columns.add(
-                tuple(sorted((correlation_numerical.columns[r[0]],
-                              correlation_numerical.iloc[r[1]].name))))  # get names of rows and columns
+                tuple(sorted((correlation_numerical.columns[r[0]], correlation_numerical.iloc[r[1]].name)))
+            )  # get names of rows and columns
         return self
 
-    def create_column_embeddings(self, types: list = None) -> 'DataFrameMetadataCreator':
+    def create_column_embeddings(self, types: list = None) -> "DataFrameMetadataCreator":
         """
         Creates embeddings for Types.STRING, Types.TEXT, Types.UNDEFINED or another types according to types parameter
 
@@ -233,14 +283,16 @@ class DataFrameMetadataCreator:
         :return: self DataFrameMetadataCreator
         """
         if types is None:
-            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES,
-                     PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]  # todo
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]  # todo
         # sentences = []
         # names = []
         for i in types:
             for column in self.metadata.type_column[i]:
-                self.metadata.column_embeddings[column] = column2vec_as_sentence(self.dataframe[column],
-                                                                                 self.__get_model(), column)
+                self.metadata.column_embeddings[column] = column2vec_as_sentence(
+                    self.dataframe[column],
+                    self.__get_model(),
+                    column,
+                )
         #         sentences.append(str(self.dataframe[column].tolist())
         #                          .replace("\'", "")
         #                          .replace("]", "")

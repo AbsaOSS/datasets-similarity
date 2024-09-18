@@ -140,7 +140,6 @@ Explaining kinds:
 - Folder **images** contains images for README.md
 
 ---
-**.github** folder contains GitHub workflows.
 
 **column2Vec** folder contains all files for [column2Vec](#column2Vec) feature.
 More about the structure of this folder can be found [here](column2Vec/README.md/#structure).
@@ -186,9 +185,33 @@ Or you can run all the tests by running this:
  python -m unittest
  #or
  pytest
+ # or for specific file
+ pytest test/test_types.py 
 ```
 **Please be aware that some tests in the test_column2Vec 
 module may take a long time.**
+
+```80 passed, 2 skipped, 500 warnings in 1887.83s (0:31:27)```
+
+### Static tests
+For static tests, we use pylint and black.
+#### Pylint
+You can run it by using this command:
+```bash
+pylint $(git ls-files '*.py')
+# or for specific file
+pylint similarity/metadata_creator.py
+```
+You can change pylint settings in [.pylintrc](.pylintrc) file.
+
+#### Black
+You can run it by using this command:
+```bash
+black $(git ls-files '*.py')
+# or for specific file
+black similarity/metadata_creator.py
+```
+You can change black settings in [pyproject.toml](pyproject.toml) file.
 
 ## How to contribute
 Please see our [**Contribution Guidelines**](CONTRIBUTING.md).

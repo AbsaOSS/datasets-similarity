@@ -10,8 +10,24 @@ from typing import Generator, Optional, Any, List
 from pandas import Series
 from torch import Tensor
 
-from similarity.Types import DataKind, Type, COMPUTER_GENERATED, HUMAN_GENERATED, INT, FLOAT, NUMERICAL, NONNUMERICAL, \
-    WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES
+from similarity.Types import (
+    DataKind,
+    Type,
+    COMPUTER_GENERATED,
+    HUMAN_GENERATED,
+    INT,
+    FLOAT,
+    NUMERICAL,
+    NONNUMERICAL,
+    WORD,
+    ALPHABETIC,
+    ALPHANUMERIC,
+    ALL,
+    SENTENCE,
+    ARTICLE,
+    PHRASE,
+    MULTIPLE_VALUES,
+)
 
 
 def dumps(value: list) -> list[Any] | list:
@@ -54,9 +70,16 @@ class KindMetadata:
     todo format (uuid, rodc, visa/mastercard ...)
     """
 
-    def __init__(self, value: Optional[tuple], distribution: Optional[tuple[int, ...]],
-                 longest: Optional[Any], shortest: Optional[Any], null_values: Optional[bool],
-                 ratio_max_length: Optional[float], model):
+    def __init__(
+        self,
+        value: Optional[tuple],
+        distribution: Optional[tuple[int, ...]],
+        longest: Optional[Any],
+        shortest: Optional[Any],
+        null_values: Optional[bool],
+        ratio_max_length: Optional[float],
+        model,
+    ):
         self.kind_metadata = None
         self.value = value
         self.value_embeddings = None if value is None or value[0] is not str else model.encode(list(value))
@@ -69,8 +92,10 @@ class KindMetadata:
         self.ratio_max_length = ratio_max_length
 
     def __str__(self):
-        return (f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
-                f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})")
+        return (
+            f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
+            f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})"
+        )
 
 
 class NonnumericalMetadata:
@@ -82,7 +107,12 @@ class NonnumericalMetadata:
     It should also store bigrams, trigrams ...
     """
 
-    def __init__(self, longest: str, shortest: str, avg_length: int):
+    def __init__(
+        self,
+        longest: str,
+        shortest: str,
+        avg_length: int,
+    ):
         self.longest = longest
         self.shortest = shortest
         self.avg_length = avg_length
@@ -100,7 +130,12 @@ class NumericalMetadata:
     It should also store distribution
     """
 
-    def __init__(self, min_value: float | int, max_value: float | int, same_value_length: bool):
+    def __init__(
+        self,
+        min_value: float | int,
+        max_value: float | int,
+        same_value_length: bool,
+    ):
         self.min_value = min_value
         self.max_value = max_value
         self.range_size = max_value - min_value
@@ -108,14 +143,17 @@ class NumericalMetadata:
         # todo distribution !!!!!!
 
     def __str__(self):
-        return (f"NumericalMetadata(min_value={self.min_value}, max_value={self.max_value},"
-                f" range_size={self.range_size}, same_value_length={self.same_value_length})")
+        return (
+            f"NumericalMetadata(min_value={self.min_value}, max_value={self.max_value},"
+            f" range_size={self.range_size}, same_value_length={self.same_value_length})"
+        )
 
 
 class DataFrameMetadata:
     """
     Metadata for Table
     """
+
     def __init__(self):
         # default
         self.size = int
@@ -183,7 +221,4 @@ class DataFrameMetadata:
         """
         Get column names for numerical column
         """
-        return self.get_column_names_by_type(NUMERICAL, FLOAT,
-                                             INT,
-                                             HUMAN_GENERATED,
-                                             COMPUTER_GENERATED)
+        return self.get_column_names_by_type(NUMERICAL, FLOAT, INT, HUMAN_GENERATED, COMPUTER_GENERATED)

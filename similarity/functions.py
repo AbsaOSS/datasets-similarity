@@ -1,6 +1,7 @@
 """
 This module contains helpful functions
 """
+
 import os
 
 import pandas as pd
@@ -33,7 +34,6 @@ def create_string_from_columns(database: list[pd.DataFrame], table_names: list[s
     sentences_datasets = []
     for table, name in zip(database, table_names):
         for column in table.columns:
-            sentences.append(
-                str(table[column].tolist()).replace("\'", "").replace("]", "").replace("[", ""))  # column to string
+            sentences.append(str(table[column].tolist()).replace("'", "").replace("]", "").replace("[", ""))  # column to string
             sentences_datasets.append(name)
     return sentences, sentences_datasets

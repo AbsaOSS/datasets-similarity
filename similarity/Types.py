@@ -1,6 +1,7 @@
 """
 This files contains all
 """
+
 import re
 import warnings
 from enum import Enum
@@ -24,8 +25,9 @@ class TypeSettings:
     threshold = (size_dataset - uniq_count) / size_dataset
 
     computer_generated_threshold is threshold for number of numbers after decimal point
-    
+
     """
+
     categorical_big_threshold = 0.9
     categorical_small_threshold = 0.7
     categorical_small_dataset = 50
@@ -75,9 +77,14 @@ def series_to_numeric(x: pd.Series) -> pd.Series:
     :return: numeric series
     """
     try:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s.replace(',', '.'), errors='coerce'))
+        to_numeric = x.apply(
+            lambda s: pd.to_numeric(
+                s.replace(",", "."),
+                errors="coerce",
+            )
+        )
     except AttributeError:
-        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors='coerce'))
+        to_numeric = x.apply(lambda s: pd.to_numeric(s, errors="coerce"))
     return to_numeric
 
 
@@ -91,9 +98,7 @@ def is_numerical(x: pd.Series) -> bool:
     :param x: the type
     :return: true if it is numerical, otherwise false
     """
-    return (x.any()
-            and (x.dtype in (np.float64, np.int64))
-            and not (x.isnull().values.sum() / x.size > 0.9))
+    return x.any() and (x.dtype in (np.float64, np.int64)) and not (x.isnull().values.sum() / x.size > 0.9)
 
 
 def is_int(x: pd.Series) -> bool:
@@ -110,14 +115,14 @@ def is_int(x: pd.Series) -> bool:
 
 def is_human_gen(x: pd.Series) -> bool:
     """
-     Decide if float number is human generated
+    Decide if float number is human generated
 
-     Float is human generated if number of numbers after decimal
-     point is smaller than computer_generated_threshold
+    Float is human generated if number of numbers after decimal
+    point is smaller than computer_generated_threshold
 
-     :param x: the series for decide
-     :return: true if it is human generated, otherwise false
-     """
+    :param x: the series for decide
+    :return: true if it is human generated, otherwise false
+    """
 
     def floating_length_gt(num: Any, gt: int) -> bool:
         """
@@ -130,17 +135,22 @@ def is_human_gen(x: pd.Series) -> bool:
             return len(split[1]) > gt
         return False
 
-    return x.apply(lambda s: not floating_length_gt(s, TypeSettings.computer_generated_threshold)).all()
+    return x.apply(
+        lambda s: not floating_length_gt(
+            s,
+            TypeSettings.computer_generated_threshold,
+        )
+    ).all()
 
 
 def is_not_numerical(x: pd.Series) -> bool:
     """
-     Decide if  type is not numerical
-     The column is not numerical if it is not numerical, and it could be transferred to string
+    Decide if  type is not numerical
+    The column is not numerical if it is not numerical, and it could be transferred to string
 
-     :param x: the series for decide
-     :return: false if it is numerical, otherwise true
-     """
+    :param x: the series for decide
+    :return: false if it is numerical, otherwise true
+    """
     return x.apply(lambda s: str(s)).all() and not is_numerical(x)
 
 
@@ -236,10 +246,9 @@ def is_sentence(x: pd.Series) -> bool:
     """
 
     def is_str_sentence(word: str) -> bool:
-        return (((word.endswith(".") or word.endswith("!")
-                  or word.endswith("?")) and word.count(".") <= 1
-                 and word.count("!") <= 1 and word.count("?") <= 1)
-                and re.search("^[A-Z]", word))
+        return (
+            (word.endswith(".") or word.endswith("!") or word.endswith("?")) and word.count(".") <= 1 and word.count("!") <= 1 and word.count("?") <= 1
+        ) and re.search("^[A-Z]", word)
 
     return x.apply(lambda s: is_str_sentence(s)).all()
 
@@ -263,12 +272,10 @@ def is_multiple(x: pd.Series) -> bool:
     """
 
     def is_str_multiple(word: str) -> bool:
-        regex = re.compile('[a-zA-Z0-9]')
-        word_clean = regex.sub('', word)
+        regex = re.compile("[a-zA-Z0-9]")
+        word_clean = regex.sub("", word)
         res = "".join(dict.fromkeys(word_clean))
-        return ((word.count(res) == word_clean.count(res)
-                 and word_clean.count(res) > 0)
-                or res == '' and res != ' ')
+        return (word.count(res) == word_clean.count(res) and word_clean.count(res) > 0) or res == "" and res != " "
 
     return x.apply(lambda s: is_str_multiple(s)).all()
 
@@ -283,20 +290,18 @@ def is_true_multiple(x: pd.Series) -> bool:
     """
 
     def is_str_multiple(word: str) -> str:
-        regex = re.compile('[a-zA-Z0-9]')
-        word_clean = regex.sub('', word)
+        regex = re.compile("[a-zA-Z0-9]")
+        word_clean = regex.sub("", word)
         res = "".join(dict.fromkeys(word_clean))
         return res
 
     result_arr = x.apply(lambda s: is_str_multiple(s)).values
-    to_return = [i for i in result_arr if i != '']
+    to_return = [i for i in result_arr if i != ""]
     if len(to_return) == 0:
         return True
-    if to_return[0].replace(" ", "") == '':
+    if to_return[0].replace(" ", "") == "":
         return False
     return to_return.count(to_return[0]) == len(to_return)
-
-
 
 
 def is_date(column: pd.Series) -> bool:
@@ -307,42 +312,47 @@ def is_date(column: pd.Series) -> bool:
     :param column: series for decide
     :return:true for date
     """
+
     def is_str_date(word: str) -> bool:
         element = str(word).strip()
         try:
             parse(element, fuzzy=True)
             return True
         except (ParserError, OverflowError):
-            one_or_two = r'(\d{1}|\d{2})'
-            two_or_four = r'(\d{2}|\d{4})'
-            months = ('(January|February|March|April|May|June|July|August|'
-                      'September|October|November|December|Jan|Feb'
-                      '|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)')
-            date_pattern = r'^(T(\d{6}|\d{4})(|.\d{3})(|Z))$'
+            one_or_two = r"(\d{1}|\d{2})"
+            two_or_four = r"(\d{2}|\d{4})"
+            months = (
+                "(January|February|March|April|May|June|July|August|"
+                "September|October|November|December|Jan|Feb"
+                "|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec)"
+            )
+            date_pattern = r"^(T(\d{6}|\d{4})(|.\d{3})(|Z))$"
             pattern = date_pattern
             # + '$'  # 1999,4 Feb 1999,4 February
-            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) ' + months
+            pattern = pattern + "|" + r"^(\d{1}|\d{2}|\d{4}),(\d{1}|\d{2}) " + months
             # 11. 4. 1999
-            pattern = pattern + '|' + r'^' + one_or_two + r'\. ' + one_or_two + r'\. ' + two_or_four
+            pattern = pattern + "|" + r"^" + one_or_two + r"\. " + one_or_two + r"\. " + two_or_four
             # 1999,4February 1999,4Feb
-            pattern = pattern + '|' + r'^(\d{1}|\d{2}|\d{4}),' + one_or_two + months
+            pattern = pattern + "|" + r"^(\d{1}|\d{2}|\d{4})," + one_or_two + months
             # '99/12/31', '05/2/3' 00/2/3
-            pattern = pattern + '|' + r'^' + two_or_four + r'/' + one_or_two + r'/' + one_or_two
+            pattern = pattern + "|" + r"^" + two_or_four + r"/" + one_or_two + r"/" + one_or_two
             # 1995W05 2024-W50
-            pattern = pattern + '|' + r'^(\d{4}(W|-W)\d{2})'
+            pattern = pattern + "|" + r"^(\d{4}(W|-W)\d{2})"
             # 1995W0512  2023-W03-2
-            pattern = pattern + '|' + r'(\d{4}(W|-W)\d{2}(-|)' + one_or_two + ')$'
+            pattern = pattern + "|" + r"(\d{4}(W|-W)\d{2}(-|)" + one_or_two + ")$"
             # '1995-035', '1995035', '2024340'
-            pattern = pattern + '|' + r'^((2|1)\d{3}-\d{3})$|(^(2|1)\d{6})$'
+            pattern = pattern + "|" + r"^((2|1)\d{3}-\d{3})$|(^(2|1)\d{6})$"
             # epoch time 1911517200(2030 will be max for us)
-            pattern = pattern + '|' + r'(^\d{1,10})$'
+            pattern = pattern + "|" + r"(^\d{1,10})$"
 
             return bool(re.match(pattern, element))
 
     return column.apply(lambda s: is_str_date(s)).all()
 
 
-def get_data_kind(column: pd.Series) -> "DataKind":
+def get_data_kind(
+    column: pd.Series,
+) -> "DataKind":
     """
     Indicates kind of column.
 
@@ -364,6 +374,7 @@ class DataKind(Enum):
     """
     Represents all data kind.
     """
+
     BOOL = "bool"
     ID = "id"
     CONSTANT = "constant"
@@ -406,7 +417,9 @@ def get_advanced_type(column: pd.Series) -> Any:
     return UNDEFINED
 
 
-def get_advanced_structural_type(column: pd.Series) -> Any:
+def get_advanced_structural_type(
+    column: pd.Series,
+) -> Any:
     """
     Indicates type of column int, float - human, computer, date,
     text - word, sentence, phrase article, multiple

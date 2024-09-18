@@ -6,9 +6,9 @@ on:
   pull_request:
 
 jobs:
-  analysis:
+  static-analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
-    name: Pylint Analysis
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,16 +21,32 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
           pip install pylint
 
       - name: Analysing the code with pylint
         run: |
-          pylint \
-            --fail-under=6.0 \
-            --ignore-patterns=test_.*?py \
-            --max-line-length=180 \
-            $(git ls-files '*.py')
+          pylint $(git ls-files '*.py')
+
+  format-check:
+    name: Format check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install black
+
+      - name: Check code format with Black
+        run: |
+          black --check $(git ls-files '*.py')
 
   python-tests:
     env:

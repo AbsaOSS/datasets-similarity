@@ -1,0 +1,4 @@
+[tool.black]
+line-length = 160
+target-version = ['py311']
+force-exclude = '''test'''
