@@ -1,5 +1,7 @@
 # Structure
-- folder [comparing_all_tables](comparing_all_tables) 
+- folder [comparing_all_tables](comparing_all_tables)
+- folder [interfaces](interfaces)
+- folder [models](models)
 - file [Comparator](Comparator.py)
 - file [ComparatorByColumns](ComparatorByColumn.py)
 - file [Types](Types.py)
@@ -15,6 +17,10 @@ we do not recommend to use it.
 
 File `categorical.ipynb` shows usage of `comparing.py`.
 
+## folder interfaces
+This folder contains two files: `ConnectorInterface.py` and `UserInterface.py`.
+## folder models
+Contains all models that are used for interfaces.
 ## file Comparator.py
 File contains Comparator class, ComparatorType classes and DistanceFunction
 Comparator is part of the pipeline that is shown below
