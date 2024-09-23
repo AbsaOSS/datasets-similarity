@@ -9,6 +9,7 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 import plotly.express as px
+from memory_profiler import profile
 from sentence_transformers import (
     SentenceTransformer,
 )
@@ -42,7 +43,6 @@ def get_nonnumerical_data(
         metadata1 = metadata_creator.get_metadata()
         column_names = metadata1.get_column_names_by_type(NONNUMERICAL)
         for name in column_names:
-            print(f" {i} : {name}")
             result[name + str(index)] = data[name]
     return result
 
@@ -148,9 +148,5 @@ def compute_distances(vectors: dict):
     :param vectors: Dictionary of embedding vectors
     :return: matrix with distances
     """
-    res = {}
-    for key1, vec1 in vectors.items():
-        res[key1] = {}
-        for key2, vec2 in vectors.items():
-            res[key1][key2] = 1 - cosine_sim(vec1, vec2)
+    res = {key1: {key2: 1 - cosine_sim(vec1, vec2) for key2, vec2 in vectors.items()} for key1, vec1 in vectors.items()}
     return res

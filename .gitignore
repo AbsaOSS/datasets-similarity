@@ -165,3 +165,7 @@ cython_debug/
 # Custom for this project
 fingerprints/
 **/.DS_Store
+cache_test*.csv
+tmp.txt
+similarity/testcomparatorByColumn.ipynb
+

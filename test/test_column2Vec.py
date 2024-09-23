@@ -1,8 +1,10 @@
 import os
+import sys
 import unittest
 import time
 
 import pandas as pd
+from memory_profiler import profile
 from sentence_transformers import SentenceTransformer
 
 from column2Vec.impl.Column2Vec import (column2vec_as_sentence, column2vec_as_sentence_clean,
@@ -19,6 +21,15 @@ SKIP_SIMILAR = False
 MODEL = 'bert-base-nli-mean-tokens'  #
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 TRANSFORMER = SentenceTransformer(MODEL)
+
+def get_size(foo):
+    num =  sys.getsizeof(foo)
+    suffix="B"
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
 
 def vectors_are_same(vec1, vec2):
     for i, j in zip(vec1, vec2):
@@ -268,6 +279,9 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
 
     @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_avg ...")
     def test_column2vec_avg(self):
+        # slow one 1:30
+        # slow one 1:30
+        # slow one 1:30
         vectors_sentence = get_vectors(column2vec_avg, self.data)
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "AVG")
