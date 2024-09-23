@@ -31,3 +31,8 @@ class ConnectorInterface(metaclass=abc.ABCMeta):
         :return: data"""
         data = self._connect_and_load_data_source(settings)
         return self._format_data(data)
+
+    @abc.abstractmethod
+    def close(self):
+        """Close the connection"""
+        raise NotImplementedError
