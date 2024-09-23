@@ -8,7 +8,7 @@ from enum import Enum
 import pandas as pd
 from pydantic import BaseModel
 
-Output = pd.DataFrame
+Output = tuple[list[pd.DataFrame], list[str]]
 
 class FileType(Enum):
     CSV = "csv"
@@ -20,8 +20,10 @@ class ConnectorSettings(BaseModel):
     ConnectorSettings class is a base class for connector settings.
     """
 
-    # here will be common fields for all connectors
     file_type: tuple[FileType] # csv, parquet, etc., tuple for immutability
+    class Config:
+        # arbitrary_types_allowed is set to True to allow tuple FileType
+        arbitrary_types_allowed = True
 
 
 class ConnectorOutput(BaseModel):
@@ -29,8 +31,12 @@ class ConnectorOutput(BaseModel):
     ConnectorOutput class is a base class for connector output.
     """
     names: list[str]
-    tables: tuple[list[pd.DataFrame]]
-    # here will be common fields for all connectors
+    tables: list[pd.DataFrame]
+
+    class Config:
+        # arbitrary_types_allowed is set to True to allow list of pandas DataFrames
+        arbitrary_types_allowed = True
+
 
 class FSConnectorSettings(ConnectorSettings):
     """

@@ -3,12 +3,9 @@ import pandas as pd
 from models.connector_models import FileType
 
 
-def load_files_from_list(folder: list[str], file_type: tuple[FileType] = FileType.CSV) -> tuple[list[pd.DataFrame], list[str]]:
+def load_files_from_list(folder: list[str], file_type: tuple = (FileType.CSV, )) -> tuple[list[pd.DataFrame], list[str]]:
     """
-    it loads cvs files from folder and returns list of loaded dataframe and list of names
-    :param folder: from which we load the files
-    :param file_type: type of file, csv, parquet, etc.
-    :return: two lists
+
     """
     data = []
     names = []
@@ -20,3 +17,8 @@ def load_files_from_list(folder: list[str], file_type: tuple[FileType] = FileTyp
             data.append(pd.read_parquet(file))
             names.append(file.replace(".parquet", ""))
     return data, names
+
+def csv_to_parquet(file: str):
+    df = pd.read_csv(file)
+    df.to_parquet(file.replace(".csv", ".parquet"))
+    return file.replace(".csv", ".parquet")
