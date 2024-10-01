@@ -48,7 +48,8 @@ FUNCTIONS = [
 ]
 MODEL = "paraphrase-multilingual-mpnet-base-v2"  # 'bert-base-nli-mean-tokens'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-model = SentenceTransformer(MODEL)
+model = SentenceTransformer(MODEL, tokenizer_kwargs={
+        'clean_up_tokenization_spaces': True})
 
 
 def count_embedding(column1: pd.Series, function, key: str) -> pd.Series:

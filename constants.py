@@ -51,7 +51,9 @@ class TrainedModel:
     """
 
     configure()
-    __model = SentenceTransformer("paraphrase-multilingual-mpnet-base-v2")
+    __model = SentenceTransformer("paraphrase-multilingual-mpnet-base-v2", tokenizer_kwargs={
+        'clean_up_tokenization_spaces': True,
+    })
 
     def set_module(self, model: SentenceTransformer):
         """
