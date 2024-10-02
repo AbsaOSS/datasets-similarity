@@ -3,7 +3,6 @@ This files contains all
 """
 
 import re
-import warnings
 from enum import Enum
 from typing import Any
 from dateutil.parser import parse, ParserError

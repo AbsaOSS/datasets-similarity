@@ -4,7 +4,7 @@ Comparator compares each couple of columns independently.
 
 from __future__ import annotations
 
-import warnings
+import logging
 from abc import ABC, abstractmethod
 from statistics import mean
 
@@ -42,11 +42,11 @@ class ComparatorType(ABC):
         """
         if len(column1) == 0 and len(column2) == 0:
             if warning_enable.get_status():
-                warnings.warn(f"Warning: {message} is not present in the dataframe.")
+                logging.info(f"Warning: {message} is not present in the dataframe.")
             return True, 0
         if (len(column1) == 0) != (len(column2) == 0):
             if warning_enable.get_status():
-                warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
+                logging.info(f"Warning: {message} is not present in one of the dataframes.")
             return True, 1
         return False, 0
 
@@ -155,7 +155,7 @@ class ColumnNamesEmbeddingsComparator(GeneralColumnComparator):
         """
         if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
             if warning_enable.get_status():
-                warnings.warn("Warning: column name embedding is not computed")
+                logging.warning("Warning: column name embedding is not computed")
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_name_embeddings[index1],
@@ -184,7 +184,7 @@ class ColumnEmbeddingsComparator(GeneralColumnComparator):
             or index2 not in metadata2.column_embeddings
         ):
             if warning_enable.get_status():
-                warnings.warn("Warning: column embedding is not computed")
+                logging.warning("Warning: column embedding is not computed")
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_embeddings[index1],

@@ -5,8 +5,8 @@ Comparator is split to types comparator, all columns with same types are compare
 
 from __future__ import annotations
 
+import logging
 import math
-import warnings
 from abc import abstractmethod, ABC
 from enum import Enum
 from statistics import mean
@@ -324,7 +324,7 @@ class ColumnExactNamesComparator(ComparatorType):
         :return: dataframe fill by 0 and 1
         """
         if (metadata1.column_names_clean == {} or metadata2.column_names_clean == {}) and warning_enable.get_status():
-            warnings.warn("Warning: column_names_clean is not computed")
+            logging.warning("Warning: column_names_clean is not computed")
         return fill_result(metadata1.column_names_clean, metadata2.column_names_clean)
 
 
@@ -349,7 +349,7 @@ class ColumnNamesEmbeddingsComparator(ComparatorType):
         :return: dataframe fill by distances between 0 and 1
         """
         if (metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
-            warnings.warn("Warning: column name embedding is not computed")
+            logging.warning("Warning: column name embedding is not computed")
 
         result = pd.DataFrame()
         for idx1, name1 in enumerate(metadata1.column_name_embeddings.values()):
@@ -444,11 +444,11 @@ class KindComparator(ComparatorType):
         """
         if len(column1) == 0 and len(column2) == 0:
             if warning_enable.get_status():
-                warnings.warn(f"Warning: {message} is not present in the dataframe.")
+                logging.info(f"Warning: {message} is not present in the dataframe.")
             return True, pd.DataFrame([0])
         if (len(column1) == 0) != (len(column2) == 0):
             if warning_enable.get_status():
-                warnings.warn(f"Warning: {message} is not present in one of the dataframes.")
+                logging.info(f"Warning: {message} is not present in one of the dataframes.")
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
 
