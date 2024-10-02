@@ -1,10 +1,18 @@
+"""
+This file contains functions used in the similarityRunner package.
+"""
 import pandas as pd
 
 from models.connector_models import FileType
 
 
 def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,)) -> tuple[list[pd.DataFrame], list[str]]:
-    """ """
+    """
+    Load files from a list of files
+    :param folder: list of files to load
+    :param file_types: tuple of posible file types
+    :return: tuple of data list and names list
+    """
     data = []
     names = []
     for file in folder:
@@ -17,7 +25,11 @@ def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,))
     return data, names
 
 
-def csv_to_parquet(file: str):
+def csv_to_parquet(file: str) -> str:
+    """
+    Convert csv file to parquet
+    :param file: file to convert
+    """
     df = pd.read_csv(file)
     df.to_parquet(file.replace(".csv", ".parquet"))
     return file.replace(".csv", ".parquet")
