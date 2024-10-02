@@ -1,6 +1,7 @@
 """
 This module contains the user models
 """
+
 from enum import Enum
 
 from pydantic import BaseModel
@@ -23,28 +24,34 @@ class SimilarityOutput(BaseModel):
         # arbitrary_types_allowed is set to True to allow list and dictionary
         arbitrary_types_allowed = True
 
+
 class MetadataSettings(BaseModel):
     """
     MetadataSettings class is a base class for metadata settings.
     """
+
     all: bool
     kinds: bool
     types: bool
     embeddings: bool
+
 
 class RunType(str, Enum):
     ALL = "all"
     METADATA = "metadata"
     SIMILARITY = "similarity"
 
+
 class ComparatorType(Enum):
     BY_COLUMN = ComparatorByColumn()
     BY_TYPE = Comparator()
+
 
 class SimilaritySettings(BaseModel):
     """
     SimilaritySettings class is a base class for similarity settings.
     """
+
     connector: ConnectorSettings
     metadata: MetadataSettings
     run_type: RunType

@@ -63,8 +63,7 @@ class DataFrameMetadataCreator:
         """
         self.dataframe = dataframe
         self.metadata = DataFrameMetadata()
-        self.model: Optional[SentenceTransformer] = SentenceTransformer("bert-base-nli-mean-tokens", tokenizer_kwargs={
-        'clean_up_tokenization_spaces': True})
+        self.model: Optional[SentenceTransformer] = SentenceTransformer("bert-base-nli-mean-tokens", tokenizer_kwargs={"clean_up_tokenization_spaces": True})
         self.metadata.size = dataframe.shape[0]
         self.metadata.column_names = list(dataframe.columns)
         self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in self.metadata.column_names}
@@ -153,8 +152,7 @@ class DataFrameMetadataCreator:
         :return: embedding model if exists or creates new one
         """
         if not self.model:
-            self.model = SentenceTransformer("bert-base-nli-mean-tokens", tokenizer_kwargs={
-        'clean_up_tokenization_spaces': True})
+            self.model = SentenceTransformer("bert-base-nli-mean-tokens", tokenizer_kwargs={"clean_up_tokenization_spaces": True})
         return self.model
 
     # Setting Creator

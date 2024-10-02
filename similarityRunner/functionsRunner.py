@@ -4,9 +4,7 @@ from models.connector_models import FileType
 
 
 def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,)) -> tuple[list[pd.DataFrame], list[str]]:
-    """
-
-    """
+    """ """
     data = []
     names = []
     for file in folder:
@@ -17,6 +15,7 @@ def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,))
             data.append(pd.read_parquet(file))
             names.append(file.replace(".parquet", ""))
     return data, names
+
 
 def csv_to_parquet(file: str):
     df = pd.read_csv(file)

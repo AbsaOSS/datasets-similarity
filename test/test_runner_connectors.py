@@ -1,6 +1,6 @@
 import unittest
 
-from similarityRunner.connectors.filesystem_connector import FilesystemConnector
+from connectors.filesystem_connector import FilesystemConnector
 from similarityRunner.models.connector_models import FSConnectorSettings
 
 

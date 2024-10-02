@@ -1,6 +1,7 @@
 """
 This
 """
+
 import time
 
 from Comparator import Comparator, KindComparator, ColumnExactNamesComparator as ExactNames
@@ -22,13 +23,9 @@ def create_metadata(settings: SimilaritySettings, data: Output) -> dict[str, Dat
     df_metadata = {}
     if settings.metadata.all:
         for df, name in zip(dataframes, names):
-            df_metadata[name] = (DataFrameMetadataCreator(df)
-                                 .create_column_embeddings()
-                                 .compute_advanced_structural_types()
-                                 .compute_column_kind()
-                                 .get_metadata())
+            df_metadata[name] = DataFrameMetadataCreator(df).create_column_embeddings().compute_advanced_structural_types().compute_column_kind().get_metadata()
     else:
-        ... # todo after #35
+        ...  # todo after #35
 
     # todo save metadata after #35
     return df_metadata
@@ -43,8 +40,9 @@ def __get_comparator(settings: SimilaritySettings):
         return comp.add_comparator_type(ColumnKindComparator()).add_comparator_type(ColumnExactNamesComparator())
         # todo add by settings #35
     else:
-        comp = Comparator() # todo add by settings #35
+        comp = Comparator()  # todo add by settings #35
         return comp.add_comparator_type(KindComparator()).add_comparator_type(ExactNames())
+
 
 def compute_similarity(settings: SimilaritySettings, data: dict[str, DataFrameMetadata]):
     """
@@ -52,11 +50,9 @@ def compute_similarity(settings: SimilaritySettings, data: dict[str, DataFrameMe
     """
     comparator = __get_comparator(settings)
     names = list(data.keys())
-    similarity = {
-        name: {name2: comparator.compare(data[name], data[name2]) for name2 in names}
-        for name in names
-    }
+    similarity = {name: {name2: comparator.compare(data[name], data[name2]) for name2 in names} for name in names}
     return similarity
+
 
 def run(settings: SimilaritySettings):
     """
@@ -78,4 +74,4 @@ def run(settings: SimilaritySettings):
     elif settings.run_type == "metadata":
         create_metadata(settings, data)
     elif settings.run_type == "similarity":
-        print("Similarity") # todo after #35
+        print("Similarity")  # todo after #35

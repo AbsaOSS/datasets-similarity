@@ -1,7 +1,9 @@
 """
 
 """
+
 import abc
+
 
 class OutputFormaterInterface(metaclass=abc.ABCMeta):
     """
