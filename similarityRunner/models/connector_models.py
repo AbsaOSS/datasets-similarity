@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 Output = tuple[list[pd.DataFrame], list[str]]
 
-class FileType(Enum):
+class FileType(str, Enum):
     CSV = "csv"
     PARQUET = "parquet"
 
