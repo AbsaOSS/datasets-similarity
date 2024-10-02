@@ -12,6 +12,7 @@ class TestFileSystemConnector(unittest.TestCase):
                                        directory_paths=[],
                                      file_type=("csv",))
         data, names = connector.get_data(settings)
+        connector.close()
         self.assertEqual(len(data), 2)
         self.assertEqual(names[0], "./data/netflix_titles")
         self.assertEqual(names[1], "./data/disney_movies")
@@ -22,4 +23,5 @@ class TestFileSystemConnector(unittest.TestCase):
                                        directory_paths=["./data"],
                                        file_type=("csv",))
         data, _ = connector.get_data(settings)
+        connector.close()
         self.assertEqual(len(data), 11)

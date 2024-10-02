@@ -75,7 +75,7 @@ jobs:
            pytest $TEST_FILES
 
       - name: Show coverage
-        run: coverage report -m --omit=".*.ipynb"
+        run: coverage report -m --omit=[".*.ipynb", "similarityRunner/UI", "similarityRunner/models", "similarityRunner/runner.py"]
 
       - name: Create coverage file
         if: github.event_name == 'pull_request'
