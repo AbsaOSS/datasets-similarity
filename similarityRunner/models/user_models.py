@@ -1,7 +1,7 @@
 """
 This module contains the user models
 """
-from enum import EnumType
+from enum import Enum
 
 from pydantic import BaseModel
 
@@ -12,12 +12,16 @@ from models.connector_models import ConnectorSettings
 
 class SimilarityOutput(BaseModel):
     """
-    SimilarityOutput class isclass containing similarity output.
+    SimilarityOutput class is class containing similarity output.
     """
 
     # here will be common fields for all similarity models
     table_names: list[str]
     distances: dict[(str, str), float]
+
+    class Config:
+        # arbitrary_types_allowed is set to True to allow list and dictionary
+        arbitrary_types_allowed = True
 
 class MetadataSettings(BaseModel):
     """
@@ -28,14 +32,15 @@ class MetadataSettings(BaseModel):
     types: bool
     embeddings: bool
 
-class RunType(EnumType):
+class RunType(str, Enum):
     ALL = "all"
     METADATA = "metadata"
     SIMILARITY = "similarity"
 
-class ComparatorType(EnumType):
+class ComparatorType(Enum):
     BY_COLUMN = ComparatorByColumn()
     BY_TYPE = Comparator()
+
 class SimilaritySettings(BaseModel):
     """
     SimilaritySettings class is a base class for similarity settings.
@@ -44,3 +49,7 @@ class SimilaritySettings(BaseModel):
     metadata: MetadataSettings
     run_type: RunType
     comparator_type: ComparatorType
+
+    class Config:
+        # arbitrary_types_allowed is set to True to allow Enum Types
+        arbitrary_types_allowed = True

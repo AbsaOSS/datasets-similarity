@@ -226,10 +226,10 @@ class ColumnKindComparator(SpecificColumnComparator):
         """
         res = pd.DataFrame()
         row_mins = []
-        for id1, embed1 in enumerate(embeddings1.items()):
-            for id2, embed2 in enumerate(embeddings2.items()):
+        for id1, embed1 in enumerate(embeddings1):
+            for id2, embed2 in enumerate(embeddings2):
                 res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
-            row_mins.append(min(res[id1]))
+            row_mins.append(res.loc[id1].min())
         column_mins = []
         for _, column in res.items():
             column_mins.append(min(column))

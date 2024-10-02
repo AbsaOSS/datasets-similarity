@@ -20,7 +20,7 @@ class ConnectorSettings(BaseModel):
     ConnectorSettings class is a base class for connector settings.
     """
 
-    file_type: tuple[FileType] # csv, parquet, etc., tuple for immutability
+    file_type: tuple[FileType, ...] # csv, parquet, etc., tuple for immutability
     class Config:
         # arbitrary_types_allowed is set to True to allow tuple FileType
         arbitrary_types_allowed = True
@@ -44,3 +44,9 @@ class FSConnectorSettings(ConnectorSettings):
     """
     files_paths: list[str]
     directory_paths: list[str]
+
+class S3ConnectorSettings(ConnectorSettings):
+    """
+    S3ConnectorSettings class is a derived class for S3 connector settings.
+    """
+    pass
