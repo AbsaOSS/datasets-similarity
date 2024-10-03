@@ -66,7 +66,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install coverage pytest
 
       - name: Run tests
         run: |
@@ -79,7 +78,7 @@ jobs:
 
       - name: Create coverage file
         if: github.event_name == 'pull_request'
-        run: coverage xml
+        run: coverage xml --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"
 
       - name: Get Cover
         if: github.event_name == 'pull_request'
