@@ -4,7 +4,7 @@ This file contains filesystem connector implementation
 
 import os
 
-from functionsRunner import load_files_from_list
+from functions_runner import load_files_from_list
 from interfaces.ConnectorInterface import ConnectorInterface
 from models.connector_models import Output, ConnectorOutput, FSConnectorSettings
 

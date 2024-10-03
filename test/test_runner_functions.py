@@ -1,6 +1,6 @@
 import unittest
 
-from similarityRunner.functionsRunner import load_files_from_list, csv_to_parquet
+from similarityRunner.functions_runner import load_files_from_list, csv_to_parquet
 from similarityRunner.models.connector_models import FileType
 
 
