@@ -2,6 +2,7 @@
 This file is a part of the similarityRunner package.
 It is used to run the similarity pipeline from console.
 """
+
 import sys
 
 

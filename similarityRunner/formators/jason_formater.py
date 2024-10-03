@@ -1,6 +1,7 @@
 """
 This file contains JSON formater implementation.
 """
+
 import json
 
 from interfaces.OutputFormaterInterface import OutputFormaterInterface
@@ -10,6 +11,7 @@ class JsonFormater(OutputFormaterInterface):
     """
     This class is responsible for formatting the output in JSON format.
     """
+
     def format(self, data: dict) -> str:
         """
         Format data to JSON

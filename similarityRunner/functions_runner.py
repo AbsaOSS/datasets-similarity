@@ -1,6 +1,7 @@
 """
 This file contains functions used in the similarityRunner package.
 """
+
 import pandas as pd
 
 from models.connector_models import FileType

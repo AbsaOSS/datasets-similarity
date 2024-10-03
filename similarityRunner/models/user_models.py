@@ -38,6 +38,7 @@ class MetadataSettings(BaseModel):
 
 class RunType(str, Enum):
     """enum class, which contains run types for which part of the pipeline we would like to run"""
+
     ALL = "all"
     METADATA = "metadata"
     SIMILARITY = "similarity"
@@ -45,6 +46,7 @@ class RunType(str, Enum):
 
 class ComparatorType(Enum):
     """Enum class for comparator types"""
+
     BY_COLUMN = ComparatorByColumn()
     BY_TYPE = Comparator()
 
