@@ -1,3 +1,7 @@
+"""
+This file is a part of the similarityRunner package.
+It is used to run the similarity pipeline from console.
+"""
 import sys
 
 
@@ -6,7 +10,12 @@ from models.user_models import SimilaritySettings, MetadataSettings, ComparatorT
 import runner as r
 
 
-def get_arg(index, message):
+def get_arg(index, message) -> str:
+    """
+    Get argument from a command line
+    :param index: index of an argument
+    :param message:  a message to print if argument is not found
+    """
     try:
         return sys.argv[index]
     except IndexError:
@@ -17,7 +26,7 @@ def get_arg(index, message):
 if __name__ == "__main__":
     directory = get_arg(1, "Add path to directory")
     run_type = get_arg(2, "Add run type, all metadata, similarity")  # all, metadata, similarity
-    comparator_type = get_arg(3, "Add comparator type: by_column, by_type ")  # by_column, by_type
+    comparator_type = get_arg(3, "Add comparator type: by_column, by_type ")  # by_type, by_column
     settings = SimilaritySettings(
         connector=FSConnectorSettings(file_type=(ft.CSV, ft.PARQUET), files_paths=[], directory_paths=[directory]),
         metadata=MetadataSettings(all=True, kinds=True, types=True, embeddings=True),

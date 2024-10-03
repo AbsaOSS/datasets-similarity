@@ -15,8 +15,8 @@ class ConnectorInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _connect_and_load_data_source(self, settings: ConnectorSettings) -> ConnectorOutput:
-        """Load in the data set
-        :param settings: ConnectorSettings
+        """Load the data set
+        :param settings: ConnectorSettings for getting information about files
         this is a protected method"""
         raise NotImplementedError
 

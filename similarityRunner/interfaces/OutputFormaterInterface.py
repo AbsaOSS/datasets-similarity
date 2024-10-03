@@ -1,5 +1,5 @@
 """
-
+This file contains abstract class OutputFormaterInterface
 """
 
 import abc
@@ -13,4 +13,4 @@ class OutputFormaterInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def format(self, data: dict):
-        pass
+        """Format data to specific format"""

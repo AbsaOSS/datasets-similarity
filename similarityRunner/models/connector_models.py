@@ -55,5 +55,3 @@ class S3ConnectorSettings(ConnectorSettings):
     """
     S3ConnectorSettings class is a derived class for S3 connector settings.
     """
-
-    pass

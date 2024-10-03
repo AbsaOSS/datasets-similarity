@@ -8,9 +8,9 @@ from models.connector_models import FileType
 
 def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,)) -> tuple[list[pd.DataFrame], list[str]]:
     """
-    Load files from a list of files
+    Load files from a list of file
     :param folder: list of files to load
-    :param file_types: tuple of posible file types
+    :param file_types: tuple of possible file types
     :return: tuple of data list and names list
     """
     data = []

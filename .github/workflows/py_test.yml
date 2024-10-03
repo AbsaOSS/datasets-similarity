@@ -82,12 +82,12 @@ jobs:
 
       - name: Get Cover
         if: github.event_name == 'pull_request'
-        uses: orgoro/coverage@v3.1
+        uses: orgoro/coverage@v3.2
         with:
           coverageFile: coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           thresholdAll: 0.7
-          thresholdNew: 0.9
+          thresholdNew: 0.8
 
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'pull_request'

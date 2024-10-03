@@ -1,5 +1,5 @@
 """
-This
+This file contains a runner function that can run the pipeline according to settings
 """
 
 import time
@@ -10,7 +10,6 @@ from DataFrameMetadata import DataFrameMetadata
 from DataFrameMetadataCreator import DataFrameMetadataCreator
 from connectors.filesystem_connector import FilesystemConnector
 from formators.jason_formater import JsonFormater
-from main import BY_COLUMN
 from models.connector_models import Output
 from models.user_models import SimilaritySettings, ComparatorType
 
@@ -18,6 +17,9 @@ from models.user_models import SimilaritySettings, ComparatorType
 def create_metadata(settings: SimilaritySettings, data: Output) -> dict[str, DataFrameMetadata]:
     """
     Create metadata for each table in the data
+    :param settings: settings for the metadata creation
+    :param data: data to create metadata from
+    :return: dictionary of metadata for each table
     """
     dataframes, names = data
     df_metadata = {}
@@ -39,14 +41,15 @@ def __get_comparator(settings: SimilaritySettings):
         comp = ComparatorByColumn()
         return comp.add_comparator_type(ColumnKindComparator()).add_comparator_type(ColumnExactNamesComparator())
         # todo add by settings #35
-    else:
-        comp = Comparator()  # todo add by settings #35
-        return comp.add_comparator_type(KindComparator()).add_comparator_type(ExactNames())
+    comp = Comparator()  # todo add by settings #35
+    return comp.add_comparator_type(KindComparator()).add_comparator_type(ExactNames())
 
 
-def compute_similarity(settings: SimilaritySettings, data: dict[str, DataFrameMetadata]):
+def compute_similarity(settings: SimilaritySettings, data: dict[str, DataFrameMetadata]) -> dict[str, dict[str, float]]:
     """
     Compute similarity between tables
+    :param settings: settings for the similarity computation
+    :param data: metadata of the tables
     """
     comparator = __get_comparator(settings)
     names = list(data.keys())
