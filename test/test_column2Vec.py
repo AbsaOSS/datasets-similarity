@@ -33,7 +33,8 @@ def get_vectors(function, data):
     count = 1
     for key in data:
         # print("Processing column: " + key + " " + str(round((count / len(data)) * 100, 2)) + "%")
-        result[key] = function(data[key], SentenceTransformer(MODEL), key)
+        result[key] = function(data[key], SentenceTransformer(MODEL, tokenizer_kwargs={
+        'clean_up_tokenization_spaces': True}), key)
         count += 1
     end = time.time()
     print(f"ELAPSED TIME :{end - start}")

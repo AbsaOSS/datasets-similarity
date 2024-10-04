@@ -213,5 +213,15 @@ black similarity/metadata_creator.py
 ```
 You can change black settings in [pyproject.toml](pyproject.toml) file.
 
+
+#### Coverage
+You can run it by using this command:
+```bash
+PYTHONPATH="./similarity:./similarityRunner:$PYTHONPATH" \                      
+           coverage run --source='similarity,column2Vec,similarityRunner' -m \
+           pytest test/test_similarity* test/test_runner* test/test_column2VecCache.py
+
+```
+
 ## How to contribute
 Please see our [**Contribution Guidelines**](CONTRIBUTING.md).

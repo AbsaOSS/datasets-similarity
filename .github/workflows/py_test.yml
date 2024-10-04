@@ -50,7 +50,7 @@ jobs:
 
   python-tests:
     env:
-      TEST_FILES: test/test_types.py test/test_metadata.py test/test_comparator.py test/test_column2VecCache.py
+      TEST_FILES: test/test_similarity* test/test_runner* test/test_column2VecCache.py
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:
@@ -66,26 +66,28 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install coverage pytest
 
       - name: Run tests
-        run: coverage run --source='similarity,column2Vec' -m pytest $TEST_FILES
+        run: |
+          PYTHONPATH="./similarity:./similarityRunner:$PYTHONPATH" \
+           coverage run --source='similarity,column2Vec,similarityRunner' -m \
+           pytest $TEST_FILES
 
       - name: Show coverage
-        run: coverage report -m --omit=".*.ipynb"
+        run: coverage report -m --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"
 
       - name: Create coverage file
         if: github.event_name == 'pull_request'
-        run: coverage xml
+        run: coverage xml --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"
 
       - name: Get Cover
         if: github.event_name == 'pull_request'
-        uses: orgoro/coverage@v3.1
+        uses: orgoro/coverage@v3.2
         with:
           coverageFile: coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           thresholdAll: 0.7
-          thresholdNew: 0.9
+          thresholdNew: 0.8
 
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'pull_request'

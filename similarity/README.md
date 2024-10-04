@@ -1,5 +1,5 @@
 # Structure
-- folder [comparing_all_tables](comparing_all_tables) 
+- folder [comparing_all_tables](comparing_all_tables)
 - file [Comparator](Comparator.py)
 - file [ComparatorByColumns](ComparatorByColumn.py)
 - file [Types](Types.py)
