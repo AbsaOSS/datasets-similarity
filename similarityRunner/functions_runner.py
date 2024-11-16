@@ -26,11 +26,11 @@ def load_files_from_list(folder: list[str], file_types: tuple = (FileType.CSV,))
     return data, names
 
 
-def csv_to_parquet(file: str) -> str:
+def csv_to_parquet(file: str, sep: str = ',') -> str:
     """
     Convert csv file to parquet
     :param file: file to convert
     """
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, sep=sep, low_memory=False)
     df.to_parquet(file.replace(".csv", ".parquet"))
     return file.replace(".csv", ".parquet")
