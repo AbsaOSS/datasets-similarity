@@ -8,24 +8,25 @@ from statistics import mean
 from src.impl.comparator.utils import cosine_sim, are_columns_null
 from src.interfaces.comparator.comparator import HandlerType, Comparator
 from src.models.constants import warning_enable
-from src.models.metadata import DataFrameMetadata, KindMetadata, CategoricalMetadata
-from src.models.types import DataKind
+from src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
+from src.models.models import Settings
+from src.models.types_ import DataKind
 
 
 class BasicHandler(HandlerType):
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         if "index1" not in kwargs or "index2" not in kwargs:
             raise RuntimeError(f"Handler didnt have sufficient arguments - index1 and index2 - {kwargs}")
         return self._inner_compare(metadata1, metadata2, kwargs['index1'], kwargs['index2'])
 
     @abstractmethod
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> pd.DataFrame:
-        ...
+        pass
 
 
-class TableHandler(BasicHandler, ABC):
+class TableHandler(HandlerType, ABC):
     """
     Abstract class for table handlers it should compare features of whole table
     """
@@ -48,8 +49,7 @@ class SizeHandler(TableHandler):
     Handler of size of two tables
     """
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str = "",
-                       index2: str = "") -> float:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> float:
         """
         Compare the size of the two dataframes. If sizes are the same distance is 0, else distance is 1 - % of max size.
         :param index1: in this case is not used
@@ -68,7 +68,7 @@ class IncompleteColumnsHandler(GeneralColumnHandler):
     Handler for incomplete columns
     """
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> float:
         """
         Compare if two columns are complete or incomplete. If both are complete,
@@ -87,7 +87,7 @@ class ColumnExactNamesHandler(GeneralColumnHandler):
     Handler for exact column names
     """
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> float:
         """
         Compare if two columns have the same name. If both have the same name distance is 0, else distance is 1.
@@ -105,7 +105,7 @@ class ColumnNamesEmbeddingsHandler(GeneralColumnHandler):
     Handler for column names embeddings
     """
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> float:
         """
         Compare if two columns have similar name. Computes cosine distance for embeddings
@@ -130,7 +130,7 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
     Handler for column values embeddings
     """
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> float:
         """
         Compare embeddings for two columns. Computes cosine distance for embeddings.
@@ -316,7 +316,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         ratio_max_re = abs(metadata1.ratio_max_length - metadata2.ratio_max_length)
         return (value_short_re + value_long_re + nulls_re + ratio_max_re) / 4
 
-    def _inner_compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, index1: str,
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
                        index2: str) -> float:
         """
         Compare if two columns have the same kind. If both have the same kind distance is 0, else distance is 1.
@@ -380,7 +380,6 @@ class ComparatorByColumn(Comparator):
         Constructor for ComparatorByColumn
         """
         super().__init__()
-        self.comparator_type: list[HandlerType] = []
         self.table_comparators: list[TableHandler] = []
 
     def add_comparator_type(self, comparator: HandlerType) -> "ComparatorByColumn":
@@ -404,10 +403,15 @@ class ComparatorByColumn(Comparator):
         sum_weight = sum([weight for _, weight in distances])
         return sum([distance * weight / sum_weight for distance, weight in distances])
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> float:
+    def __pre_compare_individual(self):
+        for i in self.table_comparators:
+            i.settings = self.settings
+
+    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
         """
         Compare two tables according to previously set properties.
         """
+
         table_distances = []
         distances = pd.DataFrame()
         for comparator in self.table_comparators:
@@ -422,8 +426,8 @@ class ComparatorByColumn(Comparator):
                                 comparator.compare(
                                     metadata1,
                                     metadata2,
-                                    column1,
-                                    column2,
+                                    index1=column1,
+                                    index2=column2,
                                 ),
                                 comparator.weight,
                             )

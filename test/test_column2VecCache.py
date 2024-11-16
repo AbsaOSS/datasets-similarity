@@ -4,15 +4,15 @@ import time
 
 from sentence_transformers import SentenceTransformer
 
-from column2Vec.impl.Column2Vec import (cache,
-                                        column2vec_as_sentence,
-                                        column2vec_as_sentence_clean,
-                                        column2vec_as_sentence_clean_uniq,
-                                        column2vec_avg,
-                                        column2vec_weighted_sum,
-                                        column2vec_sum,
-                                        column2vec_weighted_avg)
-from column2Vec.impl.functions import get_nonnumerical_data
+from column2vec.src.column2vec import (cache,
+                                       column2vec_as_sentence,
+                                       column2vec_as_sentence_clean,
+                                       column2vec_as_sentence_clean_uniq,
+                                       column2vec_avg,
+                                       column2vec_weighted_sum,
+                                       column2vec_sum,
+                                       column2vec_weighted_avg)
+from column2vec.src.functions import get_nonnumerical_data
 
 MODEL = 'bert-base-nli-mean-tokens'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -11,8 +11,9 @@ from torch import Tensor
 from src.impl.comparator.utils import cosine_sim, get_ratio, concat, fill_result
 from src.interfaces.common import DistanceFunction
 from src.interfaces.comparator.comparator import HandlerType, Settings, Comparator
-from src.models.metadata import DataFrameMetadata
-from src.models.types import DataKind
+from src.interfaces.comparator.distance_functions import HausdorffDistanceMin
+from src.models.metadata import Metadata
+from src.models.types_ import DataKind
 from src.models.constants import warning_enable
 
 
@@ -59,7 +60,7 @@ class CategoricalHandler(HandlerType):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         Compare two categorical columns
          the distance is between 0 and 1
@@ -122,7 +123,7 @@ class CategoricalHandlerSimilar(CategoricalHandler):
             res += max(i)
         return count, res / len(similarity_matrix) * (count / len(similarity_matrix))
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         Compare categorical columns, if the columns are similar
         :param metadata1: first table
@@ -149,7 +150,7 @@ class ColumnEmbeddingHandler(HandlerType):
     Handler for column values embeddings
     """
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         Compare embeddings of columns
         :param metadata1: first table
@@ -179,7 +180,7 @@ class SizeHandler(HandlerType):
     Size of table Handler class
     """
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         If sizes are the same distance is 0, else distance is 1 - % of max
         :param metadata1: first table
@@ -200,8 +201,8 @@ class ColumnExactNamesHandler(HandlerType):
 
     def compare(
             self,
-            metadata1: DataFrameMetadata,
-            metadata2: DataFrameMetadata, *kwargs
+            metadata1: Metadata,
+            metadata2: Metadata, *kwargs
     ) -> pd.DataFrame:
         """
         This is dummy Handler if the names are exactly the same distance is 0 if not distance is 1
@@ -221,8 +222,8 @@ class ColumnNamesEmbeddingsHandler(HandlerType):
 
     def compare(
             self,
-            metadata1: DataFrameMetadata,
-            metadata2: DataFrameMetadata, **kwargs
+            metadata1: Metadata,
+            metadata2: Metadata, **kwargs
     ) -> pd.DataFrame:
         """
         Computes cosine distance for each column name embedding
@@ -248,7 +249,7 @@ class IncompleteColumnsHandler(HandlerType):
     Handler for incomplete columns
     """
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         Compare if two columns are complete or incomplete, if both have same outcome (True False)
          the distance is 0 otherwise is 1
@@ -264,9 +265,9 @@ class KindHandler(HandlerType):
     Handler for column kind
     """
 
-    def __init__(self, settings: set[Settings], distance_function: DistanceFunction,
+    def __init__(self, distance_function: DistanceFunction = HausdorffDistanceMin(),
                  compare_kind=None, weight: dict[DataKind.BOOL, int] = None):
-        super().__init__(settings, weight=1)
+        super().__init__(weight=1)
         self.distance_function = distance_function
         if compare_kind is None:
             self.compare_kind = [
@@ -338,7 +339,7 @@ class KindHandler(HandlerType):
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
 
-    def compare_constants(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+    def compare_constants(self, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
         """
         Compare all constant columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -379,7 +380,7 @@ class KindHandler(HandlerType):
 
         return concat(nulls_re, value_re)
 
-    def compare_ids(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+    def compare_ids(self, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
         """
         Compare all id columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -423,7 +424,7 @@ class KindHandler(HandlerType):
             nulls_re,
         )
 
-    def compare_bools(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+    def compare_bools(self, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
         """
         Compare all boolean columns. Compare if they have the same distribution of True and False values.
         Compare if they contain nulls.
@@ -459,7 +460,7 @@ class KindHandler(HandlerType):
                     )
         return concat(value_re, distr_re, nulls_re)
 
-    def compare_categorical(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> pd.DataFrame:
+    def compare_categorical(self, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
         """
         Compare all categorical columns. Compare if they contain nulls.
         Compare embeddings of values.
@@ -488,7 +489,7 @@ class KindHandler(HandlerType):
                 # compare the difference between the two dictionaries
         return concat(value_re, count_re)
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata, **kwargs) -> pd.DataFrame:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         """
         Compare kind columns
         :param metadata1: first table
@@ -535,11 +536,6 @@ class ComparatorByType(Comparator):
     """
     Comparator for comparing two tables by type
     """
-
-    def __init__(self):
-        super().__init__()
-        self.comparator_type: list[HandlerType] = []
-
     def add_comparator_type(self, comparator: HandlerType) -> "ComparatorByType":
         """
         Add comparator
@@ -547,7 +543,7 @@ class ComparatorByType(Comparator):
         self.comparator_type.append(comparator)
         return self
 
-    def compare(self, metadata1: DataFrameMetadata, metadata2: DataFrameMetadata) -> float:
+    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
         """
         Compare two tables according to previously set properties.
         """

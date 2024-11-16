@@ -9,16 +9,11 @@ import pandas as pd
 
 from config import configure
 from constants import warning_enable
-from similarity.Comparator import Comparator, SizeComparator, IncompleteColumnsComparator, KindComparator, ColumnNamesEmbeddingsComparator
-from similarity.ComparatorByColumn import (
-    ComparatorByColumn,
-    SizeComparator as SizeComparatorByColumn,
-    IncompleteColumnsComparator as IncompleteColumnsComparatorByColumn,
-    ColumnNamesEmbeddingsComparator as ColumnNamesEmbeddingsComparatorByColumn,
-)
-from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
-
-BY_COLUMN = True
+from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType, IncompleteColumnsHandler, SizeHandler, ColumnNamesEmbeddingsHandler, KindHandler
+from similarity_framework.src.impl.comparator.comparator_by_column import (ComparatorByColumn, SizeHandler as SizeComparatorByColumn, IncompleteColumnsHandler as IncompleteColumnsComparatorByColumn,
+                                                                           ColumnNamesEmbeddingsHandler as ColumnNamesEmbeddingsComparatorByColumn)
+from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
+BY_COLUMN = False
 configure()
 
 
@@ -27,7 +22,7 @@ def create_metadata(data):
     This function creates metadata
     :return created metadata
     """
-    return (DataFrameMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
+    return (TypeMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
 
 
 def compare_datasets(path1, path2):
@@ -44,16 +39,16 @@ def compare_datasets(path1, path2):
     metadata2 = create_metadata(data2)
     comparator_by_column = (
         ComparatorByColumn()
-        .add_comparator_type(SizeComparatorByColumn())
-        .add_comparator_type(IncompleteColumnsComparatorByColumn())
-        .add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
+            .add_comparator_type(SizeComparatorByColumn())
+            .add_comparator_type(IncompleteColumnsComparatorByColumn())
+            .add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
     )
     compartor = (
-        Comparator()
-        .add_comparator_type(SizeComparator())
-        .add_comparator_type(IncompleteColumnsComparator())
-        .add_comparator_type(KindComparator())
-        .add_comparator_type(ColumnNamesEmbeddingsComparator())
+        ComparatorByType()
+            .add_comparator_type(SizeHandler())
+            .add_comparator_type(IncompleteColumnsHandler())
+            .add_comparator_type(KindHandler())
+            .add_comparator_type(ColumnNamesEmbeddingsHandler())
     )
     if BY_COLUMN:
         return comparator_by_column.compare(metadata1, metadata2)

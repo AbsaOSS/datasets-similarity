@@ -1,4 +1,5 @@
 import logging
+import os
 
 import numpy as np
 import pandas as pd
@@ -7,7 +8,7 @@ from torch import Tensor
 from src.models.constants import warning_enable
 
 
-def concat(self, *data_frames: pd.DataFrame) -> pd.DataFrame:
+def concat(*data_frames: pd.DataFrame) -> pd.DataFrame:
     """
     Concat all dataframes together, compute avg for each cell
     :param data_frames: array of dataframes
@@ -74,3 +75,35 @@ def are_columns_null(column1: set, column2: set, message: str) -> tuple[bool, fl
             logging.info(f"Warning: {message} is not present in one of the dataframes.")
         return True, 1
     return False, 0
+
+def load__csv_files_from_folder(folder: str) -> tuple[list[pd.DataFrame], list[str]]:
+    """
+    it loads cvs files from folder and returns list of loaded dataframe and list of names
+    :param folder: from which we load the files
+    :return: two lists
+    """
+    data = []
+    names = []
+    for file in os.listdir(folder):
+        if file.endswith(".csv"):
+            data.append(pd.read_csv(folder + "/" + file))
+            names.append(file.replace(".csv", ""))
+    return data, names
+
+
+def create_string_from_columns(database: list[pd.DataFrame], table_names: list[str]) -> tuple[list[str], list[str]]:
+    """
+    For each column in each table in database it creates string from that column.
+    :param database: all tables
+    :param table_names: all names of tables
+    :return: list of strings representing column, list of string of the
+             same length representing names of table for each column
+    """
+    sentences = []
+    sentences_datasets = []
+    for table, name in zip(database, table_names):
+        for column in table.columns:
+            sentences.append(str(table[column].tolist()).replace("'", "").replace("]", "").replace("[", ""))  # column to string
+            sentences_datasets.append(name)
+    return sentences, sentences_datasets
+

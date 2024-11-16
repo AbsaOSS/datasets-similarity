@@ -13,10 +13,10 @@ from sentence_transformers import (
     SentenceTransformer,
 )
 
-from column2Vec.impl.functions import (
+from column2vec.src.functions import (
     get_nonnumerical_data,
 )
-from column2Vec.impl.Column2Vec import (
+from column2vec.src.column2vec import (
     column2vec_as_sentence,
     column2vec_as_sentence_clean,
     column2vec_as_sentence_clean_uniq,
@@ -27,7 +27,7 @@ from column2Vec.impl.Column2Vec import (
     cache,
 )
 
-from column2Vec.research.generate_report import (
+from column2vec.research.generate_report import (
     generate_time_report,
     generate_sim_report,
     generate_stability_report,

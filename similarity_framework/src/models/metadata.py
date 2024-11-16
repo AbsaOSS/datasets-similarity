@@ -10,7 +10,7 @@ from typing import Generator, Optional, Any, List
 from pandas import Series
 from torch import Tensor
 
-from similarity.Types import (
+from src.models.types_ import (
     DataKind,
     Type,
     COMPUTER_GENERATED,
@@ -56,45 +56,76 @@ class CategoricalMetadata:
         self.category_embedding = category_embedding
         # self.categories_embeddings = categories_embeddings
 
-
 class KindMetadata:
-    """
-    Metadata for kind
-    value: for BOOL tuple and CONSTANT one value
-    distribution: for BOOL
-    longest: for ID
-    shortest: for ID
-    nulls: for BOOL, CONSTANT, ID
-    ratio_max_length = for ID (max value)/(size column)
+    pass
 
-    todo format (uuid, rodc, visa/mastercard ...)
+class BoolMetadata(KindMetadata):
+    """
+    Metadata for boolean columns
     """
 
     def __init__(
         self,
-        value: Optional[tuple],
-        distribution: Optional[tuple[int, ...]],
-        longest: Optional[Any],
-        shortest: Optional[Any],
+        value: tuple,
+        distribution: tuple[int, ...],
         null_values: Optional[bool],
-        ratio_max_length: Optional[float],
         model,
     ):
-        self.kind_metadata = None
-        self.value = value
-        self.value_embeddings = None if value is None or value[0] is not str else model.encode(list(value))
         self.distribution = distribution
+        self.nulls = null_values
+        self.value = value
+        self.value_embeddings = None if value[0] is not str else model.encode(list(value))
+
+    def __str__(self):
+        return (
+            f"BoolMetadata(values={self.value},distribution={self.distribution}, null_values={self.nulls})"
+        )
+
+class IDMetadata(KindMetadata):
+    """
+    Metadata for ID columns
+    """
+
+    def __init__(
+        self,
+        longest: Any,
+        shortest: Any,
+        null_values: Optional[bool],
+        ratio_max_length: float,
+        model,
+    ):
+        self.nulls = null_values
         self.longest = longest
         self.shortest = shortest
-        self.longest_embeddings = None if value is None or value[0] is not str else model.encode(longest)
-        self.shortest_embeddings = None if value is None or value[0] is not str else model.encode(shortest)
-        self.nulls = null_values
+        self.longest_embeddings = None if longest[0] is not str else model.encode(longest)
+        self.shortest_embeddings = None if shortest[0] is not str else model.encode(shortest)
         self.ratio_max_length = ratio_max_length
 
     def __str__(self):
         return (
-            f"KindMetadata(value={self.value}, distribution={self.distribution}, longest={self.longest},"
-            f" shortest={self.shortest}, null_values={self.nulls}, ratio_max_length={self.ratio_max_length})"
+            f"IDMetadata(null_values={self.nulls},"
+            f" longest={self.longest}, shortest={self.shortest}, ratio_max_length={self.ratio_max_length})")
+
+class ConstantMetadata(KindMetadata):
+    """
+    Metadata for constant columns
+    """
+
+    def __init__(
+        self,
+        value: tuple,
+        distribution: Optional[tuple[int, ...]],
+        null_values: Optional[bool],
+        model,
+    ):
+        self.nulls = null_values
+        self.value = value
+        self.distribution = distribution
+        self.value_embeddings = None if value[0] is not str else model.encode(list(value))
+
+    def __str__(self):
+        return (
+            f"ConstantMetadata(values={self.value}, null_values={self.nulls}, distribution={self.distribution})"
         )
 
 
@@ -149,7 +180,7 @@ class NumericalMetadata:
         )
 
 
-class DataFrameMetadata:
+class Metadata:
     """
     Metadata for Table
     """
@@ -160,10 +191,9 @@ class DataFrameMetadata:
         self.column_names: list[str] = []
         self.column_names_clean: dict[str, str] = defaultdict()
         self.column_incomplete: dict[str, bool] = defaultdict()
-        self.correlated_columns = set()  # todo
 
         # compute_*_type
-        self.type_column: dict[type[Type], set[str]] = defaultdict(set)
+        self.column_type: dict[type[Type], set[str]] = defaultdict(set)
         self.numerical_metadata: dict[str, NumericalMetadata] = defaultdict()
         self.nonnumerical_metadata: dict[str, NonnumericalMetadata] = defaultdict()
 
@@ -178,23 +208,9 @@ class DataFrameMetadata:
         # create_column_embeddings
         self.column_embeddings = {}
 
-    def get_column_type(self, name: str) -> type[Type] | None:
-        """
-        Get column type by column name
-        """
-        for column_type, columns in self.type_column.items():
-            if name in columns:
-                return column_type
-        return None
+        # compute correlated columns
+        self.correlated_columns = set()  # todo
 
-    def get_column_kind(self, name: str) -> DataKind | None:
-        """
-        Get column kind by column name
-        """
-        for column_kind, columns in self.column_kind.items():
-            if name in columns:
-                return column_kind
-        return None
 
     def get_column_names_by_kind(self, *kinds: DataKind) -> List[str]:
         """
@@ -214,7 +230,7 @@ class DataFrameMetadata:
             types.extend([WORD, ALPHABETIC, ALPHANUMERIC, ALL, SENTENCE, ARTICLE, PHRASE, MULTIPLE_VALUES])
         columns: list = []
         for t in types:
-            columns.extend(self.type_column[t])
+            columns.extend(self.column_type[t])
         return columns
 
     def get_numerical_columns_names(self):
