@@ -3,16 +3,15 @@ from abc import abstractmethod, ABC
 import pandas as pd
 
 from src.interfaces.common import DistanceFunction
-from src.interfaces.comparator.distance_functions import HausdorffDistanceMin
+from src.impl.comparator.distance_functions import HausdorffDistanceMin
 from src.models.metadata import Metadata
-from src.models.models import Settings
+from src.models.models import Settings, SimilarityOutput
 
 
 class HandlerType(ABC):
     """Abstract class for comparators"""
 
     def __init__(self, weight: int = 1):
-        # TODO:KUBA settings se musi pridat do vsech construktoru
         """
         Constructor for ComparatorType
         :param weight: weight of the comparator
@@ -55,7 +54,7 @@ class Comparator(ABC):
         self.settings.add(setting)
         return self
 
-    def compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
+    def compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         self.__pre_compare()
         return self._compare(metadata1, metadata2)
 
@@ -73,7 +72,7 @@ class Comparator(ABC):
         pass
 
     @abstractmethod
-    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
+    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         """
         Compare two tables according to previously set properties.
         """

@@ -14,16 +14,11 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 from column2vec.src.column2vec import column2vec_as_sentence
-from streamlit import dataframe
+from src.impl.types_functions import series_to_numeric, get_data_kind, get_advanced_type, get_advanced_structural_type, get_basic_type
 
 from src.models.metadata import Metadata, CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata, IDMetadata, BoolMetadata, ConstantMetadata
 from src.models.types_ import (
-    get_basic_type,
-    get_advanced_type,
-    get_advanced_structural_type,
-    get_data_kind,
     DataKind,
-    series_to_numeric,
     Type,
     NUMERICAL,
     NONNUMERICAL,
@@ -260,7 +255,6 @@ class TypeMetadataCreator(MetadataCreator):
 
     def compute_numerical_correlation(self, strong_correlation: float) -> "TypeMetadataCreator":
         """
-        todo
         Compute correlation for numerical columns and saves it to correlated_columns
         as tuple of correlation number and name of column
 
@@ -289,9 +283,7 @@ class TypeMetadataCreator(MetadataCreator):
         :return: self TypeMetadataCreator
         """
         if types is None:
-            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]  # todo
-        # sentences = []
-        # names = []
+            types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]
         for i in types:
             for column in self.metadata.column_type[i]:
                 self.metadata.column_embeddings[column] = column2vec_as_sentence(
@@ -299,14 +291,6 @@ class TypeMetadataCreator(MetadataCreator):
                     self.__get_model(),
                     column,
                 )
-        #         sentences.append(str(self.dataframe[column].tolist())
-        #                          .replace("\'", "")
-        #                          .replace("]", "")
-        #                          .replace("[", ""))  # column to string
-        #         names.append(column)
-        # column_embeddings = self.__get_model().encode(sentences)
-        # for i, name in zip(column_embeddings, names):
-        #     self.metadata.column_embeddings[name] = i
         return self
 
     # Getters

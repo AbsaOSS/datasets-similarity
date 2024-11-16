@@ -3,7 +3,6 @@ import pandas as pd
 
 from src.interfaces.common import DistanceFunction
 
-
 class HausdorffDistanceMin(DistanceFunction):
     """Hausdorff distance class"""
 

@@ -7,9 +7,9 @@ from statistics import mean
 
 from src.impl.comparator.utils import cosine_sim, are_columns_null
 from src.interfaces.comparator.comparator import HandlerType, Comparator
-from src.models.constants import warning_enable
+from src.impl.logging import warning_enable
 from src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
-from src.models.models import Settings
+from src.models.models import SimilarityOutput
 from src.models.types_ import DataKind
 
 
@@ -407,7 +407,7 @@ class ComparatorByColumn(Comparator):
         for i in self.table_comparators:
             i.settings = self.settings
 
-    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
+    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         """
         Compare two tables according to previously set properties.
         """
@@ -440,4 +440,4 @@ class ComparatorByColumn(Comparator):
         if table_distances:
             for dist in table_distances:
                 res += dist * dist
-        return np.sqrt(res)
+        return SimilarityOutput(distance = np.sqrt(res))

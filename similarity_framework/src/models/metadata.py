@@ -29,16 +29,6 @@ from src.models.types_ import (
     MULTIPLE_VALUES,
 )
 
-
-def dumps(value: list) -> list[Any] | list:
-    """
-    Convert Generator to list
-    """
-    if isinstance(value, Generator):
-        value = [val for val in value]
-    return value
-
-
 class CategoricalMetadata:
     """
     Metadata for categorical columns

@@ -11,10 +11,11 @@ from torch import Tensor
 from src.impl.comparator.utils import cosine_sim, get_ratio, concat, fill_result
 from src.interfaces.common import DistanceFunction
 from src.interfaces.comparator.comparator import HandlerType, Settings, Comparator
-from src.interfaces.comparator.distance_functions import HausdorffDistanceMin
+from src.impl.comparator.distance_functions import HausdorffDistanceMin
 from src.models.metadata import Metadata
+from src.models.models import SimilarityOutput
 from src.models.types_ import DataKind
-from src.models.constants import warning_enable
+from src.impl.logging import warning_enable
 
 
 class CategoricalHandler(HandlerType):
@@ -543,7 +544,7 @@ class ComparatorByType(Comparator):
         self.comparator_type.append(comparator)
         return self
 
-    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> float:
+    def _compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         """
         Compare two tables according to previously set properties.
         """
@@ -575,4 +576,4 @@ class ComparatorByType(Comparator):
                 result += dist * dist * ratio * weight
         if nan == len(distances):
             return 1
-        return np.sqrt(result)
+        return SimilarityOutput(distance = np.sqrt(result))

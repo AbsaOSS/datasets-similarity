@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from torch import Tensor
 
-from src.models.constants import warning_enable
+from src.impl.logging import warning_enable
 
 
 def concat(*data_frames: pd.DataFrame) -> pd.DataFrame:
@@ -75,6 +75,7 @@ def are_columns_null(column1: set, column2: set, message: str) -> tuple[bool, fl
             logging.info(f"Warning: {message} is not present in one of the dataframes.")
         return True, 1
     return False, 0
+
 
 def load__csv_files_from_folder(folder: str) -> tuple[list[pd.DataFrame], list[str]]:
     """
