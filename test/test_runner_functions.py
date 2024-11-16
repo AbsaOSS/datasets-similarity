@@ -1,7 +1,7 @@
 import unittest
 
-from similarityRunner.functions_runner import load_files_from_list, csv_to_parquet
-from similarityRunner.models.connector_models import FileType
+from similarity_runner.functions_runner import load_files_from_list, csv_to_parquet
+from similarity_runner.models.connector_models import FileType
 
 
 class TestLoadFilesFromList(unittest.TestCase):
