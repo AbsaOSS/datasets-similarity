@@ -1,0 +1,4 @@
+- comparator_by_type.py stejne jako je comparator_by_column.py
+- vymyslet jmena misto ComparatorType, protoze to stoji za velkou ...u
+- vymyslet co bude vracet ComparatorType, protoze v by_type vraci DF a v by_column vraci float
+- 
