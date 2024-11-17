@@ -5,7 +5,7 @@ import time
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from src.column2vec import (column2vec_as_sentence, column2vec_as_sentence_clean,
+from src.column2vec.src.column2vecœ import (column2vec_as_sentence, column2vec_as_sentence_clean,
                             column2vec_as_sentence_clean_uniq, column2vec_avg,
                             column2vec_weighted_avg, column2vec_sum,
                             column2vec_weighted_sum, cache)

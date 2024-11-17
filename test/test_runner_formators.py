@@ -1,6 +1,6 @@
 import unittest
 
-from formators.jason_formater import JsonFormater
+from src.formators import JsonFormater
 
 
 class TestJsonFormater(unittest.TestCase):

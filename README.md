@@ -27,7 +27,7 @@ the main set (training) on which the program is
 tuned, and a validation set for validating the results.
 
 #### Definition of table similarity:
-![img_1.png](images/similarity_def.png)
+![img_1.png](docs/similarity_def.png)
 >Parameter **important columns** is user input.
 > 
 >Parameter **k** is also user input.
@@ -44,8 +44,8 @@ input for Comparator.
 Comparator compares metadata and it computes distance.
 We should test which one is better.
 
-1. ![img_2.png](similarity_framework/docs/pipeline1.png)
-2. ![img_3.png](similarity_framework/docs/pipeline2.png)
+1. ![img_2.png](similarity_runner/similarity_framework/docs/pipeline1.png)
+2. ![img_3.png](similarity_runner/similarity_framework/docs/pipeline2.png)
 #### Metadata creator
 MetadataCreator has:
   - **constructor** that fills fields:
@@ -102,7 +102,7 @@ of these two tables.
 ### Column2Vec
 Column2Vec is a module in which we implement word2Vec based functionality for columns. 
 It will compute embeddings for columns, so we can compare them. 
-More about this module can be found [here](column2vec/README.md).
+More about this module can be found [here](similarity_runner/similarity_framework/src/column2vec/README.md).
 ### Types and Kinds
 We have decided to split columns by type. We can compute types or kinds for each column.
 Types define the real type of column. Some you may know from programming languages (int, float, string)
@@ -118,14 +118,14 @@ Explaining some types:
 - phrase: string with more than one word
 - multiple: string that represents not atomic data or structured data
 - article: string with more than one sentence
-3. ![img.png](images/types.png)
+3. ![img.png](docs/types.png)
 Kind has only for "types" plus undefined. You can see all types on the picture 4.
 Explaining kinds:
    - As **Id** will be marked column that contains only uniq values
    - As **Bool** will be marked column that contains only two unique values
    - As **Constant** will be marked column that contains only one unique value
    - As **Categorical** will be marked column that contains categories. Number of uniq values is less than threshold % of the total number of rows. Threshold is different for small and big dataset.
-4. ![img.png](images/kind.png)
+4. ![img.png](docs/kind.png)
 ### Applicability
 - merging teams 
 - fuze of companies
@@ -133,7 +133,7 @@ Explaining kinds:
 - finding similar or different data
 ## Structure
 - **Source code** is in folder [similarity](similarity). More about similarity folder structure in [README.md](similarity/README.md)
-- **Source code for column2Vec** is in folder [column2Vec](column2vec).
+- **Source code for column2Vec** is in folder [column2Vec](similarity_runner/similarity_framework/src/column2vec).
 - **Tests** are in folder [test](test)
 - **Data** are stored in folders [**data**](data) and [**data_validation**](data_validation).
 - **Main folder** contains: folder .github, files .gitignore, CONTRIBUTING.MD, LICENSE, README.md, requirements.txt, constants.py and main.py
@@ -142,7 +142,7 @@ Explaining kinds:
 ---
 
 **column2Vec** folder contains all files for [column2Vec](#column2Vec) feature.
-More about the structure of this folder can be found [here](column2vec/README.md/#structure).
+More about the structure of this folder can be found [here](similarity_runner/similarity_framework/src/column2vec/README.md/#structure).
 
 **Datasets** for testing are stored in [**data**](data) and [**data_validation**](data_validation)
 Corresponding link, name and eventual description for each dataset is

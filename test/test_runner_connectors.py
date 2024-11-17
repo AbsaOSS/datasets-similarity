@@ -1,7 +1,7 @@
 import unittest
 
-from connectors.filesystem_connector import FilesystemConnector
-from similarity_runner.models.connector_models import FSConnectorSettings
+from src.connectors.filesystem_connector import FilesystemConnector
+from src.models import FSConnectorSettings
 
 
 class TestFileSystemConnector(unittest.TestCase):
