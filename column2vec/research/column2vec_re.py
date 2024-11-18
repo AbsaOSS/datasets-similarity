@@ -13,10 +13,10 @@ from sentence_transformers import (
     SentenceTransformer,
 )
 
-from src.functions import (
+from column2vec.src.functions import (
     get_nonnumerical_data,
 )
-from src.column2vec import (
+from column2vec.src.column2vec import (
     column2vec_as_sentence,
     column2vec_as_sentence_clean,
     column2vec_as_sentence_clean_uniq,
@@ -27,12 +27,13 @@ from src.column2vec import (
     cache,
 )
 
-from research.generate_report import (
+from column2vec.research.generate_report import (
     generate_time_report,
 )
-from config import configure
+
 from constants import warning_enable
-from similarity.Comparator import cosine_sim
+from similarity_framework.config import configure
+from similarity_framework.src.impl.comparator.comparator_by_type import cosine_sim
 
 FUNCTIONS = [
     column2vec_as_sentence,

@@ -50,7 +50,7 @@ jobs:
 
   python-tests:
     env:
-      TEST_FILES: test/test_similarity* test/test_runner* test/test_column2VecCache.py
+      TEST_FILES: tests/similarity_framework/test_similarity* tests/runner/test_runner* tests/column2vec/test_column2vec_cache.py
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:
@@ -69,9 +69,7 @@ jobs:
 
       - name: Run tests
         run: |
-          PYTHONPATH="./similarity:./similarityRunner:$PYTHONPATH" \
-           coverage run --source='similarity,column2Vec,similarityRunner' -m \
-           pytest $TEST_FILES
+           coverage run -m pytest $TEST_FILES
 
       - name: Show coverage
         run: coverage report -m --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"

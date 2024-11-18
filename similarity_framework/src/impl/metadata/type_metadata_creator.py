@@ -15,8 +15,7 @@ from sentence_transformers import SentenceTransformer
 
 from column2vec.src.column2vec import column2vec_as_sentence
 from similarity_framework.src.impl.types_functions import series_to_numeric, get_data_kind, get_advanced_type, get_advanced_structural_type, get_basic_type
-
-from similarity_framework.src.models.metadata import Metadata, CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata, IDMetadata, BoolMetadata, \
+from similarity_framework.src.models.metadata import CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata, IDMetadata, BoolMetadata, \
     ConstantMetadata, MetadataCreatorInput
 from similarity_framework.src.models.types_ import (
     DataKind,
@@ -61,22 +60,7 @@ class TypeMetadataCreator(MetadataCreator):
                             True for incomplete data and False otherwise
         """
         super().__init__(input_)
-        self.metadata = Metadata()
         self.model: Optional[SentenceTransformer] = SentenceTransformer("bert-base-nli-mean-tokens", tokenizer_kwargs={"clean_up_tokenization_spaces": True})
-        # TODO: all processing logic needs to be moved into single function - get_metadata
-        self.metadata.size = self.dataframe.shape[0]
-        self.metadata.column_names = list(self.dataframe.columns)
-        self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in self.metadata.column_names}
-
-        self.metadata.column_incomplete = {
-            name: i < self.metadata.size * 0.7
-            for i, name in zip(
-                self.dataframe.count(),
-                list(self.dataframe.columns),
-            )
-        }  # more than 30 % missing
-
-        # -----------------------------------------------------------------------------------
 
     def __normalize(self, num1: int, num2: int) -> tuple[int, int]:
         """
@@ -162,6 +146,7 @@ class TypeMetadataCreator(MetadataCreator):
         self.model = model
         return self
 
+    @MetadataCreator.buildermethod
     def compute_column_names_embeddings(
         self,
     ) -> "TypeMetadataCreator":
@@ -178,6 +163,7 @@ class TypeMetadataCreator(MetadataCreator):
             self.metadata.column_name_embeddings[name] = i
         return self
 
+    @MetadataCreator.buildermethod
     def compute_column_kind(
         self,
     ) -> "TypeMetadataCreator":
@@ -207,6 +193,7 @@ class TypeMetadataCreator(MetadataCreator):
                 )
         return self
 
+    @MetadataCreator.buildermethod
     def compute_basic_types(
         self,
     ) -> "TypeMetadataCreator":
@@ -222,6 +209,7 @@ class TypeMetadataCreator(MetadataCreator):
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
+    @MetadataCreator.buildermethod
     def compute_advanced_types(
         self,
     ) -> "TypeMetadataCreator":
@@ -237,6 +225,7 @@ class TypeMetadataCreator(MetadataCreator):
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
+    @MetadataCreator.buildermethod
     def compute_advanced_structural_types(
         self,
     ) -> "TypeMetadataCreator":
@@ -252,8 +241,7 @@ class TypeMetadataCreator(MetadataCreator):
             self.__compute_type_metadata(type_, self.dataframe[i], i)
         return self
 
-
-
+    @MetadataCreator.buildermethod
     def compute_numerical_correlation(self, strong_correlation: float) -> "TypeMetadataCreator":
         """
         Compute correlation for numerical columns and saves it to correlated_columns
@@ -272,10 +260,12 @@ class TypeMetadataCreator(MetadataCreator):
             )  # get names of rows and columns
         return self
 
+    @MetadataCreator.buildermethod
     def compute_correlation(self) -> "TypeMetadataCreator":
         self.metadata.correlated_columns = self.dataframe.corr()
         return self
 
+    @MetadataCreator.buildermethod
     def create_column_embeddings(self, types: list = None) -> "TypeMetadataCreator":
         """
         Creates embeddings for Types.STRING, Types.TEXT, Types.UNDEFINED or another types according to types parameter
@@ -315,8 +305,17 @@ class TypeMetadataCreator(MetadataCreator):
         """
         return self.dataframe[self.metadata.get_numerical_columns_names()]
 
-    def get_metadata(self) -> Metadata:
+    def _get_metadata_impl(self):
         """
         :return: created metadata
         """
-        return self.metadata
+        self.metadata.column_names = list(self.dataframe.columns)
+        self.metadata.column_names_clean = {i: re.sub("[^(0-9 |a-z).]", " ", i.lower()) for i in self.metadata.column_names}
+        self.metadata.size = self.dataframe.shape[0]
+        self.metadata.column_incomplete = {
+            name: i < self.metadata.size * 0.7
+            for i, name in zip(
+                self.dataframe.count(),
+                list(self.dataframe.columns),
+            )
+        }  # more than 30 % missing
