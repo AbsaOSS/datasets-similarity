@@ -575,5 +575,5 @@ class ComparatorByType(Comparator):
             else:
                 result += dist * dist * ratio * weight
         if nan == len(distances):
-            return 1
+            return SimilarityOutput(distance = 1)
         return SimilarityOutput(distance = np.sqrt(result))

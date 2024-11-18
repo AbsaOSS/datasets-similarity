@@ -18,12 +18,10 @@ class TestGetColumnType(unittest.TestCase):
 
         self.file = os.path.join(THIS_DIR, '../data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
-        self.metadata_creator = (TypeMetadataCreator(
-            MetadataCreatorInput(dataframe=self.data)
-        ).
+        self.metadata_creator = (TypeMetadataCreator().
                                  compute_advanced_structural_types().
                                  compute_column_kind())
-        self.metadata = self.metadata_creator.get_metadata()
+        self.metadata = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
 
     def test_get_column(self):
         column_names = self.metadata.get_numerical_columns_names()
@@ -69,8 +67,8 @@ class TestGetColumnType(unittest.TestCase):
                 'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0']}
         str_data = pd.DataFrame(data)
         str_data.float_with_nan = str_data.float_with_nan.astype(float)
-        metadata_creator = TypeMetadataCreator(MetadataCreatorInput(dataframe=str_data))
-        metadata = metadata_creator.get_metadata()
+        metadata_creator = TypeMetadataCreator()
+        metadata = metadata_creator.get_metadata(MetadataCreatorInput(dataframe=str_data))
         self.assertEqual(sum(1 for value in metadata.column_incomplete.values() if value),
                          1)  # any incomplete column
 
@@ -173,7 +171,8 @@ class TestGetColumnType(unittest.TestCase):
         self.assertIsNot(self.metadata.column_names_clean.values(), {})
         self.assertIsNot(self.metadata.column_names, {})
 
-        metadata = self.metadata_creator.compute_column_names_embeddings().create_column_embeddings().get_metadata()
+        metadata = (self.metadata_creator.compute_column_names_embeddings()
+                    .create_column_embeddings().get_metadata(MetadataCreatorInput(dataframe=self.data)))
 
         self.assertIsNot({}, metadata.column_embeddings)
         self.assertIsNot({}, metadata.column_name_embeddings)

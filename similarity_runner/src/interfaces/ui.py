@@ -24,10 +24,10 @@ class UI(abc.ABC):
 
         metadata_input: list[MetadataCreatorInput] = connector.get_data(connector_settings)
         metadata = []
+        # TODO: call specific methods on connector based on analysis settings
+        TypeMetadataCreator().compute_advanced_structural_types()
         for i in metadata_input:
             metadata.append(
-                # TODO: call specific methods on connector based on analysis settings
-                TypeMetadataCreator(i)
                     .compute_basic_types()
                     .get_metadata()
             )

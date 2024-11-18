@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Optional
+
+import pandas as pd
 
 from similarity_framework.src.models.metadata import Metadata, MetadataCreatorInput
 
@@ -11,32 +14,38 @@ class MetadataCreator(ABC):
         args: tuple
         kwargs: dict
 
+        def __hash__(self):
+            return hash(self.func) + hash(self.args) + hash(str(self.kwargs))
+
     @staticmethod
     def buildermethod(func):
         def inner1(*args, **kwargs):
             if not args[0].create:
-                args[0].functions_to_run.append(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
+                args[0].__dict__['_MetadataCreator__functions_to_run'].add(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
                 return args[0]
             else:
                 func(*args, **kwargs)
                 return args[0]
         return inner1
 
-    def __init__(self, input_: MetadataCreatorInput):
-        self.dataframe = input_.dataframe
-        self.functions_to_run = list()
+    def __init__(self):
+        self.dataframe: Optional[pd.DataFrame] = None
+        self.__functions_to_run = set()
         self.create = False
-        self.metadata = Metadata()
+        self.metadata: Optional[Metadata] = None
 
     @abstractmethod
     def _get_metadata_impl(self):
         pass
 
-    def get_metadata(self) -> Metadata:
+    def get_metadata(self, input_: MetadataCreatorInput) -> Metadata:
+        self.dataframe = input_.dataframe
+        self.metadata = Metadata()
+
         self._get_metadata_impl()
         self.create = True
-        for fun in self.functions_to_run:
+        for fun in self.__functions_to_run:
             fun.func(*fun.args, **fun.kwargs)
-        self.functions_to_run = set()
-        self.functions_to_run = list()
+        self.__functions_to_run = set()
+        self.create = False
         return self.metadata
