@@ -7,6 +7,7 @@ from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMet
 from similarity_framework.src.interfaces.comparator.comparator import Comparator
 from similarity_framework.src.interfaces.metadata.MetadataCreator import MetadataCreator
 from similarity_framework.src.models.metadata import MetadataCreatorInput
+from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_runner.src.interfaces.connector import ConnectorInterface
 from similarity_framework.src.models.analysis import AnalysisSettings
 from similarity_runner.src.models.connectors import ConnectorSettings, FSConnectorSettings, FileType
@@ -21,28 +22,11 @@ class UI(abc.ABC):
 
     @abc.abstractmethod
     def _parse_input(self, data: Any) -> tuple[list[MetadataCreatorInput], Comparator, MetadataCreator, AnalysisSettings]:
-        # TODO: parse user input and return connector, connector_settings, comparator, analysis_settings
-        analysis_settings: AnalysisSettings = AnalysisSettings()
+        pass
 
-        match data.comparator:
-            case "by_column":
-                comparator = ComparatorByColumn.from_settings(analysis_settings)
-            case "by_type":
-                comparator = ComparatorByType.from_settings(analysis_settings)
-            case _:
-                raise ValueError("Invalid comparator")
-        match data.metadata_creator:
-            case "type":
-                metadata_creator = TypeMetadataCreator.from_settings(analysis_settings)
-            case _:
-                raise ValueError("Invalid metadata creator")
-
-        connector_settings = FSConnectorSettings(filetypes=data.filetypes, directory_paths=data.directory_paths)
-
-        return (FilesystemConnector().get_data(connector_settings),
-                comparator,
-                metadata_creator,
-                analysis_settings)
+    @abc.abstractmethod
+    def show(self, result: list[SimilarityOutput], settings: AnalysisSettings):
+        pass
 
 
     def run(self):
@@ -58,4 +42,4 @@ class UI(abc.ABC):
             for second in metadata:
                 result.append(comparator.compare(first, second))
         # TODO: based on analysis settings get specified metadata objects
-        print("Result: ", result)
+        self.show(result, analysis_settings)
