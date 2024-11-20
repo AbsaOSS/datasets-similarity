@@ -11,6 +11,7 @@ from similarity_framework.src.impl.logging import warning_enable
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_framework.src.models.types_ import DataKind
+from similarity_framework.src.models.analysis import AnalysisSettings
 
 
 class BasicHandler(HandlerType):
@@ -369,11 +370,29 @@ class ColumnKindHandler(SpecificColumnHandler):
             return are_nulls[1]
         return np.nan
 
+## TODO Type
 
 class ComparatorByColumn(Comparator):
     """
     Comparator for comparing two tables
     """
+
+    @staticmethod
+    def from_settings(settings: AnalysisSettings) -> "ComparatorByColumn":
+        comparator = ComparatorByColumn()
+        if settings.size:
+            comparator.add_comparator_type(SizeHandler(settings.weights.size))
+        if settings.incomplete_columns:
+            comparator.add_comparator_type(IncompleteColumnsHandler(settings.weights.incomplete_columns))
+        if settings.exact_names:
+            comparator.add_comparator_type(ColumnExactNamesHandler(settings.weights.exact_names))
+        if settings.column_name_embeddings:
+            comparator.add_comparator_type(ColumnNamesEmbeddingsHandler(settings.weights.column_name_embeddings))
+        if settings.column_embeddings:
+            comparator.add_comparator_type(ColumnEmbeddingsHandler(settings.weights.column_embeddings))
+        if settings.kinds:
+            comparator.add_comparator_type(ColumnKindHandler(settings.weights.kinds))
+        return comparator
 
     def __init__(self):
         """

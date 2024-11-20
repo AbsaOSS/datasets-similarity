@@ -6,6 +6,7 @@ from similarity_framework.src.interfaces.common import DistanceFunction
 from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin
 from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import Settings, SimilarityOutput
+from similarity_framework.src.models.analysis import AnalysisSettings
 
 
 class HandlerType(ABC):
@@ -69,6 +70,11 @@ class Comparator(ABC):
 
     @abstractmethod
     def add_comparator_type(self, comparator: HandlerType) -> "Comparator":
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def from_settings(settings: AnalysisSettings) -> "Comparator":
         pass
 
     @abstractmethod

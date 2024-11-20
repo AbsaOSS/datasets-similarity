@@ -4,6 +4,7 @@ from typing import Optional
 
 import pandas as pd
 
+from similarity_framework.src.models.analysis import AnalysisSettings
 from similarity_framework.src.models.metadata import Metadata, MetadataCreatorInput
 
 
@@ -49,3 +50,8 @@ class MetadataCreator(ABC):
         self.__functions_to_run = set()
         self.create = False
         return self.metadata
+
+    @staticmethod
+    @abstractmethod
+    def from_settings(settings: AnalysisSettings) -> "MetadataCreator":
+        pass

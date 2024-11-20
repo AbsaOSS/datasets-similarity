@@ -16,6 +16,7 @@ from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import SimilarityOutput, Settings
 from similarity_framework.src.models.types_ import DataKind
 from similarity_framework.src.impl.logging import warning_enable
+from similarity_framework.src.models.analysis import AnalysisSettings
 
 
 class CategoricalHandler(HandlerType):
@@ -92,6 +93,7 @@ class CategoricalHandler(HandlerType):
         # todo p value or correlation
         return concat(result, name_distance)
 
+## TODO Kind, Type
 
 class CategoricalHandlerSimilar(CategoricalHandler):
     """
@@ -537,6 +539,24 @@ class ComparatorByType(Comparator):
     """
     Comparator for comparing two tables by type
     """
+
+    @staticmethod
+    def from_settings(settings: AnalysisSettings) -> "ComparatorByType":
+        comparator = ComparatorByType()
+        if settings.size:
+            comparator.add_comparator_type(SizeHandler(settings.weights.size))
+        if settings.incomplete_columns:
+            comparator.add_comparator_type(IncompleteColumnsHandler(settings.weights.incomplete_columns))
+        if settings.exact_names:
+            comparator.add_comparator_type(ColumnExactNamesHandler(settings.weights.exact_names))
+        if settings.column_name_embeddings:
+            comparator.add_comparator_type(ColumnNamesEmbeddingsHandler(settings.weights.column_name_embeddings))
+        if settings.column_embeddings:
+            comparator.add_comparator_type(ColumnEmbeddingHandler(settings.weights.column_embeddings))
+        if settings.kinds:
+            comparator.add_comparator_type(CategoricalHandler(settings.weights.kinds))
+        return comparator
+
     def add_comparator_type(self, comparator: HandlerType) -> "ComparatorByType":
         """
         Add comparator
