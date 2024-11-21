@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
 
 @dataclass
 class WeightSettings:
@@ -24,4 +25,4 @@ class AnalysisSettings:
     incomplete_columns: bool = False,
     exact_names: bool = False
 
-    weights: WeightSettings = WeightSettings()
+    weights: WeightSettings = field(default_factory=WeightSettings)

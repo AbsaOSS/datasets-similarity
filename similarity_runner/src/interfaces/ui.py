@@ -1,4 +1,5 @@
 import abc
+import sys
 from typing import Any
 
 from similarity_framework.src.impl.comparator.comparator_by_column import ComparatorByColumn
@@ -18,7 +19,6 @@ class UI(abc.ABC):
     @abc.abstractmethod
     def _load_user_input(self) -> Any:
         pass
-
 
     @abc.abstractmethod
     def _parse_input(self, data: Any) -> tuple[list[MetadataCreatorInput], Comparator, MetadataCreator, AnalysisSettings]:

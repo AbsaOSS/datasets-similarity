@@ -1,4 +1,5 @@
 import abc
+import argparse
 from typing import Any
 
 from similarity_framework.src.impl.comparator.comparator_by_column import ComparatorByColumn
@@ -8,7 +9,6 @@ from similarity_framework.src.interfaces.comparator.comparator import Comparator
 from similarity_framework.src.interfaces.metadata.MetadataCreator import MetadataCreator
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_framework.src.models.similarity import SimilarityOutput
-from similarity_runner.src.interfaces.connector import ConnectorInterface
 from similarity_framework.src.models.analysis import AnalysisSettings
 from similarity_runner.src.interfaces.ui import UI
 from similarity_runner.src.models.connectors import ConnectorSettings, FSConnectorSettings, FileType
@@ -16,12 +16,30 @@ from similarity_runner.src.impl.filesystem_connector import FilesystemConnector
 
 
 class CLI(UI):
+
+    REGISTERED_CONNECTORS = {FilesystemConnector, }
+
     def show(self, result: list[SimilarityOutput], settings: AnalysisSettings):
         pass
 
     def _load_user_input(self) -> Any:
-        pass
+        parser = argparse.ArgumentParser(
+            prog='SimilarityRunner CLI',
+            description='This is a CLI for interaction with similarity-framework, which is a framework for comparing data',
+        )
 
+        parser.add_argument("-c", "--config", required=False, default="config")
+
+        for connector in self.REGISTERED_CONNECTORS:
+            for field, description in connector.get_settings_class().required_fields():
+                parser.add_argument(f"--{field}", help=f"[{connector.__name__}] {description}", required=False)
+            parser.add_argument(f"--{connector.__name__}", help=f"Use {connector.__name__} connector", action="store_true")
+
+        res = parser.parse_args()
+
+
+
+        return res
 
     def _parse_input(self, data: Any) -> tuple[list[MetadataCreatorInput], Comparator, MetadataCreator, AnalysisSettings]:
         # TODO: parse user input and return connector, connector_settings, comparator, analysis_settings

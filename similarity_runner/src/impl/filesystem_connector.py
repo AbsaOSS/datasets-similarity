@@ -3,13 +3,13 @@ This file contains filesystem connector implementation
 """
 
 import os
-from typing import Iterable
+from typing import Iterable, ClassVar
 
 import pandas as pd
 
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_runner.src.interfaces.connector import ConnectorInterface
-from similarity_runner.src.models.connectors import FSConnectorSettings, FileType
+from similarity_runner.src.models.connectors import FSConnectorSettings, FileType, ConnectorSettings
 
 
 class FilesystemConnector(ConnectorInterface):
@@ -17,6 +17,14 @@ class FilesystemConnector(ConnectorInterface):
     FilesystemConnector class is a class that implements ConnectorInterface.
     It is used to load data from filesystem
     """
+
+    @staticmethod
+    def get_settings_class() -> type[FSConnectorSettings]:
+        return FSConnectorSettings
+
+    @staticmethod
+    def get_name():
+        return "filesystem"
 
     def __load_files_from_list(self, files: list[str], file_types: Iterable[FileType] = (FileType.CSV,)) -> list[MetadataCreatorInput]:
         """
