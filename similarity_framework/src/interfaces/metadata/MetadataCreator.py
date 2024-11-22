@@ -4,7 +4,7 @@ from typing import Optional
 
 import pandas as pd
 
-from similarity_framework.src.models.analysis import AnalysisSettings
+from similarity_framework.src.models.settings import AnalysisSettings
 from similarity_framework.src.models.metadata import Metadata, MetadataCreatorInput
 
 

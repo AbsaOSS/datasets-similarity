@@ -6,7 +6,7 @@ from similarity_framework.src.interfaces.common import DistanceFunction
 from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin
 from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import Settings, SimilarityOutput
-from similarity_framework.src.models.analysis import AnalysisSettings
+from similarity_framework.src.models.settings import AnalysisSettings
 
 
 class HandlerType(ABC):

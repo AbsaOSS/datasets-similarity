@@ -15,7 +15,7 @@ from sentence_transformers import SentenceTransformer
 
 from column2vec.src.column2vec import column2vec_as_sentence
 from similarity_framework.src.impl.types_functions import series_to_numeric, get_data_kind, get_advanced_type, get_advanced_structural_type, get_basic_type
-from similarity_framework.src.models.analysis import AnalysisSettings
+from similarity_framework.src.models.settings import AnalysisSettings
 from similarity_framework.src.models.metadata import CategoricalMetadata, KindMetadata, NumericalMetadata, NonnumericalMetadata, IDMetadata, BoolMetadata, \
     ConstantMetadata, MetadataCreatorInput
 from similarity_framework.src.models.types_ import (

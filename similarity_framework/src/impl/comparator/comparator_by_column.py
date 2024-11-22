@@ -11,7 +11,7 @@ from similarity_framework.src.impl.logging import warning_enable
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_framework.src.models.types_ import DataKind
-from similarity_framework.src.models.analysis import AnalysisSettings
+from similarity_framework.src.models.settings import AnalysisSettings
 
 
 class BasicHandler(HandlerType):
