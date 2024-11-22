@@ -1,14 +1,11 @@
-import abc
 import argparse
-from pathlib import Path
-from pprint import pprint
 from typing import Any
 
 from similarity_framework.src.impl.comparator.comparator_by_column import ComparatorByColumn
 from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
 from similarity_framework.src.interfaces.comparator.comparator import Comparator
-from similarity_framework.src.interfaces.metadata.MetadataCreator import MetadataCreator
+from similarity_framework.src.interfaces.metadata.metadata_creator import MetadataCreator
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_framework.src.models.settings import AnalysisSettings, Settings
@@ -18,18 +15,25 @@ from similarity_runner.src.impl.filesystem_connector import FilesystemConnector
 
 class CLI(UI):
 
-    REGISTERED_CONNECTORS = {FilesystemConnector, }
+    REGISTERED_CONNECTORS = {
+        FilesystemConnector,
+    }
 
     def show(self, result: list[SimilarityOutput], settings: AnalysisSettings):
         pass
 
     def _load_user_input(self) -> Any:
         parser = argparse.ArgumentParser(
-            prog='SimilarityRunner CLI',
-            description='This is a CLI for interaction with similarity-framework, which is a framework for comparing data',
+            prog="SimilarityRunner CLI",
+            description="This is a CLI for interaction with similarity-framework, which is a framework for comparing data",
         )
         parser.add_argument("-c", "--config", required=False, default=".config")
-        subparsers = parser.add_subparsers(title="Connectors", description=f"Available connectors: {', '.join([item.get_name() for item in self.REGISTERED_CONNECTORS])}", dest="connector", required=True)
+        subparsers = parser.add_subparsers(
+            title="Connectors",
+            description=f"Available connectors: {', '.join([item.get_name() for item in self.REGISTERED_CONNECTORS])}",
+            dest="connector",
+            required=True,
+        )
 
         for connector in self.REGISTERED_CONNECTORS:
             connector_parser = subparsers.add_parser(connector.get_name(), help=f"{connector.get_name().capitalize()} connector")
@@ -64,7 +68,4 @@ class CLI(UI):
             case _:
                 raise ValueError("Invalid metadata creator")
 
-        return (connector.get_data(connector_settings),
-                comparator,
-                metadata_creator,
-                settings.analysis_settings)
+        return (connector.get_data(connector_settings), comparator, metadata_creator, settings.analysis_settings)

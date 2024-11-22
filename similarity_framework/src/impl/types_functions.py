@@ -3,15 +3,30 @@ This files contains all functions for types
 """
 
 import re
-from enum import Enum
 from typing import Any
 from dateutil.parser import parse, ParserError
 
 import numpy as np
 import pandas as pd
 
-from similarity_framework.src.models.types_ import DataKind, NUMERICAL, NONNUMERICAL, INT, HUMAN_GENERATED, COMPUTER_GENERATED, DATE, ALPHABETIC, ALPHANUMERIC, ALL, MULTIPLE_VALUES, \
-    SENTENCE, PHRASE, ARTICLE, UNDEFINED, FLOAT
+from similarity_framework.src.models.types_ import (
+    DataKind,
+    NUMERICAL,
+    NONNUMERICAL,
+    INT,
+    HUMAN_GENERATED,
+    COMPUTER_GENERATED,
+    DATE,
+    ALPHABETIC,
+    ALPHANUMERIC,
+    ALL,
+    MULTIPLE_VALUES,
+    SENTENCE,
+    PHRASE,
+    ARTICLE,
+    UNDEFINED,
+    FLOAT,
+)
 
 
 class TypeSettings:
@@ -35,6 +50,7 @@ class TypeSettings:
     categorical_small_dataset = 50
 
     computer_generated_threshold = 3
+
 
 def is_id(column: pd.Series) -> bool:
     """
@@ -369,7 +385,6 @@ def get_data_kind(
     if is_categorical(column):
         return DataKind.CATEGORICAL
     return DataKind.UNDEFINED
-
 
 
 def get_basic_type(column: pd.Series) -> Any:

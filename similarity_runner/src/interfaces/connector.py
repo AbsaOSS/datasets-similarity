@@ -1,5 +1,5 @@
 import abc
-from typing import Any, ClassVar
+from typing import Any
 
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_runner.src.models.connectors import ConnectorSettings
@@ -40,7 +40,6 @@ class ConnectorInterface(abc.ABC):
 
     def close(self):
         """Close the connection"""
-        pass
 
     def get_data(self, settings: ConnectorSettings) -> list[MetadataCreatorInput]:
         """Get formated data from the loaded data source

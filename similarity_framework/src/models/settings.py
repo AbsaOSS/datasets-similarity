@@ -10,6 +10,7 @@ class WeightSettings(BaseModel):
     incomplete_columns: int = Field(1, description="Weight for incomplete columns")
     exact_names: int = Field(1, description="Weight for exact names")
 
+
 class AnalysisSettings(BaseSettings):
     weights: WeightSettings = Field(default_factory=WeightSettings)
 
@@ -26,12 +27,13 @@ class AnalysisSettings(BaseSettings):
     incomplete_columns: bool = Field(default=False, description="Use incomplete columns for comparison")
     exact_names: bool = Field(default=False, description="Use exact names for comparison")
 
+
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_nested_delimiter='__')
+    model_config = SettingsConfigDict(env_nested_delimiter="__")
 
     analysis_settings: AnalysisSettings = Field(default_factory=AnalysisSettings)
-    comparator: str = Field(validation_alias=AliasChoices('by_column', 'by_type'), default='by_type')
-    metadata_creator: str = Field(validation_alias=AliasChoices('type'), default='type')
+    comparator: str = Field(validation_alias=AliasChoices("by_column", "by_type"), default="by_type")
+    metadata_creator: str = Field(validation_alias=AliasChoices("type"), default="type")
 
     @staticmethod
     def load(filepath: str):

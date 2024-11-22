@@ -11,9 +11,13 @@ import logging
 from similarity_framework.config import configure
 from constants import warning_enable
 from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType, IncompleteColumnsHandler, ColumnNamesEmbeddingsHandler
-from similarity_framework.src.impl.comparator.comparator_by_column import (ComparatorByColumn, IncompleteColumnsHandler as IncompleteColumnsComparatorByColumn,
-                                                      ColumnNamesEmbeddingsHandler as ColumnNamesEmbeddingsComparatorByColumn)
+from similarity_framework.src.impl.comparator.comparator_by_column import (
+    ComparatorByColumn,
+    IncompleteColumnsHandler as IncompleteColumnsComparatorByColumn,
+    ColumnNamesEmbeddingsHandler as ColumnNamesEmbeddingsComparatorByColumn,
+)
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
+
 BY_COLUMN = True
 configure()
 
@@ -40,17 +44,16 @@ def compare_datasets(path1, path2):
     metadata2 = create_metadata(data2)
     comparator_by_column = (
         ComparatorByColumn()
-            # .add_comparator_type(SizeComparatorByColumn())
-            .add_comparator_type(IncompleteColumnsComparatorByColumn())
-            .add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
-            # .add_comparator_type(ColumnKindHandler())
+        # .add_comparator_type(SizeComparatorByColumn())
+        .add_comparator_type(IncompleteColumnsComparatorByColumn()).add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
+        # .add_comparator_type(ColumnKindHandler())
     )
     compartor = (
         ComparatorByType()
-            # .add_comparator_type(SizeHandler())
-            .add_comparator_type(IncompleteColumnsHandler())
-            # .add_comparator_type(KindHandler())
-            .add_comparator_type(ColumnNamesEmbeddingsHandler())
+        # .add_comparator_type(SizeHandler())
+        .add_comparator_type(IncompleteColumnsHandler())
+        # .add_comparator_type(KindHandler())
+        .add_comparator_type(ColumnNamesEmbeddingsHandler())
     )
     if BY_COLUMN:
         return comparator_by_column.compare(metadata1, metadata2)
@@ -71,12 +74,11 @@ def comapre_two(path1, path2):
     ).distance
     logging.info(f"'{path1}' |< >| '{path2}' = {distance}\n")
 
+
 if __name__ == "__main__":
     configure()
     warning_enable.change_status(False)
     warning_enable.disable_timezone_warn()
-
-
 
     files = sys.argv[1:]
     logging.info(files)

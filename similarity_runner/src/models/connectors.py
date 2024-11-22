@@ -3,8 +3,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Iterable
 
-from similarity_runner_old.src.models.connector_models import FileType
 
+class FileType(str, Enum):
+    CSV = "csv"
+    PARQUET = "parquet"
 
 class ConnectorSettings:
     @staticmethod
@@ -18,15 +20,15 @@ class FSConnectorSettings(ConnectorSettings):
     """
     ConnectorSettings class is a base class for connector settings.
     """
+
     filetypes: Iterable[FileType]
-    files_paths: list[str] = field(default_factory=lambda: list())
-    directory_paths: list[str] = field(default_factory=lambda: list())
+    files_paths: list[str] = field(default_factory=lambda: [])
+    directory_paths: list[str] = field(default_factory=lambda: [])
 
     def __init__(self, filetypes: str, files_paths: str, directory_paths: str, **_):
         self.filetypes = [FileType(item) for item in filetypes.split(",")]
         self.files_paths = files_paths.split(",")
         self.directory_paths = directory_paths.split(",")
-
 
     @staticmethod
     def required_fields() -> list[tuple[str, str]]:

@@ -31,6 +31,7 @@ from similarity_framework.src.models.types_ import (
     MULTIPLE_VALUES,
 )
 
+
 class CategoricalMetadata:
     """
     Metadata for categorical columns
@@ -48,8 +49,10 @@ class CategoricalMetadata:
         self.category_embedding = category_embedding
         # self.categories_embeddings = categories_embeddings
 
+
 class KindMetadata:
     pass
+
 
 class BoolMetadata(KindMetadata):
     """
@@ -69,9 +72,8 @@ class BoolMetadata(KindMetadata):
         self.value_embeddings = None if value[0] is not str else model.encode(list(value))
 
     def __str__(self):
-        return (
-            f"BoolMetadata(values={self.value},distribution={self.distribution}, null_values={self.nulls})"
-        )
+        return f"BoolMetadata(values={self.value},distribution={self.distribution}, null_values={self.nulls})"
+
 
 class IDMetadata(KindMetadata):
     """
@@ -94,9 +96,8 @@ class IDMetadata(KindMetadata):
         self.ratio_max_length = ratio_max_length
 
     def __str__(self):
-        return (
-            f"IDMetadata(null_values={self.nulls},"
-            f" longest={self.longest}, shortest={self.shortest}, ratio_max_length={self.ratio_max_length})")
+        return f"IDMetadata(null_values={self.nulls}," f" longest={self.longest}, shortest={self.shortest}, ratio_max_length={self.ratio_max_length})"
+
 
 class ConstantMetadata(KindMetadata):
     """
@@ -116,9 +117,7 @@ class ConstantMetadata(KindMetadata):
         self.value_embeddings = None if value[0] is not str else model.encode(list(value))
 
     def __str__(self):
-        return (
-            f"ConstantMetadata(values={self.value}, null_values={self.nulls}, distribution={self.distribution})"
-        )
+        return f"ConstantMetadata(values={self.value}, null_values={self.nulls}, distribution={self.distribution})"
 
 
 class NonnumericalMetadata:
@@ -202,7 +201,6 @@ class Metadata:
 
         # compute correlated columns
         self.correlated_columns = set()  # todo
-
 
     def get_column_names_by_kind(self, *kinds: DataKind) -> List[str]:
         """

@@ -39,6 +39,4 @@ class WarningEnable:
         return self.__timezone
 
 
-
-
 warning_enable = WarningEnable()

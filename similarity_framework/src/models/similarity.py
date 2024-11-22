@@ -3,6 +3,7 @@ from enum import Enum
 
 from similarity_framework.src.models.metadata import Metadata
 
+
 @dataclass
 class SimilarityConfiguration:
     ...
@@ -13,6 +14,7 @@ class SimilarityConfiguration:
 class SimilarityOutput:
     distance: float
     # TODO: Thesis add other proper fields
+
 
 @dataclass
 class SimilarityInput:

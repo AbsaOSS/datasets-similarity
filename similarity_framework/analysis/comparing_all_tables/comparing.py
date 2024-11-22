@@ -7,8 +7,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from similarity.DataFrameMetadata import DataFrameMetadata
-
+from similarity_framework.src.models.metadata import Metadata
 
 @dataclasses.dataclass
 class CategoricalSimilarity:
@@ -124,7 +123,7 @@ class ComparatorForDatasets:
     # {name: DataFrameWithStat(table) for table, name in zip(database, names)}
     def __init__(
         self,
-        database: dict[str, DataFrameMetadata],
+        database: dict[str, Metadata],
     ):
         self.database = database
         self.similarity: dict[str, SimilarityData] = defaultdict()

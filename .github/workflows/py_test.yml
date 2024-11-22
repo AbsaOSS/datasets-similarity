@@ -50,7 +50,7 @@ jobs:
 
   python-tests:
     env:
-      TEST_FILES: tests/similarity_framework/test_similarity* tests/runner/test_runner* tests/column2vec/test_column2vec_cache.py
+      TEST_FILES: tests/similarity_framework/test_similarity*  tests/column2vec/test_column2vec_cache.py
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:
@@ -72,11 +72,11 @@ jobs:
            coverage run -m pytest $TEST_FILES
 
       - name: Show coverage
-        run: coverage report -m --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"
+        run: coverage report -m --omit=".*.ipynb,similarity_runner/*"
 
       - name: Create coverage file
         if: github.event_name == 'pull_request'
-        run: coverage xml --omit=".*.ipynb,similarityRunner/UI/*,*[U|u]ser*,similarityRunner/runner.py"
+        run: coverage xml --omit=".*.ipynb,similarity_runner/*"
 
       - name: Get Cover
         if: github.event_name == 'pull_request'

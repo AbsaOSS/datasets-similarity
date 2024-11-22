@@ -3,6 +3,7 @@ import pandas as pd
 
 from similarity_framework.src.interfaces.common import DistanceFunction
 
+
 class HausdorffDistanceMin(DistanceFunction):
     """Hausdorff distance class"""
 

@@ -2,7 +2,6 @@
 This files contains all types and kinds
 """
 
-import re
 from enum import Enum
 
 
@@ -16,6 +15,7 @@ class DataKind(Enum):
     CONSTANT = "constant"
     UNDEFINED = "undefined"
     CATEGORICAL = "categorical"
+
 
 class Type:
     """

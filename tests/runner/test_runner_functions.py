@@ -1,8 +1,19 @@
 import unittest
 
-from src.functions_runner import load_files_from_list, csv_to_parquet
-from src.models import FileType
+import pandas as pd
 
+from similarity_runner.src.impl.filesystem_connector import load_files_from_list
+from similarity_runner.src.models.connectors import FileType
+
+
+def csv_to_parquet(file: str, sep: str = ',') -> str:
+    """
+    Convert csv file to parquet
+    :param file: file to convert
+    """
+    df = pd.read_csv(file, sep=sep, low_memory=False)
+    df.to_parquet(file.replace(".csv", ".parquet"))
+    return file.replace(".csv", ".parquet")
 
 class TestLoadFilesFromList(unittest.TestCase):
     def test_load_csv_file(self):

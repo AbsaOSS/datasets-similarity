@@ -66,7 +66,6 @@ class Comparator(ABC):
 
     def __pre_compare_individual(self, **kwargs):
         """This method can be implemented by each implementation and will be called automatically at __pre_compare method"""
-        pass
 
     @abstractmethod
     def add_comparator_type(self, comparator: HandlerType) -> "Comparator":
@@ -82,4 +81,3 @@ class Comparator(ABC):
         """
         Compare two tables according to previously set properties.
         """
-        pass

@@ -19,11 +19,10 @@ class BasicHandler(HandlerType):
     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
         if "index1" not in kwargs or "index2" not in kwargs:
             raise RuntimeError(f"Handler didnt have sufficient arguments - index1 and index2 - {kwargs}")
-        return self._inner_compare(metadata1, metadata2, kwargs['index1'], kwargs['index2'])
+        return self._inner_compare(metadata1, metadata2, kwargs["index1"], kwargs["index2"])
 
     @abstractmethod
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> pd.DataFrame:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> pd.DataFrame:
         pass
 
 
@@ -69,8 +68,7 @@ class IncompleteColumnsHandler(GeneralColumnHandler):
     Handler for incomplete columns
     """
 
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> float:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
         Compare if two columns are complete or incomplete. If both are complete,
          or both are incomplete distance is 0, else distance is 1
@@ -88,8 +86,7 @@ class ColumnExactNamesHandler(GeneralColumnHandler):
     Handler for exact column names
     """
 
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> float:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
         Compare if two columns have the same name. If both have the same name distance is 0, else distance is 1.
         :param index2: name or id of column in metadata2
@@ -106,8 +103,7 @@ class ColumnNamesEmbeddingsHandler(GeneralColumnHandler):
     Handler for column names embeddings
     """
 
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> float:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
         Compare if two columns have similar name. Computes cosine distance for embeddings
         :param index2: name or id of column in metadata2
@@ -131,8 +127,7 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
     Handler for column values embeddings
     """
 
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> float:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
         Compare embeddings for two columns. Computes cosine distance for embeddings.
         :param index2: name or id of column in metadata2
@@ -142,10 +137,10 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
         :return: float number in range <0, 1> 0 exactly the same 1 completely different
         """
         if (
-                metadata1.column_embeddings == {}
-                or metadata2.column_embeddings == {}
-                or index1 not in metadata1.column_embeddings
-                or index2 not in metadata2.column_embeddings
+            metadata1.column_embeddings == {}
+            or metadata2.column_embeddings == {}
+            or index1 not in metadata1.column_embeddings
+            or index2 not in metadata2.column_embeddings
         ):
             if warning_enable.get_status():
                 logging.warning("Warning: column embedding is not computed")
@@ -200,9 +195,9 @@ class ColumnKindHandler(SpecificColumnHandler):
         return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
 
     def compare_bools(
-            self,
-            metadata1: KindMetadata,
-            metadata2: KindMetadata,
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
     ) -> float:
         """
         Compare two boolean columns. Compare if they have the same distribution of True and False values.
@@ -214,24 +209,22 @@ class ColumnKindHandler(SpecificColumnHandler):
         :return: float number in range <0, 1>
         """
         nulls = 0 if metadata1.nulls == metadata2.nulls else 1
-        distr = abs(
-            metadata1.distribution[0] / metadata1.distribution[1] - metadata2.distribution[0] / metadata2.distribution[
-                1])
+        distr = abs(metadata1.distribution[0] / metadata1.distribution[1] - metadata2.distribution[0] / metadata2.distribution[1])
         if metadata1.value_embeddings is None or metadata2.value_embeddings is None:
             return (nulls + distr) / 2
         return (
-                       nulls
-                       + distr
-                       + self.compute_embeddings_distance(
-                   metadata1.value_embeddings,
-                   metadata2.value_embeddings,
-               )
-               ) / 3
+            nulls
+            + distr
+            + self.compute_embeddings_distance(
+                metadata1.value_embeddings,
+                metadata2.value_embeddings,
+            )
+        ) / 3
 
     def compare_categoricals(
-            self,
-            metadata1: CategoricalMetadata,
-            metadata2: CategoricalMetadata,
+        self,
+        metadata1: CategoricalMetadata,
+        metadata2: CategoricalMetadata,
     ) -> float:
         """
         Compare two categorical columns. Compare if they contain nulls.
@@ -254,9 +247,9 @@ class ColumnKindHandler(SpecificColumnHandler):
         return (value_re + count_re) / 2
 
     def compare_constants(
-            self,
-            metadata1: KindMetadata,
-            metadata2: KindMetadata,
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
     ) -> float:
         """
         Compare two constant columns. Compare if they contain nulls.
@@ -282,9 +275,9 @@ class ColumnKindHandler(SpecificColumnHandler):
         return (nulls + value) / 2
 
     def compare_ids(
-            self,
-            metadata1: KindMetadata,
-            metadata2: KindMetadata,
+        self,
+        metadata1: KindMetadata,
+        metadata2: KindMetadata,
     ) -> float:
         """
         Compare two id columns. Compare if they contain nulls.
@@ -317,8 +310,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         ratio_max_re = abs(metadata1.ratio_max_length - metadata2.ratio_max_length)
         return (value_short_re + value_long_re + nulls_re + ratio_max_re) / 4
 
-    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str,
-                       index2: str) -> float:
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
         Compare if two columns have the same kind. If both have the same kind distance is 0, else distance is 1.
         :param index2: name or id of column in metadata2
@@ -343,34 +335,29 @@ class ColumnKindHandler(SpecificColumnHandler):
         if DataKind.BOOL in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.BOOL] and index2 in metadata2.column_kind[DataKind.BOOL]:
                 return self.compare_bools(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL],
-                                         "Boolean column")
+            are_nulls = are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL], "Boolean column")
         if DataKind.ID in self.compare_kind:
             if index1 in metadata1.column_kind[DataKind.ID] and index2 in metadata2.column_kind[DataKind.ID]:
                 return self.compare_ids(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
-            are_nulls = are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],
-                                         "ID column")
+            are_nulls = are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID column")
         if DataKind.CATEGORICAL in self.compare_kind:
-            if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[
-                DataKind.CATEGORICAL]:
-                return self.compare_categoricals(metadata1.categorical_metadata[index1],
-                                                 metadata2.categorical_metadata[index2])
-            are_nulls = are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL],
-                                         metadata2.column_kind[DataKind.CATEGORICAL], "Categorical column")
+            if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[DataKind.CATEGORICAL]:
+                return self.compare_categoricals(metadata1.categorical_metadata[index1], metadata2.categorical_metadata[index2])
+            are_nulls = are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL], "Categorical column")
 
         if DataKind.CONSTANT in self.compare_kind:
-            if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[
-                DataKind.CONSTANT]:
+            if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[DataKind.CONSTANT]:
                 return self.compare_constants(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
 
-            are_nulls = are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
-                                         metadata2.column_kind[DataKind.CONSTANT], "Constant column")
+            are_nulls = are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT], "Constant column")
 
         if are_nulls[0]:
             return are_nulls[1]
         return np.nan
 
+
 ## TODO Type
+
 
 class ComparatorByColumn(Comparator):
     """
@@ -459,4 +446,4 @@ class ComparatorByColumn(Comparator):
         if table_distances:
             for dist in table_distances:
                 res += dist * dist
-        return SimilarityOutput(distance = np.sqrt(res))
+        return SimilarityOutput(distance=np.sqrt(res))

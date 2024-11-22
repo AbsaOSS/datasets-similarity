@@ -22,11 +22,11 @@ class MetadataCreator(ABC):
     def buildermethod(func):
         def inner1(*args, **kwargs):
             if not args[0].create:
-                args[0].__dict__['_MetadataCreator__functions_to_run'].add(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
+                args[0].__dict__["_MetadataCreator__functions_to_run"].add(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
                 return args[0]
-            else:
-                func(*args, **kwargs)
-                return args[0]
+            func(*args, **kwargs)
+            return args[0]
+
         return inner1
 
     def __init__(self):
