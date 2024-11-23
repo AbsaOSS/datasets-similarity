@@ -67,7 +67,7 @@ class TestGetColumnType(unittest.TestCase):
                 'float_with_minus': ['-2.1', '-3.0', '5.0', '2.0']}
         str_data = pd.DataFrame(data)
         str_data.float_with_nan = str_data.float_with_nan.astype(float)
-        metadata_creator = TypeMetadataCreator()
+        metadata_creator = TypeMetadataCreator().compute_incomplete_column()
         metadata = metadata_creator.get_metadata(MetadataCreatorInput(dataframe=str_data))
         self.assertEqual(sum(1 for value in metadata.column_incomplete.values() if value),
                          1)  # any incomplete column

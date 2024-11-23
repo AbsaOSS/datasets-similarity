@@ -302,6 +302,9 @@ class TypeMetadataCreator(MetadataCreator):
         :param types: optional parameter for set desirable types
         :return: self TypeMetadataCreator
         """
+        if not self.metadata.column_type:
+            raise RuntimeError("Column types need to be computed before this method is called, "
+                               "use compute_basic_types, compute_advanced_types or compute_advanced_structural_types")
         if types is None:
             types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]
         for i in types:

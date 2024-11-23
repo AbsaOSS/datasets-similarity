@@ -37,8 +37,8 @@ def get_nonnumerical_data(
     for i in files:
         index += 1
         data = pd.read_csv(i)
-        metadata_creator = TypeMetadataCreator(MetadataCreatorInput(dataframe=data)).compute_advanced_structural_types().compute_column_kind()
-        metadata1 = metadata_creator.get_metadata()
+        metadata_creator = TypeMetadataCreator().compute_advanced_structural_types().compute_column_kind()
+        metadata1 = metadata_creator.get_metadata(MetadataCreatorInput(dataframe=data))
         column_names = metadata1.get_column_names_by_type(NONNUMERICAL)
         for name in column_names:
             print(f" {i} : {name}")

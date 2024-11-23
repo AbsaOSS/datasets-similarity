@@ -64,8 +64,8 @@ class TestSingleSpecificComparator(unittest.TestCase):
                                  .compute_advanced_structural_types()
                                  .compute_column_kind()
                                  .compute_advanced_structural_types()
-                                 .compute_column_kind()
-                                 .compute_incomplete_column())
+                                 .compute_incomplete_column()
+                                 .compute_column_names_embeddings())
         self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
         self.metadata_diff_column_names = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_diff_column_names))
         self.metadata_first_half = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_first_half))
@@ -104,10 +104,7 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
 
     def test_embeddings_names_compare(self):
-        self.metadata_creator.compute_column_names_embeddings()
-        self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
         self.compartor.add_comparator_type(ColumnNamesEmbeddingsHandler())
-
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.compartor.add_settings(Settings.NO_RATIO)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
@@ -163,10 +160,14 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.data_second_half.index = self.data_second_half.index - int(len(self.data) / 2)
         self.data_diff_type = self.data.copy()  # todo fill
 
-        self.metadata_creator = (TypeMetadataCreator().
-                                 compute_advanced_structural_types().
-                                 compute_column_kind()
-                                 .compute_incomplete_column())
+        self.metadata_creator = (TypeMetadataCreator()
+                                 .compute_advanced_structural_types()
+                                 .compute_column_kind()
+                                 .compute_incomplete_column()
+                                 .compute_column_kind()
+                                 .compute_column_names_embeddings()
+                                 .create_column_embeddings()
+                                )
         self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
 
         self.metadata_diff_column_names = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_diff_column_names))
@@ -207,10 +208,7 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
 
     def test_embeddings_names_compare(self):
-        self.metadata_creator.compute_column_names_embeddings()
-        self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
         self.compartor.add_comparator_type(ColumnNamesEmbeddingsHandlerByColumn())
-
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.compartor.add_settings(Settings.NO_RATIO)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
@@ -252,13 +250,11 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
 
     def test_embedding_compare(self):
-        self.metadata_creator.create_column_embeddings().compute_advanced_structural_types().compute_column_kind()
-        self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
-        self.compartor.add_comparator_type(ColumnEmbeddingsHandler())
-
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
-        self.compartor.add_settings(Settings.NO_RATIO)
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
+        comparator = ComparatorByColumn()
+        comparator.add_comparator_type(ColumnEmbeddingsHandler())
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata1).distance, 0)
+        comparator.add_settings(Settings.NO_RATIO)
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata1).distance, 0)
 
 
 if __name__ == '__main__':

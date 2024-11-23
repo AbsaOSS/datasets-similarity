@@ -15,14 +15,11 @@ class MetadataCreator(ABC):
         args: tuple
         kwargs: dict
 
-        def __hash__(self):
-            return hash(self.func) + hash(self.args) + hash(str(self.kwargs))
-
     @staticmethod
     def buildermethod(func):
         def inner1(*args, **kwargs):
             if not args[0].create:
-                args[0].__dict__["_MetadataCreator__functions_to_run"].add(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
+                args[0].__dict__["_MetadataCreator__functions_to_run"].append(MetadataCreator.__FunctionsParams(func=func, args=args, kwargs=kwargs))
                 return args[0]
             func(*args, **kwargs)
             return args[0]
@@ -31,7 +28,7 @@ class MetadataCreator(ABC):
 
     def __init__(self):
         self.dataframe: Optional[pd.DataFrame] = None
-        self.__functions_to_run = set()
+        self.__functions_to_run = list()
         self.create = False
         self.metadata: Optional[Metadata] = None
 
@@ -47,8 +44,6 @@ class MetadataCreator(ABC):
         self.create = True
         for fun in self.__functions_to_run:
             fun.func(*fun.args, **fun.kwargs)
-        self.__functions_to_run = set()
-        self.create = False
         return self.metadata
 
     @staticmethod
