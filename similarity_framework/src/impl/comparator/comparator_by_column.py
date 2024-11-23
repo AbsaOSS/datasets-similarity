@@ -7,7 +7,6 @@ from statistics import mean
 
 from similarity_framework.src.impl.comparator.utils import cosine_sim, are_columns_null
 from similarity_framework.src.interfaces.comparator.comparator import HandlerType, Comparator
-from similarity_framework.src.impl.logging import warning_enable
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_framework.src.models.types_ import DataKind, Type
@@ -113,8 +112,7 @@ class ColumnNamesEmbeddingsHandler(GeneralColumnHandler):
         :return: float number in range <0, 1> 0 exactly the same 1 completely different
         """
         if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
-            if warning_enable.get_status():
-                logging.warning("Warning: column name embedding is not computed")
+            logging.warning("Warning: column name embedding is not computed")
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_name_embeddings[index1],
@@ -142,8 +140,7 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
             or index1 not in metadata1.column_embeddings
             or index2 not in metadata2.column_embeddings
         ):
-            if warning_enable.get_status():
-                logging.warning("Warning: column embedding is not computed")
+            logging.warning("Warning: column embedding is not computed")
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_embeddings[index1],

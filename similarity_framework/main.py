@@ -9,7 +9,6 @@ import pandas as pd
 import logging
 
 from similarity_framework.config import configure
-from constants import warning_enable
 from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType, IncompleteColumnsHandler, ColumnNamesEmbeddingsHandler
 from similarity_framework.src.impl.comparator.comparator_by_column import (
     ComparatorByColumn,
@@ -77,8 +76,6 @@ def comapre_two(path1, path2):
 
 if __name__ == "__main__":
     configure()
-    warning_enable.change_status(False)
-    warning_enable.disable_timezone_warn()
 
     files = sys.argv[1:]
     logging.info(files)

@@ -16,7 +16,7 @@ from sentence_transformers import SentenceTransformer
 
 from torch import Tensor
 
-logger = logging.getLogger(__name__)
+from logging_ import logger
 
 
 class Cache:
@@ -37,11 +37,11 @@ class Cache:
         try:
             self.__cache = pd.io.parsers.read_csv(self.__file, index_col=0)
         except FileNotFoundError:
-            logger.warning("CACHE: File not found.")
+            logger.debug("CACHE: File not found.")
         except pd.errors.EmptyDataError:
-            logger.warning("CACHE: No data")
+            logger.debug("CACHE: No data")
         except pd.errors.ParserError:
-            logger.warning("CACHE: Parser error")
+            logger.debug("CACHE: Parser error")
 
     def get_cache(self, key: str, function: str) -> list | None:
         """
@@ -60,7 +60,7 @@ class Cache:
             tmp = self.__cache.loc[function, key]
             if (tmp != "nan" and tmp is not int) or (tmp is int and not math.isnan(tmp)):
                 return json.loads(tmp)  # json is faster than ast
-        print(f"NO CACHE key: {key}, function: {function}")
+        # print(f"NO CACHE key: {key}, function: {function}")
         return None
 
     def save(

@@ -1,6 +1,7 @@
 import argparse
 from typing import Any
 
+from logging_ import logger
 from similarity_framework.src.impl.comparator.comparator_by_column import ComparatorByColumn
 from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
@@ -70,5 +71,5 @@ class CLI(UI):
                 metadata_creator = TypeMetadataCreator.from_settings(settings.analysis_settings)
             case _:
                 raise ValueError("Invalid metadata creator")
-
+        logger.info(f"Using {comparator.__class__.__name__} and {metadata_creator.__class__.__name__}")
         return (connector.get_data(connector_settings), comparator, metadata_creator, settings.analysis_settings)

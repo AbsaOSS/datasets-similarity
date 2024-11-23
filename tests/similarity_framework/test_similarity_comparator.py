@@ -166,7 +166,7 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
                                  .compute_incomplete_column()
                                  .compute_column_kind()
                                  .compute_column_names_embeddings()
-                                 .create_column_embeddings()
+                                 .compute_column_embeddings()
                                 )
         self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
 

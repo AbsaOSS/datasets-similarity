@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import math
 from statistics import mean
 
@@ -8,6 +7,7 @@ import numpy as np
 import pandas as pd
 from torch import Tensor
 
+from logging_ import logger
 from similarity_framework.src.impl.comparator.utils import cosine_sim, get_ratio, concat, fill_result
 from similarity_framework.src.interfaces.common import DistanceFunction
 from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin
@@ -15,7 +15,6 @@ from similarity_framework.src.interfaces.comparator.comparator import HandlerTyp
 from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import SimilarityOutput, Settings
 from similarity_framework.src.models.types_ import DataKind
-from similarity_framework.src.impl.logging import warning_enable
 from similarity_framework.src.models.settings import AnalysisSettings
 
 
@@ -174,8 +173,8 @@ class ColumnEmbeddingHandler(HandlerType):
             ) in enumerate(metadata2.column_embeddings.items()):
                 result.loc[id1, id2] = 1 - cosine_sim(embedding1, embedding2)
                 name_distance.loc[id1, id2] = 1 - cosine_sim(
-                    metadata1.column_name_embeddings[column1],
-                    metadata2.column_name_embeddings[column2],
+                    metadata1.column_embeddings[column1],
+                    metadata2.column_embeddings[column2],
                 )
         return concat(result, name_distance)
 
@@ -211,8 +210,8 @@ class ColumnExactNamesHandler(HandlerType):
         :param metadata2: second table
         :return: dataframe fill by 0 and 1
         """
-        if (metadata1.column_names_clean == {} or metadata2.column_names_clean == {}) and warning_enable.get_status():
-            logging.warning("Warning: column_names_clean is not computed")
+        if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
+            logger.warning("Warning: column_names_clean is not computed")
         return fill_result(metadata1.column_names_clean, metadata2.column_names_clean)
 
 
@@ -230,9 +229,8 @@ class ColumnNamesEmbeddingsHandler(HandlerType):
         :param settings: - not used
         :return: dataframe fill by distances between 0 and 1
         """
-        if (
-                metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}) and warning_enable.get_status():
-            logging.warning("Warning: column name embedding is not computed")
+        if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
+            logger.warning("Warning: column name embedding is not computed")
 
         result = pd.DataFrame()
         for idx1, name1 in enumerate(metadata1.column_name_embeddings.values()):
@@ -329,12 +327,10 @@ class KindHandler(HandlerType):
         :return:  tuple of bool and dataframe, if columns are empty return True
         """
         if len(column1) == 0 and len(column2) == 0:
-            if warning_enable.get_status():
-                logging.info(f"Warning: {message} is not present in the dataframe.")
+            logger.warning(f"Warning: {message} is not present in the dataframe.")
             return True, pd.DataFrame([0])
         if (len(column1) == 0) != (len(column2) == 0):
-            if warning_enable.get_status():
-                logging.info(f"Warning: {message} is not present in one of the dataframes.")
+            logger.warning(f"Warning: {message} is not present in one of the dataframes.")
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
 
@@ -604,6 +600,8 @@ class ComparatorByType(Comparator):
             comparator.add_comparator_type(CategoricalHandler(settings.weights.kinds))
         if settings.type_basic or settings.type_structural or settings.type_advanced:
             comparator.add_comparator_type(TypeHandler(settings.weights.type))
+        logger.info("Comparator by type created")
+        logger.info(f"Handlers used: {','.join([item.__class__.__name__ for item in comparator.comparator_type])}")
         return comparator
 
     def add_comparator_type(self, comparator: HandlerType) -> "ComparatorByType":

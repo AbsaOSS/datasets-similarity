@@ -2,6 +2,7 @@ import abc
 import json
 from typing import Any
 
+from logging_ import logger
 from similarity_framework.src.interfaces.comparator.comparator import Comparator
 from similarity_framework.src.interfaces.metadata.metadata_creator import MetadataCreator
 from similarity_framework.src.models.metadata import MetadataCreatorInput
@@ -25,13 +26,13 @@ class UI(abc.ABC):
     def run(self):
         something = self._load_user_input()
         metadata_input, comparator, metadata_creator, analysis_settings = self._parse_input(something)
-        print("Analysis settings: ")
-        print(json.dumps(analysis_settings.model_dump(), indent=4))
-        print(f"\nMetadata input has {len(metadata_input)} elements")
+        logger.debug("Analysis settings: ")
+        logger.debug(json.dumps(analysis_settings.model_dump(), indent=4))
+        logger.info(f"Metadata input has {len(metadata_input)} elements")
         metadata = []
         for i in metadata_input:
             metadata.append(metadata_creator.get_metadata(i))
-        print(f"Loaded metadata with size {len(metadata)}")
+        logger.info(f"Loaded metadata with size {len(metadata)}")
 
         result = dict()
         for first in metadata:

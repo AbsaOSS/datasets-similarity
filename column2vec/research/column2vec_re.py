@@ -31,7 +31,6 @@ from column2vec.research.generate_report import (
     generate_time_report,
 )
 
-from constants import warning_enable
 from similarity_framework.config import configure
 from similarity_framework.src.impl.comparator.comparator_by_type import cosine_sim
 
@@ -253,6 +252,4 @@ def run_fun():
 
 
 configure()
-warning_enable.change_status(True)
-
 run_fun()

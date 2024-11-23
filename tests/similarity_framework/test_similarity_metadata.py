@@ -172,7 +172,7 @@ class TestGetColumnType(unittest.TestCase):
         self.assertIsNot(self.metadata.column_names, {})
 
         metadata = (self.metadata_creator.compute_column_names_embeddings()
-                    .create_column_embeddings().get_metadata(MetadataCreatorInput(dataframe=self.data)))
+                    .compute_column_embeddings().get_metadata(MetadataCreatorInput(dataframe=self.data)))
 
         self.assertIsNot({}, metadata.column_embeddings)
         self.assertIsNot({}, metadata.column_name_embeddings)

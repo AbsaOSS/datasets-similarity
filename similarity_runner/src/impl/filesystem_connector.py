@@ -25,8 +25,8 @@ class FSConnectorSettings(ConnectorSettings):
 
     def __init__(self, filetypes: str, files_paths: str, directory_paths: str, **_):
         self.filetypes = [FileType(item) for item in filetypes.split(",")]
-        self.files_paths = files_paths.split(",") if files_paths else ""
-        self.directory_paths = directory_paths.split(",") if directory_paths else ""
+        self.files_paths = files_paths.split(",") if files_paths else []
+        self.directory_paths = directory_paths.split(",") if directory_paths else []
 
     @staticmethod
     def required_fields() -> list[tuple[str, str]]:

@@ -333,7 +333,7 @@ def is_date(column: pd.Series) -> bool:
     def is_str_date(word: str) -> bool:
         element = str(word).strip()
         try:
-            parse(element, fuzzy=True)
+            parse(element, fuzzy=True, ignoretz=True)
             return True
         except (ParserError, OverflowError):
             one_or_two = r"(\d{1}|\d{2})"
