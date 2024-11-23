@@ -1,0 +1,8 @@
+comparator=by_column
+analysis_settings__type_advanced=True
+analysis_settings__column_embeddings=True
+analysis_settings__column_name_embeddings=True
+analysis_settings__kinds=True
+analysis_settings__size=True
+analysis_settings__incomplete_columns=True
+analysis_settings__exact_names=True

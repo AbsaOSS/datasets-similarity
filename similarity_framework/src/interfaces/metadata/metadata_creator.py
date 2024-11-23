@@ -41,7 +41,7 @@ class MetadataCreator(ABC):
 
     def get_metadata(self, input_: MetadataCreatorInput) -> Metadata:
         self.dataframe = input_.dataframe
-        self.metadata = Metadata()
+        self.metadata = Metadata(input_.source_name)
 
         self._get_metadata_impl()
         self.create = True

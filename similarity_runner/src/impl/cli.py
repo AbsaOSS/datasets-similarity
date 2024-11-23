@@ -19,15 +19,16 @@ class CLI(UI):
         FilesystemConnector,
     }
 
-    def show(self, result: list[SimilarityOutput], settings: AnalysisSettings):
-        pass
+    def show(self, result: dict[tuple[str, str], SimilarityOutput], settings: AnalysisSettings):
+        for tables, res in result.items():
+            print(f"{tables[0]}, {tables[1]}: {res.distance}\n")
 
     def _load_user_input(self) -> Any:
         parser = argparse.ArgumentParser(
             prog="SimilarityRunner CLI",
             description="This is a CLI for interaction with similarity-framework, which is a framework for comparing data",
         )
-        parser.add_argument("-c", "--config", required=False, default=".config")
+        parser.add_argument("-c", "--config", help="Configuration file for configure analyses settings", required=False, default=".config")
         subparsers = parser.add_subparsers(
             title="Connectors",
             description=f"Available connectors: {', '.join([item.get_name() for item in self.REGISTERED_CONNECTORS])}",
@@ -39,6 +40,8 @@ class CLI(UI):
             connector_parser = subparsers.add_parser(connector.get_name(), help=f"{connector.get_name().capitalize()} connector")
             for field, description in connector.get_settings_class().required_fields():
                 connector_parser.add_argument(f"--{field}", help=description, required=True)
+            for field, description in connector.get_settings_class().optional_fields():
+                connector_parser.add_argument(f"--{field}", help=description, required=False)
         return parser.parse_args()
 
     def _parse_input(self, data: Any) -> tuple[list[MetadataCreatorInput], Comparator, MetadataCreator, AnalysisSettings]:

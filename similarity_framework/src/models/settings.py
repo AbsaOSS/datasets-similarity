@@ -4,11 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class WeightSettings(BaseModel):
     column_embeddings: int = Field(1, description="Weight for column embeddings")
-    column_name_embeddings_weight: int = Field(1, description="Weight for column name embeddings")
+    column_name_embeddings: int = Field(1, description="Weight for column name embeddings")
     kinds: int = Field(1, description="Weight for kinds")
     size: int = Field(1, description="Weight for size")
     incomplete_columns: int = Field(1, description="Weight for incomplete columns")
     exact_names: int = Field(1, description="Weight for exact names")
+    type: int = Field(1, description="Weight for types")
 
 
 class AnalysisSettings(BaseSettings):
@@ -32,7 +33,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_nested_delimiter="__")
 
     analysis_settings: AnalysisSettings = Field(default_factory=AnalysisSettings)
-    comparator: str = Field(validation_alias=AliasChoices("by_column", "by_type"), default="by_type")
+    comparator: str = Field(default="by_type")
     metadata_creator: str = Field(validation_alias=AliasChoices("type"), default="type")
 
     @staticmethod

@@ -176,8 +176,9 @@ class Metadata:
     Metadata for Table
     """
 
-    def __init__(self):
+    def __init__(self, name: str = "unknown"):
         # default
+        self.name = name
         self.size = int
         self.column_names: list[str] = []
         self.column_names_clean: dict[str, str] = defaultdict()

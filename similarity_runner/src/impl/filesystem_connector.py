@@ -3,13 +3,46 @@ This file contains filesystem connector implementation
 """
 
 import os
+from dataclasses import dataclass, field
 from typing import Iterable, ClassVar
 
 import pandas as pd
 
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_runner.src.interfaces.connector import ConnectorInterface
-from similarity_runner.src.models.connectors import FSConnectorSettings, FileType, ConnectorSettings
+from similarity_runner.src.models.connectors import FileType, ConnectorSettings
+
+
+@dataclass
+class FSConnectorSettings(ConnectorSettings):
+    """
+    ConnectorSettings class is a base class for connector settings.
+    """
+
+    filetypes: Iterable[FileType]
+    files_paths: list[str] = field(default_factory=lambda: [])
+    directory_paths: list[str] = field(default_factory=lambda: [])
+
+    def __init__(self, filetypes: str, files_paths: str, directory_paths: str, **_):
+        self.filetypes = [FileType(item) for item in filetypes.split(",")]
+        self.files_paths = files_paths.split(",") if files_paths else ""
+        self.directory_paths = directory_paths.split(",") if directory_paths else ""
+
+    @staticmethod
+    def required_fields() -> list[tuple[str, str]]:
+        return [
+            ("filetypes",
+             f"Filetypes to scan for - available: {[item.name.lower() for item in list(FileType)]}, comma separated - csv,parquet"),
+        ]
+
+    @staticmethod
+    def optional_fields() -> list[tuple[str, str]]:
+        return [
+            ("files_paths", "Filepaths to try add for analysis, comma separated - /path/to/file1,/path/to/file2"),
+            ("directory_paths",
+             "Directory paths to scan for files, comma separated - /path/to/folder1,/path/to/folder2"),
+        ]
+
 
 
 def load_files_from_list(files: list[str], file_types: Iterable[FileType] = (FileType.CSV,)) -> list[MetadataCreatorInput]:
@@ -52,7 +85,7 @@ class FilesystemConnector(ConnectorInterface):
         for folder in settings.directory_paths:
             file_list = file_list + [os.path.join(folder, s) for s in os.listdir(folder)]
 
-        return __load_files_from_list(file_list, settings.filetypes)
+        return load_files_from_list(file_list, settings.filetypes)
 
     def _format_data(self, data: list[MetadataCreatorInput]) -> list[MetadataCreatorInput]:
         """
@@ -65,3 +98,5 @@ class FilesystemConnector(ConnectorInterface):
         Close the connection in this case it is unnecessary
         """
         pass
+
+

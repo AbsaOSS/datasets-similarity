@@ -19,7 +19,7 @@ class UI(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def show(self, result: list[SimilarityOutput], settings: AnalysisSettings):
+    def show(self, result:  dict[tuple[str, str], SimilarityOutput], settings: AnalysisSettings):
         pass
 
     def run(self):
@@ -33,9 +33,9 @@ class UI(abc.ABC):
             metadata.append(metadata_creator.get_metadata(i))
         print(f"Loaded metadata with size {len(metadata)}")
 
-        result = []
+        result = dict()
         for first in metadata:
             for second in metadata:
-                result.append(comparator.compare(first, second, analysis_settings))
+                result[(first.name, second.name)] = comparator.compare(first, second, analysis_settings)
         # TODO: based on analysis settings get specified metadata objects
         self.show(result, analysis_settings)

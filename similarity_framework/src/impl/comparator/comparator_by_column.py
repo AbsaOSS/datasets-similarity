@@ -435,6 +435,8 @@ class ComparatorByColumn(Comparator):
             comparator.add_comparator_type(ColumnEmbeddingsHandler(settings.weights.column_embeddings))
         if settings.kinds:
             comparator.add_comparator_type(ColumnKindHandler(settings.weights.kinds))
+        if settings.type_basic or settings.type_structural or settings.type_advanced:
+            comparator.add_comparator_type(ColumnTypeHandler(settings.weights.type))
         return comparator
 
     def __init__(self):
