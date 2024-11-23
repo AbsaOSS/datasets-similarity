@@ -12,6 +12,3 @@ def configure():
     os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
     os.environ["CURL_CA_BUNDLE"] = certifi.where()
     print(f"Environment configured. {certifi.where()}")
-
-
-class Configuration: ...

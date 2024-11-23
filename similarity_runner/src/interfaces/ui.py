@@ -36,6 +36,6 @@ class UI(abc.ABC):
         result = []
         for first in metadata:
             for second in metadata:
-                result.append(comparator.compare(first, second))
+                result.append(comparator.compare(first, second, analysis_settings))
         # TODO: based on analysis settings get specified metadata objects
         self.show(result, analysis_settings)

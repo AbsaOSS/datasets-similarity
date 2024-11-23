@@ -10,7 +10,7 @@ from similarity_framework.src.interfaces.comparator.comparator import HandlerTyp
 from similarity_framework.src.impl.logging import warning_enable
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import SimilarityOutput
-from similarity_framework.src.models.types_ import DataKind
+from similarity_framework.src.models.types_ import DataKind, Type
 from similarity_framework.src.models.settings import AnalysisSettings
 
 
@@ -356,7 +356,63 @@ class ColumnKindHandler(SpecificColumnHandler):
         return np.nan
 
 
-## TODO Type
+class ColumnTypeHandler(SpecificColumnHandler):
+
+    def __numerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str,
+                             column1_type: type[Type], column2_type: type[Type]) -> float:
+        num_met1 = metadata1.numerical_metadata[index1]
+        num_met2 = metadata2.numerical_metadata[index2]
+        score = 3 if column1_type == column2_type else 0
+        if num_met1.same_value_length == num_met2.same_value_length:
+            score += 2
+        if num_met1.min_value == num_met2.min_value:
+            score += 1
+        elif num_met1.min_value == num_met2.min_value + num_met1.range_size/100 \
+            or num_met1.max_value == num_met2.max_value - num_met1.range_size/100:
+            score += 0.5
+        if num_met1.max_value == num_met2.max_value:
+            score += 1
+        elif num_met1.max_value == num_met2.max_value - num_met1.range_size/100 \
+            or num_met1.max_value == num_met2.max_value + num_met1.range_size/100:
+            score += 0.5
+        if num_met1.range_size == num_met2.range_size:
+            score += 2
+        return 1 - score / 9
+
+    def __nonnumerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str,
+                                column1_type: type[Type], column2_type: type[Type]) -> float:
+        num_met1 = metadata1.nonnumerical_metadata[index1]
+        num_met2 = metadata2.nonnumerical_metadata[index2]
+        score = 3 if column1_type == column2_type else 0
+        if num_met1.longest == num_met2.longest:
+            score += 2
+        if num_met1.shortest == num_met2.shortest:
+            score += 2
+        if num_met1.avg_length == num_met2.avg_length:
+            score += 2
+        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length/100 \
+            or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length/100:
+            score += 1
+        return 1 - score / 9
+
+
+    def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
+        """
+        Compare if two columns have the same type.
+        :param index2: name of column in metadata2
+        :param index1:  name of column in metadata1
+        :param metadata1: first dataframe metadata
+        :param metadata2: second dataframe metadata
+        :return: float number between 0 and 1 (distance)
+        """
+        column1_type = metadata1.get_column_type(index1)
+        column2_type = metadata2.get_column_type(index2)
+        if index1 in metadata1.numerical_metadata and index2 in metadata2.numerical_metadata:
+            return self.__numerical_compare1(metadata1, metadata2, index1, index2, column1_type, column2_type)
+
+        if index1 in metadata1.nonnumerical_metadata and index2 in metadata2.nonnumerical_metadata:
+            return self.__nonnumerical_compare1(metadata1, metadata2, index1, index2, column1_type, column2_type)
+        return 1
 
 
 class ComparatorByColumn(Comparator):
@@ -412,6 +468,7 @@ class ComparatorByColumn(Comparator):
     def __pre_compare_individual(self):
         for i in self.table_comparators:
             i.settings = self.settings
+            i.analysis_settings = self.analysis_settings
 
     def _compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         """

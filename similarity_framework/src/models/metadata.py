@@ -229,6 +229,24 @@ class Metadata:
         """
         return self.get_column_names_by_type(NUMERICAL, FLOAT, INT, HUMAN_GENERATED, COMPUTER_GENERATED)
 
+    def get_column_type(self, name: str) -> type[Type] | None:
+        """
+        Get column type by column name
+        """
+        for column_type, columns in self.column_type.items():
+            if name in columns:
+                return column_type
+        return None
+
+    def get_column_kind(self, name: str) -> DataKind | None:
+        """
+        Get column kind by column name
+        """
+        for column_kind, columns in self.column_kind.items():
+            if name in columns:
+                return column_kind
+        return None
+
 
 @dataclass
 class MetadataCreatorInput:

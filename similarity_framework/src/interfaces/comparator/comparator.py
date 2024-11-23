@@ -12,12 +12,13 @@ from similarity_framework.src.models.settings import AnalysisSettings
 class HandlerType(ABC):
     """Abstract class for comparators"""
 
-    def __init__(self, weight: int = 1):
+    def __init__(self, weight: int = 1, analysis_settings: AnalysisSettings = None):
         """
         Constructor for ComparatorType
         :param weight: weight of the comparator
         """
         self.weight: int = weight
+        self.analysis_settings: AnalysisSettings = analysis_settings
 
     @abstractmethod
     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame | float:
@@ -33,6 +34,7 @@ class Comparator(ABC):
         self.settings: set[Settings] = set()
         self.distance_function = HausdorffDistanceMin()
         self.comparator_type: list[HandlerType] = []
+        self.analysis_settings: AnalysisSettings = None
 
     def set_distance_function(self, distance_function: DistanceFunction) -> "Comparator":
         """
@@ -55,13 +57,15 @@ class Comparator(ABC):
         self.settings.add(setting)
         return self
 
-    def compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
+    def compare(self, metadata1: Metadata, metadata2: Metadata, analysis_settings: AnalysisSettings = AnalysisSettings()) -> SimilarityOutput:
+        self.analysis_settings = analysis_settings
         self.__pre_compare()
         return self._compare(metadata1, metadata2)
 
     def __pre_compare(self):
         for i in self.comparator_type:
             i.settings = self.settings
+            i.analysis_settings = self.analysis_settings
         self.__pre_compare_individual()
 
     def __pre_compare_individual(self, **kwargs):
