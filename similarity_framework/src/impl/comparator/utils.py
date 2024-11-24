@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from torch import Tensor
 
+from logging_ import logger
+
 
 def concat(*data_frames: pd.DataFrame) -> pd.DataFrame:
     """
@@ -65,10 +67,10 @@ def are_columns_null(column1: set, column2: set, message: str) -> tuple[bool, fl
     :return:  tuple of bool and float, if columns are empty return True
     """
     if len(column1) == 0 and len(column2) == 0:
-        logging.warning(f"{message} is not present in the dataframe.")
+        logger.debug(f"{message} is not present in the dataframe.")
         return True, 0
     if (len(column1) == 0) != (len(column2) == 0):
-        logging.warning(f"{message} is not present in one of the dataframes.")
+        logger.debug(f"{message} is not present in one of the dataframes.")
         return True, 1
     return False, 0
 

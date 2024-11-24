@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from typing import Any
 
 from logging_ import logger
@@ -20,6 +21,13 @@ class CLI(UI):
         FilesystemConnector,
     }
 
+    @staticmethod
+    def validate_path(value) -> Path:
+        path = Path(value)
+        if not path.exists():
+            raise argparse.ArgumentTypeError(f"Path {value} does not exist")
+        return path
+
     def show(self, result: dict[tuple[str, str], SimilarityOutput], settings: AnalysisSettings):
         for tables, res in result.items():
             print(f"{tables[0]}, {tables[1]}: {res.distance}\n")
@@ -29,7 +37,8 @@ class CLI(UI):
             prog="SimilarityRunner CLI",
             description="This is a CLI for interaction with similarity-framework, which is a framework for comparing data",
         )
-        parser.add_argument("-c", "--config", help="Configuration file for configure analyses settings", required=False, default=".config")
+        parser.add_argument("-c", "--config", help="Configuration file for configure analyses settings", required=False, default=".config",
+                            type=CLI.validate_path)
         subparsers = parser.add_subparsers(
             title="Connectors",
             description=f"Available connectors: {', '.join([item.get_name() for item in self.REGISTERED_CONNECTORS])}",

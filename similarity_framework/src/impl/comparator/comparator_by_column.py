@@ -1,10 +1,12 @@
 import logging
 from abc import abstractmethod, ABC
+from importlib.metadata import metadata
 
 import numpy as np
 import pandas as pd
 from statistics import mean
 
+from logging_ import logger
 from similarity_framework.src.impl.comparator.utils import cosine_sim, are_columns_null
 from similarity_framework.src.interfaces.comparator.comparator import HandlerType, Comparator
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
@@ -140,7 +142,7 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
             or index1 not in metadata1.column_embeddings
             or index2 not in metadata2.column_embeddings
         ):
-            logging.warning("Warning: column embedding is not computed")
+            logger.debug(f"column embedding is not computed - [{metadata1.column_embeddings == {}} - {metadata2.column_embeddings == {}}] {index1 if index1 not in metadata1.column_embeddings else index2}")
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_embeddings[index1],
@@ -153,11 +155,12 @@ class ColumnKindHandler(SpecificColumnHandler):
     Handler for column kind
     """
 
-    def __init__(self, compare_kind=None, weight: dict[DataKind, int] = None):
+    def __init__(self, compare_kind=None,
+                 weight=1):
         """
         Constructor for ColumnKindHandler, sets which kinds should be compared and weight for each kind
         """
-        super().__init__(weight=1)
+        super().__init__(weight=weight)
         if compare_kind is None:
             self.compare_kind = [
                 DataKind.BOOL,
@@ -180,16 +183,26 @@ class ColumnKindHandler(SpecificColumnHandler):
         :param embeddings2: values for column2
         :return: float from 0 to 1
         """
-        res = pd.DataFrame()
-        row_mins = []
-        for id1, embed1 in enumerate(embeddings1):
-            for id2, embed2 in enumerate(embeddings2):
-                res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
-            row_mins.append(res.loc[id1].min())
-        column_mins = []
-        for _, column in res.items():
-            column_mins.append(min(column))
-        return max([mean(row_mins), mean(column_mins)])  # todo vysvetlit v textu
+        # res = pd.DataFrame()
+        # row_mins = []
+        # for id1, embed1 in enumerate(embeddings1):
+        #     for id2, embed2 in enumerate(embeddings2):
+        #         res.loc[id1, id2] = 1 - cosine_sim(embed1, embed2)
+        #     row_mins.append(res.loc[id1].min())
+        # column_mins = []
+        # for _, column in res.items():
+        #     column_mins.append(min(column))
+        # return max([mean(row_mins), mean(column_mins)])
+
+        similarity_matrix = [
+            [1 - cosine_sim(embed1, embed2) for embed2 in embeddings2]
+            for embed1 in embeddings1
+        ]
+        res = pd.DataFrame(similarity_matrix)
+        row_mins = res.min(axis=1).tolist()
+        column_mins = res.min(axis=0).tolist()
+        return max(mean(row_mins), mean(column_mins))
+        # todo vysvetlit v textu
 
     def compare_bools(
         self,
@@ -431,7 +444,7 @@ class ComparatorByColumn(Comparator):
         if settings.column_embeddings:
             comparator.add_comparator_type(ColumnEmbeddingsHandler(settings.weights.column_embeddings))
         if settings.kinds:
-            comparator.add_comparator_type(ColumnKindHandler(weights=settings.weights.kinds))
+            comparator.add_comparator_type(ColumnKindHandler(weight=settings.weights.kinds))
         if settings.type_basic or settings.type_structural or settings.type_advanced:
             comparator.add_comparator_type(ColumnTypeHandler(settings.weights.type))
         return comparator

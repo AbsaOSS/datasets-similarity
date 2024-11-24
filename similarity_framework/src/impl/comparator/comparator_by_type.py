@@ -327,10 +327,10 @@ class KindHandler(HandlerType):
         :return:  tuple of bool and dataframe, if columns are empty return True
         """
         if len(column1) == 0 and len(column2) == 0:
-            logger.warning(f"Warning: {message} is not present in the dataframe.")
+            logger.warning(f"{message} is not present in the dataframe.")
             return True, pd.DataFrame([0])
         if (len(column1) == 0) != (len(column2) == 0):
-            logger.warning(f"Warning: {message} is not present in one of the dataframes.")
+            logger.warning(f"{message} is not present in one of the dataframes.")
             return True, pd.DataFrame([1])
         return False, pd.DataFrame()
 
