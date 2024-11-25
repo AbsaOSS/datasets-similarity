@@ -1,0 +1,5 @@
+measurement/data/imdb, measurement/data/imdb_diff_rows20: 0.07333728508389219
+
+measurement/data/imdb_diff_rows20, measurement/data/imdb: 0.07333728508389219
+
+Time taken: 5.546212957997341 seconds

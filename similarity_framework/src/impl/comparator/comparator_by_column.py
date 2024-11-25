@@ -115,7 +115,7 @@ class ColumnNamesEmbeddingsHandler(GeneralColumnHandler):
         """
         if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
             logging.warning("Warning: column name embedding is not computed")
-            return np.nan
+            return 1
         return 1 - cosine_sim(
             metadata1.column_name_embeddings[index1],
             metadata2.column_name_embeddings[index2],
@@ -250,7 +250,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         )
         count1 = metadata1.count_categories
         count2 = metadata2.count_categories
-        count_re = count1 / count2 if count1 < count2 else count2 / count1
+        count_re = 1 - count1 / count2 if count1 < count2 else 1- count2 / count1
         # todo compare categories_with_count for metadata1 and metadata2
         # firstly normalize dictionary categories_with_count then
         # compare the difference between the two dictionaries
@@ -394,9 +394,9 @@ class ColumnTypeHandler(SpecificColumnHandler):
         num_met1 = metadata1.nonnumerical_metadata[index1]
         num_met2 = metadata2.nonnumerical_metadata[index2]
         score = 3 if column1_type == column2_type else 0
-        if num_met1.longest == num_met2.longest:
+        if num_met1.longest == num_met2.longest or num_met1.longest is num_met2.longest:
             score += 2
-        if num_met1.shortest == num_met2.shortest:
+        if num_met1.shortest == num_met2.shortest or num_met1.shortest is num_met2.shortest:
             score += 2
         if num_met1.avg_length == num_met2.avg_length:
             score += 2
@@ -422,6 +422,9 @@ class ColumnTypeHandler(SpecificColumnHandler):
 
         if index1 in metadata1.nonnumerical_metadata and index2 in metadata2.nonnumerical_metadata:
             return self.__nonnumerical_compare1(metadata1, metadata2, index1, index2, column1_type, column2_type)
+
+        if column1_type == column2_type:
+            return 0
         return 1
 
 
@@ -473,9 +476,8 @@ class ComparatorByColumn(Comparator):
         :param distances: list of tuples (distance, weight)
         :return: weighted average
         """
-        # todo if something is none
-        sum_weight = sum([weight for _, weight in distances])
-        return sum([distance * weight / sum_weight for distance, weight in distances])
+        sum_weight = sum([weight for _, weight in distances if not np.isnan(weight)])
+        return sum([distance * weight / sum_weight for distance, weight in distances if not np.isnan(distance)])
 
     def __pre_compare_individual(self):
         for i in self.table_comparators:
@@ -515,4 +517,4 @@ class ComparatorByColumn(Comparator):
         if table_distances:
             for dist in table_distances:
                 res += dist * dist
-        return SimilarityOutput(distance=np.sqrt(res))
+        return SimilarityOutput(distance=np.sqrt(res/2))

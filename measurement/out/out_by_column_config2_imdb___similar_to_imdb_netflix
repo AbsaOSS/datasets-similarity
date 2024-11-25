@@ -1,0 +1,5 @@
+measurement/data/imdb, measurement/data/similar_to_imdb_netflix: 0.5514846840255359
+
+measurement/data/similar_to_imdb_netflix, measurement/data/imdb: 0.5514846840255359
+
+Time taken: 5.556557708012406 seconds

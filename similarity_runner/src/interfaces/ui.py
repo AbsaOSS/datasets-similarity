@@ -37,6 +37,8 @@ class UI(abc.ABC):
         result = dict()
         for first in metadata:
             for second in metadata:
+                if first == second:
+                    continue
                 logger.info(f"Comparing {first.name} with {second.name}")
                 result[(first.name, second.name)] = comparator.compare(first, second, analysis_settings)
         # TODO: based on analysis settings get specified metadata objects
