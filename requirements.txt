@@ -60,8 +60,6 @@ pydeck==0.9.1
 Pygments==2.18.0
 pylint==3.2.7
 pyparsing==3.2.0
-pyspark==3.5.3
-pyspark-stubs==3.0.0.post3
 pytest==8.3.3
 pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
@@ -81,7 +79,6 @@ scipy==1.14.1
 sentence-transformers==3.1.0
 six==1.16.0
 smmap==5.0.1
-spark==0.2.1
 streamlit==1.38.0
 sympy==1.13.2
 tauk==2.1.3
