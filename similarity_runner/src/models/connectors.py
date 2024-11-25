@@ -8,6 +8,7 @@ class FileType(str, Enum):
     CSV = "csv"
     PARQUET = "parquet"
 
+
 class ConnectorSettings:
     @staticmethod
     @abstractmethod
@@ -18,4 +19,3 @@ class ConnectorSettings:
     @abstractmethod
     def optional_fields() -> list[tuple[str, str]]:
         pass
-

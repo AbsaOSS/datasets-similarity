@@ -37,8 +37,9 @@ class CLI(UI):
             prog="SimilarityRunner CLI",
             description="This is a CLI for interaction with similarity-framework, which is a framework for comparing data",
         )
-        parser.add_argument("-c", "--config", help="Configuration file for configure analyses settings", required=False, default=".config",
-                            type=CLI.validate_path)
+        parser.add_argument(
+            "-c", "--config", help="Configuration file for configure analyses settings", required=False, default=".config", type=CLI.validate_path
+        )
         subparsers = parser.add_subparsers(
             title="Connectors",
             description=f"Available connectors: {', '.join([item.get_name() for item in self.REGISTERED_CONNECTORS])}",

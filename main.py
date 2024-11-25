@@ -9,4 +9,3 @@ cli.run()
 
 t2 = perf_counter()
 print(f"Time taken: {t2 - t1} seconds")
-

@@ -31,18 +31,15 @@ class FSConnectorSettings(ConnectorSettings):
     @staticmethod
     def required_fields() -> list[tuple[str, str]]:
         return [
-            ("filetypes",
-             f"Filetypes to scan for - available: {[item.name.lower() for item in list(FileType)]}, comma separated - csv,parquet"),
+            ("filetypes", f"Filetypes to scan for - available: {[item.name.lower() for item in list(FileType)]}, comma separated - csv,parquet"),
         ]
 
     @staticmethod
     def optional_fields() -> list[tuple[str, str]]:
         return [
             ("files_paths", "Filepaths to try add for analysis, comma separated - /path/to/file1,/path/to/file2"),
-            ("directory_paths",
-             "Directory paths to scan for files, comma separated - /path/to/folder1,/path/to/folder2"),
+            ("directory_paths", "Directory paths to scan for files, comma separated - /path/to/folder1,/path/to/folder2"),
         ]
-
 
 
 def load_files_from_list(files: list[str], file_types: Iterable[FileType] = (FileType.CSV,)) -> list[MetadataCreatorInput]:
@@ -98,5 +95,3 @@ class FilesystemConnector(ConnectorInterface):
         Close the connection in this case it is unnecessary
         """
         pass
-
-

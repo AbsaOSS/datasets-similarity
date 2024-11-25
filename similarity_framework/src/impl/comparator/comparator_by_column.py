@@ -142,7 +142,9 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
             or index1 not in metadata1.column_embeddings
             or index2 not in metadata2.column_embeddings
         ):
-            logger.debug(f"column embedding is not computed - [{metadata1.column_embeddings == {}} - {metadata2.column_embeddings == {}}] {index1 if index1 not in metadata1.column_embeddings else index2}")
+            logger.debug(
+                f"column embedding is not computed - [{metadata1.column_embeddings == {}} - {metadata2.column_embeddings == {}}] {index1 if index1 not in metadata1.column_embeddings else index2}"
+            )
             return np.nan
         return 1 - cosine_sim(
             metadata1.column_embeddings[index1],
@@ -155,8 +157,7 @@ class ColumnKindHandler(SpecificColumnHandler):
     Handler for column kind
     """
 
-    def __init__(self, compare_kind=None,
-                 weight=1):
+    def __init__(self, compare_kind=None, weight=1):
         """
         Constructor for ColumnKindHandler, sets which kinds should be compared and weight for each kind
         """
@@ -194,10 +195,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         #     column_mins.append(min(column))
         # return max([mean(row_mins), mean(column_mins)])
 
-        similarity_matrix = [
-            [1 - cosine_sim(embed1, embed2) for embed2 in embeddings2]
-            for embed1 in embeddings1
-        ]
+        similarity_matrix = [[1 - cosine_sim(embed1, embed2) for embed2 in embeddings2] for embed1 in embeddings1]
         res = pd.DataFrame(similarity_matrix)
         row_mins = res.min(axis=1).tolist()
         column_mins = res.min(axis=0).tolist()
@@ -250,7 +248,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         )
         count1 = metadata1.count_categories
         count2 = metadata2.count_categories
-        count_re = 1 - count1 / count2 if count1 < count2 else 1- count2 / count1
+        count_re = 1 - count1 / count2 if count1 < count2 else 1 - count2 / count1
         # todo compare categories_with_count for metadata1 and metadata2
         # firstly normalize dictionary categories_with_count then
         # compare the difference between the two dictionaries
@@ -368,8 +366,9 @@ class ColumnKindHandler(SpecificColumnHandler):
 
 class ColumnTypeHandler(SpecificColumnHandler):
 
-    def __numerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str,
-                             column1_type: type[Type], column2_type: type[Type]) -> float:
+    def __numerical_compare1(
+        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, column1_type: type[Type], column2_type: type[Type]
+    ) -> float:
         num_met1 = metadata1.numerical_metadata[index1]
         num_met2 = metadata2.numerical_metadata[index2]
         score = 3 if column1_type == column2_type else 0
@@ -377,20 +376,19 @@ class ColumnTypeHandler(SpecificColumnHandler):
             score += 2
         if num_met1.min_value == num_met2.min_value:
             score += 1
-        elif num_met1.min_value == num_met2.min_value + num_met1.range_size/100 \
-            or num_met1.max_value == num_met2.max_value - num_met1.range_size/100:
+        elif num_met1.min_value == num_met2.min_value + num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value - num_met1.range_size / 100:
             score += 0.5
         if num_met1.max_value == num_met2.max_value:
             score += 1
-        elif num_met1.max_value == num_met2.max_value - num_met1.range_size/100 \
-            or num_met1.max_value == num_met2.max_value + num_met1.range_size/100:
+        elif num_met1.max_value == num_met2.max_value - num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value + num_met1.range_size / 100:
             score += 0.5
         if num_met1.range_size == num_met2.range_size:
             score += 2
         return 1 - score / 9
 
-    def __nonnumerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str,
-                                column1_type: type[Type], column2_type: type[Type]) -> float:
+    def __nonnumerical_compare1(
+        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, column1_type: type[Type], column2_type: type[Type]
+    ) -> float:
         num_met1 = metadata1.nonnumerical_metadata[index1]
         num_met2 = metadata2.nonnumerical_metadata[index2]
         score = 3 if column1_type == column2_type else 0
@@ -400,11 +398,9 @@ class ColumnTypeHandler(SpecificColumnHandler):
             score += 2
         if num_met1.avg_length == num_met2.avg_length:
             score += 2
-        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length/100 \
-            or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length/100:
+        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length / 100 or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length / 100:
             score += 1
         return 1 - score / 9
-
 
     def _inner_compare(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
         """
@@ -517,4 +513,4 @@ class ComparatorByColumn(Comparator):
         if table_distances:
             for dist in table_distances:
                 res += dist * dist
-        return SimilarityOutput(distance=np.sqrt(res/2))
+        return SimilarityOutput(distance=np.sqrt(res / 2))

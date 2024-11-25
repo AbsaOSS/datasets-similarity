@@ -70,8 +70,7 @@ class TypeMetadataCreator(MetadataCreator):
             metadata_creator.compute_column_names_embeddings()
         if settings.column_embeddings:
             if not any([settings.type_basic, settings.type_advanced, settings.type_structural]):
-                logger.warning("Column embeddings need to compute column types first, "
-                      "since none were provided falling back to: compute_basic_types")
+                logger.warning("Column embeddings need to compute column types first, " "since none were provided falling back to: compute_basic_types")
                 metadata_creator.compute_basic_types()
             metadata_creator.compute_column_embeddings()
         return metadata_creator
@@ -308,8 +307,10 @@ class TypeMetadataCreator(MetadataCreator):
         :return: self TypeMetadataCreator
         """
         if not self.metadata.column_type:
-            raise RuntimeError("Column types need to be computed before this method is called, "
-                               "use compute_basic_types, compute_advanced_types or compute_advanced_structural_types")
+            raise RuntimeError(
+                "Column types need to be computed before this method is called, "
+                "use compute_basic_types, compute_advanced_types or compute_advanced_structural_types"
+            )
         if types is None:
             types = [NONNUMERICAL, UNDEFINED, WORD, ALL, MULTIPLE_VALUES, PHRASE, ARTICLE, ALPHANUMERIC, ALPHABETIC]
         for i in types:

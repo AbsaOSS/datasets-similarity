@@ -9,6 +9,7 @@ import numpy as np
 
 from similarity_framework.src.models.metadata import Metadata
 
+
 @dataclasses.dataclass
 class CategoricalSimilarity:
     """

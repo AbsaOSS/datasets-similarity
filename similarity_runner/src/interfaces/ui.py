@@ -20,7 +20,7 @@ class UI(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def show(self, result:  dict[tuple[str, str], SimilarityOutput], settings: AnalysisSettings):
+    def show(self, result: dict[tuple[str, str], SimilarityOutput], settings: AnalysisSettings):
         pass
 
     def run(self):

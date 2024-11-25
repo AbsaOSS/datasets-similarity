@@ -72,12 +72,12 @@ class CategoricalHandler(HandlerType):
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
         for id1, (
-                column1,
-                categorical1,
+            column1,
+            categorical1,
         ) in enumerate(metadata1.categorical_metadata.items()):
             for id2, (
-                    column2,
-                    categorical2,
+                column2,
+                categorical2,
             ) in enumerate(metadata2.categorical_metadata.items()):
                 simil_matrix = self.__create_dist_matrix(
                     categorical1.category_embedding,
@@ -87,8 +87,7 @@ class CategoricalHandler(HandlerType):
                 dist = self.__compute_distance(simil_matrix)
                 ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)
                 result.loc[id1, id2] = dist * ratio
-                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1],
-                                                             metadata2.column_name_embeddings[column2])
+                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
         # todo p value or correlation
         return concat(result, name_distance)
 
@@ -115,8 +114,7 @@ class CategoricalHandlerSimilar(CategoricalHandler):
             simil_matrix.append(siml_line)
         return simil_matrix
 
-    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[
-        int, float]:  # todo test some other methods
+    def __compute_similarity_score(self, similarity_matrix: list[list[float]]) -> tuple[int, float]:  # todo test some other methods
         # todo use Haufsdorfe distance ?
         res = 0.0
         count = 0
@@ -138,13 +136,11 @@ class CategoricalHandlerSimilar(CategoricalHandler):
         name_distance = pd.DataFrame()
         for id1, (column1, categorical1) in enumerate(metadata1.categorical_metadata.items()):
             for id2, (column2, categorical2) in enumerate(metadata2.categorical_metadata.items()):
-                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding,
-                                                        categorical2.category_embedding)
+                simil_matrix = self.__create_sim_matrix(categorical1.category_embedding, categorical2.category_embedding)
                 _, score = self.__compute_similarity_score(simil_matrix)
                 ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)  # todo 1-ratio???
                 result.loc[id1, id2] = 1 - (score * ratio)
-                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1],
-                                                             metadata2.column_name_embeddings[column2])
+                name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
         # todo p value or correlation
         return concat(result, name_distance)
 
@@ -164,12 +160,12 @@ class ColumnEmbeddingHandler(HandlerType):
         result = pd.DataFrame()
         name_distance = pd.DataFrame()
         for id1, (
-                column1,
-                embedding1,
+            column1,
+            embedding1,
         ) in enumerate(metadata1.column_embeddings.items()):
             for id2, (
-                    column2,
-                    embedding2,
+                column2,
+                embedding2,
             ) in enumerate(metadata2.column_embeddings.items()):
                 result.loc[id1, id2] = 1 - cosine_sim(embedding1, embedding2)
                 name_distance.loc[id1, id2] = 1 - cosine_sim(
@@ -261,8 +257,7 @@ class KindHandler(HandlerType):
     """
 
     def __init__(
-            self, distance_function: DistanceFunction = HausdorffDistanceMin(), compare_kind: list[DataKind] = None,
-            weight: dict[DataKind.BOOL, int] = None
+        self, distance_function: DistanceFunction = HausdorffDistanceMin(), compare_kind: list[DataKind] = None, weight: dict[DataKind.BOOL, int] = None
     ):
         super().__init__(weight=1)
         self.distance_function = distance_function
@@ -280,8 +275,7 @@ class KindHandler(HandlerType):
         else:
             self.kind_weight = weight
 
-    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings],
-                       weight: int):
+    def compute_result(self, distance_table: pd.DataFrame, distance_function: DistanceFunction, settings: set[Settings], weight: int):
         """
         Compute result from distance table
         """
@@ -345,8 +339,7 @@ class KindHandler(HandlerType):
         """
         value_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT],
-                                            metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CONSTANT], metadata2.column_kind[DataKind.CONSTANT], "Constant metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CONSTANT]:
@@ -387,8 +380,7 @@ class KindHandler(HandlerType):
         value_long_re = pd.DataFrame()
         value_short_re = pd.DataFrame()
         ratio_max_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID],
-                                            "ID metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.ID]:
@@ -406,11 +398,8 @@ class KindHandler(HandlerType):
                             embeddings1,
                             embeddings2,
                         )
-                nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[
-                    column2].nulls else 1
-                ratio_max_re.loc[column1, column2] = abs(
-                    metadata1.kind_metadata[column1].ratio_max_length - metadata2.kind_metadata[
-                        column2].ratio_max_length)
+                nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[column2].nulls else 1
+                ratio_max_re.loc[column1, column2] = abs(metadata1.kind_metadata[column1].ratio_max_length - metadata2.kind_metadata[column2].ratio_max_length)
 
         return concat(
             value_short_re,
@@ -432,26 +421,21 @@ class KindHandler(HandlerType):
         value_re = pd.DataFrame()
         distr_re = pd.DataFrame()
         nulls_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL],
-                                            "Boolean metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL], "Boolean metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.BOOL]:
             for column2 in metadata2.column_kind[DataKind.BOOL]:
-                nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[
-                    column2].nulls else 1
+                nulls_re.loc[column1, column2] = 0 if metadata1.kind_metadata[column1].nulls == metadata2.kind_metadata[column2].nulls else 1
                 distr_re.loc[column1, column2] = abs(
                     metadata1.kind_metadata[column1].distribution[0] / metadata1.kind_metadata[column1].distribution[1]
-                    - metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[
-                        1]
+                    - metadata2.kind_metadata[column2].distribution[0] / metadata2.kind_metadata[column2].distribution[1]
                 )
-                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[
-                    column2].value_embeddings is None:
+                if metadata1.kind_metadata[column1].value_embeddings is None or metadata2.kind_metadata[column2].value_embeddings is None:
                     value_re.loc[column1, column2] = 0
                 else:
                     value_re.loc[column1, column2] = self.compute_embeddings_distance(
-                        metadata1.kind_metadata[column1].value_embeddings,
-                        metadata2.kind_metadata[column2].value_embeddings
+                        metadata1.kind_metadata[column1].value_embeddings, metadata2.kind_metadata[column2].value_embeddings
                     )
         return concat(value_re, distr_re, nulls_re)
 
@@ -466,15 +450,13 @@ class KindHandler(HandlerType):
         """
         value_re = pd.DataFrame()
         count_re = pd.DataFrame()
-        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL],
-                                            metadata2.column_kind[DataKind.CATEGORICAL], "Categorical metadata")
+        are_nulls = self.__are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL], "Categorical metadata")
         if are_nulls[0]:
             return are_nulls[1]
         for column1 in metadata1.column_kind[DataKind.CATEGORICAL]:
             for column2 in metadata2.column_kind[DataKind.CATEGORICAL]:
                 value_re.loc[column1, column2] = self.compute_embeddings_distance(
-                    metadata1.categorical_metadata[column1].category_embedding,
-                    metadata2.categorical_metadata[column2].category_embedding
+                    metadata1.categorical_metadata[column1].category_embedding, metadata2.categorical_metadata[column2].category_embedding
                 )
                 count1 = metadata1.categorical_metadata[column1].count_categories
                 count2 = metadata2.categorical_metadata[column2].count_categories
@@ -537,13 +519,11 @@ class TypeHandler(HandlerType):
             score += 2
         if num_met1.min_value == num_met2.min_value:
             score += 1
-        elif num_met1.min_value == num_met2.min_value + num_met1.range_size/100 \
-            or num_met1.max_value == num_met2.max_value - num_met1.range_size/100:
+        elif num_met1.min_value == num_met2.min_value + num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value - num_met1.range_size / 100:
             score += 0.5
         if num_met1.max_value == num_met2.max_value:
             score += 1
-        elif num_met1.max_value == num_met2.max_value - num_met1.range_size/100 \
-            or num_met1.max_value == num_met2.max_value + num_met1.range_size/100:
+        elif num_met1.max_value == num_met2.max_value - num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value + num_met1.range_size / 100:
             score += 0.5
         if num_met1.range_size == num_met2.range_size:
             score += 2
@@ -559,11 +539,9 @@ class TypeHandler(HandlerType):
             score += 2
         if num_met1.avg_length == num_met2.avg_length:
             score += 2
-        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length / 100 \
-                or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length / 100:
+        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length / 100 or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length / 100:
             score += 1
         return 1 - score / 9
-
 
     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame | float:
         result = pd.DataFrame()
