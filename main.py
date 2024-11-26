@@ -1,79 +1,11 @@
-"""
-The main.py contains example usage.
-You can run program to compare tables by main
-"""
+from time import perf_counter
 
-import sys
+from similarity_runner.src.impl.cli import CLI
 
-import pandas as pd
+t1 = perf_counter()
 
-from config import configure
-from constants import warning_enable
-from similarity.Comparator import Comparator, SizeComparator, IncompleteColumnsComparator, KindComparator, ColumnNamesEmbeddingsComparator
-from similarity.ComparatorByColumn import (
-    ComparatorByColumn,
-    SizeComparator as SizeComparatorByColumn,
-    IncompleteColumnsComparator as IncompleteColumnsComparatorByColumn,
-    ColumnNamesEmbeddingsComparator as ColumnNamesEmbeddingsComparatorByColumn,
-)
-from similarity.DataFrameMetadataCreator import DataFrameMetadataCreator
+cli = CLI()
+cli.run()
 
-BY_COLUMN = True
-configure()
-
-
-def create_metadata(data):
-    """
-    This function creates metadata
-    :return created metadata
-    """
-    return (DataFrameMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
-
-
-def compare_datasets(path1, path2):
-    """
-    This function compare two tables
-    It will read datasets, create metadata and comparator, compare them
-    :param path1: to file with table 1
-    :param path2: to file with table 2
-    :return: distance between tables
-    """
-    data1 = pd.read_csv(path1)
-    data2 = pd.read_csv(path2)
-    metadata1 = create_metadata(data1)
-    metadata2 = create_metadata(data2)
-    comparator_by_column = (
-        ComparatorByColumn()
-        .add_comparator_type(SizeComparatorByColumn())
-        .add_comparator_type(IncompleteColumnsComparatorByColumn())
-        .add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
-    )
-    compartor = (
-        Comparator()
-        .add_comparator_type(SizeComparator())
-        .add_comparator_type(IncompleteColumnsComparator())
-        .add_comparator_type(KindComparator())
-        .add_comparator_type(ColumnNamesEmbeddingsComparator())
-    )
-    if BY_COLUMN:
-        return comparator_by_column.compare(metadata1, metadata2)
-    return compartor.compare(metadata1, metadata2)
-
-
-if __name__ == "__main__":
-    configure()
-    warning_enable.change_status(False)
-    warning_enable.disable_timezone_warn()
-    files = sys.argv[1:]
-    print(files)
-    for file1 in files:
-        for file2 in files:
-            if file1 != file2:
-                distance = compare_datasets(file1, file2)
-                print(f"{file1} |< >| {file2} = {distance}")
-    if len(files) == 0:
-        distance = compare_datasets(
-            "data/netflix_titles.csv",
-            "data/imdb_top_1000.csv",
-        )
-        print(f"'data/netflix_titles.csv' |< >| 'data/imdb_top_1000.csv' = {distance}")
+t2 = perf_counter()
+print(f"Time taken: {t2 - t1} seconds")
