@@ -69,7 +69,7 @@ class BoolMetadata(KindMetadata):
         self.distribution = distribution
         self.nulls = null_values
         self.value = value
-        self.value_embeddings = None if value[0] is not str else model.encode(list(value))
+        self.value_embeddings = None if type(value[0]) is not str else model.encode(list(value))
 
     def __str__(self):
         return f"BoolMetadata(values={self.value},distribution={self.distribution}, null_values={self.nulls})"
@@ -91,8 +91,8 @@ class IDMetadata(KindMetadata):
         self.nulls = null_values
         self.longest = longest
         self.shortest = shortest
-        self.longest_embeddings = None if longest is not str else model.encode(longest)
-        self.shortest_embeddings = None if shortest is not str else model.encode(shortest)
+        self.longest_embeddings = None if type(longest) is not str else model.encode(longest)
+        self.shortest_embeddings = None if type(shortest) is not str else model.encode(shortest)
         self.ratio_max_length = ratio_max_length
 
     def __str__(self):
@@ -114,7 +114,8 @@ class ConstantMetadata(KindMetadata):
         self.nulls = null_values
         self.value = value
         self.distribution = distribution
-        self.value_embeddings = None if value[0] is not str else model.encode(list(value))
+        #model.encode(list(value)).view(-1, 1)
+        self.value_embeddings = None if type(value[0]) is not str else model.encode(list(value))
 
     def __str__(self):
         return f"ConstantMetadata(values={self.value}, null_values={self.nulls}, distribution={self.distribution})"

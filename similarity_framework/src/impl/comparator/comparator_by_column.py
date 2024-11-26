@@ -7,6 +7,7 @@ import pandas as pd
 from statistics import mean
 
 from logging_ import logger
+from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin, AverageDist
 from similarity_framework.src.impl.comparator.utils import cosine_sim, are_columns_null
 from similarity_framework.src.interfaces.comparator.comparator import HandlerType, Comparator
 from similarity_framework.src.models.metadata import Metadata, KindMetadata, CategoricalMetadata
@@ -272,8 +273,8 @@ class ColumnKindHandler(SpecificColumnHandler):
             value: float = 0 if metadata1.value == metadata2.value else 1
         else:
             value = 1 - cosine_sim(
-                metadata1.value_embeddings,
-                metadata2.value_embeddings,
+                metadata1.value_embeddings[0], # todo 0 nebo 1
+                metadata2.value_embeddings[0],
             )
         # if nulls are equal and exist
         if nulls == 0 and metadata1.nulls:
@@ -446,6 +447,9 @@ class ComparatorByColumn(Comparator):
             comparator.add_comparator_type(ColumnKindHandler(weight=settings.weights.kinds))
         if settings.type_basic or settings.type_structural or settings.type_advanced:
             comparator.add_comparator_type(ColumnTypeHandler(settings.weights.type))
+        if settings.distance_function:
+            func = HausdorffDistanceMin() if settings.distance_function == "HausdorffDistanceMin" else AverageDist()
+            comparator.set_distance_function(func)
         return comparator
 
     def __init__(self):

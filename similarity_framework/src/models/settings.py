@@ -1,6 +1,9 @@
 from pydantic import Field, BaseModel, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin
+from similarity_framework.src.interfaces.common import DistanceFunction
+
 
 class WeightSettings(BaseModel):
     column_embeddings: int = Field(1, description="Weight for column embeddings")
@@ -22,6 +25,7 @@ class AnalysisSettings(BaseSettings):
     type_structural: bool = Field(default=False, description="Use structural type comparison")
     type_basic: bool = Field(default=False, description="Use basic type comparison")
     kinds: bool = Field(default=False, description="Use kinds for comparison")
+    distance_function: str = Field(default="HausdorffDistanceMin", description="Distance function for comparison")
 
     ## only for comparator
     size: bool = Field(default=False, description="Use size for comparison")
