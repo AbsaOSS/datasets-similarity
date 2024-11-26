@@ -32,6 +32,7 @@ class AverageDist(DistanceFunction):
         if distance_table.size == 0:
             return np.nan
         row_avg = distance_table.min(axis=1)
+        # alternative add these lines
         # column_avg = distance_table.min(axis=0)
         # return min(row_avg.mean(), column_avg.mean())
         return row_avg.mean()

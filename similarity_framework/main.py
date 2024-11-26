@@ -22,10 +22,6 @@ configure()
 
 
 def create_metadata(data):
-    """
-    This function creates metadata
-    :return created metadata
-    """
     return (TypeMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
 
 
@@ -43,14 +39,18 @@ def compare_datasets(path1, path2):
     metadata2 = create_metadata(data2)
     comparator_by_column = (
         ComparatorByColumn()
+        ## different option
         # .add_comparator_type(SizeComparatorByColumn())
         .add_comparator_type(IncompleteColumnsComparatorByColumn()).add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
+        ## different option
         # .add_comparator_type(ColumnKindHandler())
     )
     compartor = (
         ComparatorByType()
+        ## different option
         # .add_comparator_type(SizeHandler())
         .add_comparator_type(IncompleteColumnsHandler())
+        ## different option
         # .add_comparator_type(KindHandler())
         .add_comparator_type(ColumnNamesEmbeddingsHandler())
     )

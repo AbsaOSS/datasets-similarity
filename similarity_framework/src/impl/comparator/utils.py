@@ -20,7 +20,7 @@ def concat(*data_frames: pd.DataFrame) -> pd.DataFrame:
     return res.map(lambda x: x / len(data_frames))
 
 
-def cosine_sim(u: list | Tensor, v: list | Tensor) -> float:  # todo move to functions.py?
+def cosine_sim(u: list | Tensor, v: list | Tensor) -> float:
     """
     Compute cosine similarity (range 0 to 1) 1 teh same 0 completely different
     :param u: embeddings 1
@@ -30,7 +30,7 @@ def cosine_sim(u: list | Tensor, v: list | Tensor) -> float:  # todo move to fun
     return round(
         np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v)),
         3,
-    )  # todo change rounding to 4, 5 6 ...etc
+    )
 
 
 def get_ratio(count1: int, count2: int) -> float:

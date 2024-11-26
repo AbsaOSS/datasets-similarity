@@ -13,7 +13,6 @@ class SimilarityConfiguration:
 @dataclass
 class SimilarityOutput:
     distance: float
-    # TODO: Thesis add other proper fields
 
 
 @dataclass

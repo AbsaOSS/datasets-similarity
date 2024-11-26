@@ -60,7 +60,6 @@ class Cache:
             tmp = self.__cache.loc[function, key]
             if (tmp != "nan" and tmp is not int) or (tmp is int and not math.isnan(tmp)):
                 return json.loads(tmp)  # json is faster than ast
-        # print(f"NO CACHE key: {key}, function: {function}")
         return None
 
     def save(

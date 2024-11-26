@@ -15,6 +15,7 @@ from similarity_framework.src.models.types_ import NONNUMERICAL
 
 SKIP_CLUSTERS = True
 SKIP_SIMILAR = False
+# alternative model
 # MODEL = 'all-mpnet-base-v2'  # bert-base-nli-mean-tokens
 MODEL = 'bert-base-nli-mean-tokens'  #
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +33,6 @@ def get_vectors(function, data):
     result = {}
     count = 1
     for key in data:
-        # print("Processing column: " + key + " " + str(round((count / len(data)) * 100, 2)) + "%")
         result[key] = function(data[key], SentenceTransformer(MODEL, tokenizer_kwargs={
         'clean_up_tokenization_spaces': True}), key)
         count += 1

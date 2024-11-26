@@ -185,6 +185,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         :param embeddings2: values for column2
         :return: float from 0 to 1
         """
+        # alternative version
         # res = pd.DataFrame()
         # row_mins = []
         # for id1, embed1 in enumerate(embeddings1):
@@ -273,7 +274,7 @@ class ColumnKindHandler(SpecificColumnHandler):
             value: float = 0 if metadata1.value == metadata2.value else 1
         else:
             value = 1 - cosine_sim(
-                metadata1.value_embeddings[0],  # todo 0 nebo 1
+                metadata1.value_embeddings[0],
                 metadata2.value_embeddings[0],
             )
         # if nulls are equal and exist
