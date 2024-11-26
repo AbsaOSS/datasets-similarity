@@ -273,7 +273,7 @@ class ColumnKindHandler(SpecificColumnHandler):
             value: float = 0 if metadata1.value == metadata2.value else 1
         else:
             value = 1 - cosine_sim(
-                metadata1.value_embeddings[0], # todo 0 nebo 1
+                metadata1.value_embeddings[0],  # todo 0 nebo 1
                 metadata2.value_embeddings[0],
             )
         # if nulls are equal and exist

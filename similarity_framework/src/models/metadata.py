@@ -114,7 +114,7 @@ class ConstantMetadata(KindMetadata):
         self.nulls = null_values
         self.value = value
         self.distribution = distribution
-        #model.encode(list(value)).view(-1, 1)
+        # model.encode(list(value)).view(-1, 1)
         self.value_embeddings = None if type(value[0]) is not str else model.encode(list(value))
 
     def __str__(self):

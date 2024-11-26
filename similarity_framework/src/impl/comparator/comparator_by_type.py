@@ -353,7 +353,7 @@ class KindHandler(HandlerType):
                     value_re.loc[column1, column2] = int(meta1.value != meta2.value)
                 else:
                     value_re.loc[column1, column2] = 1 - cosine_sim(
-                        meta1.value_embeddings[0], #todo 0 nebo 1
+                        meta1.value_embeddings[0],  # todo 0 nebo 1
                         meta2.value_embeddings[0],
                     )
 

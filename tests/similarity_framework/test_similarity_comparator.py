@@ -11,7 +11,8 @@ from similarity_framework.src.impl.comparator.comparator_by_column import (Compa
                                                       ColumnExactNamesHandler as ColumnExactNamesHandlerByColumn,
                                                       ColumnKindHandler, ColumnEmbeddingsHandler
                                                       )
-from similarity_framework.src.impl.comparator.utils import concat
+from similarity_framework.src.impl.comparator.distance_functions import AverageDist
+from similarity_framework.src.impl.comparator.utils import concat, cosine_sim, fill_result, are_columns_null, create_string_from_columns
 from similarity_framework.src.models.metadata import MetadataCreatorInput
 from similarity_framework.src.models.similarity import Settings
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
@@ -40,11 +41,84 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(HausdorffDistanceMin().compute(df3), 1)
         self.assertEqual(HausdorffDistanceMin().compute(df4), 3)
 
+    def test_average_dist(self):
+        df1 = pd.DataFrame([(2, 3, 3), (1, 4, 2), (5, 1, 2)])
+        df2 = pd.DataFrame([(7, 2, 2), (8, 3, 4), (9, 2, 5)])
+        df3 = pd.DataFrame([(1, 1, 3), (1, 2, 3), (1, -1, 2)])
+        df4 = pd.DataFrame([(5, 3, 4), (2, 8, 8), (1, 100, 100)])
+        self.assertEqual(AverageDist().compute(df1), 4/3)
+        self.assertEqual(AverageDist().compute(df2), 7/3)
+        self.assertEqual(AverageDist().compute(df3), 1/3)
+        self.assertEqual(AverageDist().compute(df4), 6/3)
+
     def test_get_ratio(self):
         self.assertEqual(round(get_ratio(3, 5), 2), 1.67)
         self.assertEqual(round(get_ratio(5, 3), 2), 1.67)
         self.assertEqual(round(get_ratio(15, 9), 2), 1.67)
         self.assertEqual(round(get_ratio(9, 15), 2), 1.67)
+
+    def test_cosine_sim(self):
+        self.assertEqual(cosine_sim([1, 2, 3], [1, 2, 3]), 1)
+        self.assertEqual(cosine_sim([1, 2, 3], [3, 2, 1]), 0.714)
+        self.assertEqual(cosine_sim([1, 2, 3], [1, 2, 4]), 0.991)
+        self.assertEqual(cosine_sim([1, 2, 3], [1, 2, 2]), 0.98)
+        self.assertEqual(cosine_sim([1, 2, 3], [-1, -2, -3]),  -1)
+
+    def test_fill_result(self):
+        metadata1_names = {0: 'a', 1: 'b', 2: 'c'}
+        metadata2_names = {0: 'a', 1: 'b', 2: 'd'}
+        data = {
+            0: [0.0, 1.0, 1.0],
+            1: [1.0, 0.0, 1.0],
+            2: [1.0, 1.0, 1.0]
+        }
+
+        res = pd.DataFrame(data)
+        print(res)
+        self.assertTrue(fill_result(metadata1_names, metadata2_names).equals(res))
+
+    def test_create_string_from_columns(self):
+        # Create sample data
+        df1 = pd.DataFrame({
+            'col1': [1, 2, 3],
+            'col2': [4, 5, 6]
+        })
+        df2 = pd.DataFrame({
+            'col1': [7, 8, 9],
+            'col2': [10, 11, 12]
+        })
+        database = [df1, df2]
+        table_names = ['table1', 'table2']
+
+        # Expected results
+        expected_sentences = [
+            '1, 2, 3', '4, 5, 6',
+            '7, 8, 9', '10, 11, 12'
+        ]
+        expected_sentences_datasets = [
+            'table1', 'table1',
+            'table2', 'table2'
+        ]
+
+        # Run the function
+        sentences, sentences_datasets = create_string_from_columns(database, table_names)
+
+        # Assert the results
+        self.assertEqual(sentences, expected_sentences)
+        self.assertEqual(sentences_datasets, expected_sentences_datasets)
+
+class TestAreColumnsNull(unittest.TestCase):
+    def test_both_columns_empty(self):
+        self.assertEqual(are_columns_null(set(), set(), "Test message"), (True, 0))
+
+    def test_first_column_empty(self):
+        self.assertEqual(are_columns_null(set(), {1, 2, 3}, "Test message"), (True, 1))
+
+    def test_second_column_empty(self):
+        self.assertEqual(are_columns_null({1, 2, 3}, set(), "Test message"), (True, 1))
+
+    def test_both_columns_non_empty(self):
+        self.assertEqual(are_columns_null({1, 2, 3}, {4, 5, 6}, "Test message"), (False, 0))
 
 
 class TestSingleSpecificComparator(unittest.TestCase):

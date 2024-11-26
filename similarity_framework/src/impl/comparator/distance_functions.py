@@ -19,6 +19,7 @@ class HausdorffDistanceMin(DistanceFunction):
         column_mins = distance_table.min(axis=0)
         return min(row_mins.max(), column_mins.max())
 
+
 class AverageDist(DistanceFunction):
     """Hausdorff distance class"""
 
