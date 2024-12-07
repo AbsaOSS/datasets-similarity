@@ -34,7 +34,7 @@ class CLI(UI):
 
     def _load_user_input(self) -> Any:
         parser = argparse.ArgumentParser(
-            prog="SimilarityRunner CLI",
+            prog="SimilarityRunner",
             description="This is a CLI for interaction with similarity-framework, which is a framework for comparing data",
         )
         parser.add_argument(

@@ -24,8 +24,8 @@ class UI(abc.ABC):
         pass
 
     def run(self):
-        something = self._load_user_input()
-        metadata_input, comparator, metadata_creator, analysis_settings = self._parse_input(something)
+        input_ = self._load_user_input()
+        metadata_input, comparator, metadata_creator, analysis_settings = self._parse_input(input_)
         logger.debug("Analysis settings: ")
         logger.debug(json.dumps(analysis_settings.model_dump(), indent=4))
         logger.info(f"Metadata input has {len(metadata_input)} elements")
@@ -43,3 +43,8 @@ class UI(abc.ABC):
                 result[(first.name, second.name)] = comparator.compare(first, second, analysis_settings)
         # TODO: based on analysis settings get specified metadata objects
         self.show(result, analysis_settings)
+
+
+
+
+
