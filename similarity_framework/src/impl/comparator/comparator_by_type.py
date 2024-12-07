@@ -8,13 +8,15 @@ import pandas as pd
 from torch import Tensor
 
 from logging_ import logger
+from similarity_framework.src.impl.comparator.comparator_by_column import ColumnTypeHandler, IncompleteColumnsHandler, ColumnExactNamesHandler, \
+    ColumnNamesEmbeddingsHandler, ColumnEmbeddingsHandler, SizeHandler, ColumnKindHandler
 from similarity_framework.src.impl.comparator.utils import cosine_sim, get_ratio, concat, fill_result
 from similarity_framework.src.interfaces.common import DistanceFunction
-from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin
+from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin, AverageDist
 from similarity_framework.src.interfaces.comparator.comparator import HandlerType, Comparator
 from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import SimilarityOutput, Settings
-from similarity_framework.src.models.types_ import DataKind
+from similarity_framework.src.models.types_ import DataKind, Type
 from similarity_framework.src.models.settings import AnalysisSettings
 
 
@@ -145,110 +147,110 @@ class CategoricalHandlerSimilar(CategoricalHandler):
         return concat(result, name_distance)
 
 
-class ColumnEmbeddingHandler(HandlerType):
-    """
-    Handler for column values embeddings
-    """
-
-    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
-        """
-        Compare embeddings of columns
-        :param metadata1: first table
-        :param metadata2: second table
-        :return: dataframe full of numbers between 0 and 1
-        """
-        result = pd.DataFrame()
-        name_distance = pd.DataFrame()
-        for id1, (
-            column1,
-            embedding1,
-        ) in enumerate(metadata1.column_embeddings.items()):
-            for id2, (
-                column2,
-                embedding2,
-            ) in enumerate(metadata2.column_embeddings.items()):
-                result.loc[id1, id2] = 1 - cosine_sim(embedding1, embedding2)
-                name_distance.loc[id1, id2] = 1 - cosine_sim(
-                    metadata1.column_embeddings[column1],
-                    metadata2.column_embeddings[column2],
-                )
-        return concat(result, name_distance)
-
-
-class SizeHandler(HandlerType):
-    """
-    Size of table Handler class
-    """
-
-    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
-        """
-        If sizes are the same distance is 0, else distance is 1 - % of max
-        :param metadata1: first table
-        :param metadata2: second table
-        :return: dataframe of size 1x1 fill with distance number (0-1) # todo test
-        """
-        max_size = int(max(metadata1.size, metadata2.size))
-        min_size = int(min(metadata1.size, metadata2.size))
-        distance = 1 - (min_size / max_size)
-        return pd.DataFrame(index=range(1), columns=range(1)).fillna(distance)
-        # todo if this is not working try this We will fill the whole table with this numer, distance function should compute the same number (todo test)
+# class ColumnEmbeddingHandler(HandlerType):
+#     """
+#     Handler for column values embeddings
+#     """
+#
+#     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
+#         """
+#         Compare embeddings of columns
+#         :param metadata1: first table
+#         :param metadata2: second table
+#         :return: dataframe full of numbers between 0 and 1
+#         """
+#         result = pd.DataFrame()
+#         name_distance = pd.DataFrame()
+#         for id1, (
+#             column1,
+#             embedding1,
+#         ) in enumerate(metadata1.column_embeddings.items()):
+#             for id2, (
+#                 column2,
+#                 embedding2,
+#             ) in enumerate(metadata2.column_embeddings.items()):
+#                 result.loc[id1, id2] = 1 - cosine_sim(embedding1, embedding2)
+#                 name_distance.loc[id1, id2] = 1 - cosine_sim(
+#                     metadata1.column_embeddings[column1],
+#                     metadata2.column_embeddings[column2],
+#                 )
+#         return concat(result, name_distance)
 
 
-class ColumnExactNamesHandler(HandlerType):
-    """
-    Handler for exact column names
-    """
-
-    def compare(self, metadata1: Metadata, metadata2: Metadata, *kwargs) -> pd.DataFrame:
-        """
-        This is dummy Handler if the names are exactly the same distance is 0 if not distance is 1
-        :param metadata1: first table
-        :param metadata2: second table
-        :return: dataframe fill by 0 and 1
-        """
-        if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
-            logger.warning("Warning: column_names_clean is not computed")
-        return fill_result(metadata1.column_names_clean, metadata2.column_names_clean)
-
-
-class ColumnNamesEmbeddingsHandler(HandlerType):
-    """
-    Handler for column names embeddings
-    """
-
-    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
-        """
-        Computes cosine distance for each column name embedding
-        :param distance_function: - not used
-        :param metadata1: first table
-        :param metadata2: second table
-        :param settings: - not used
-        :return: dataframe fill by distances between 0 and 1
-        """
-        if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
-            logger.warning("Warning: column name embedding is not computed")
-
-        result = pd.DataFrame()
-        for idx1, name1 in enumerate(metadata1.column_name_embeddings.values()):
-            for idx2, name2 in enumerate(metadata2.column_name_embeddings.values()):
-                result.loc[idx1, idx2] = 1 - cosine_sim(name1, name2)
-        return result
+# class SizeHandler(HandlerType):
+#     """
+#     Size of table Handler class
+#     """
+#
+#     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
+#         """
+#         If sizes are the same distance is 0, else distance is 1 - % of max
+#         :param metadata1: first table
+#         :param metadata2: second table
+#         :return: dataframe of size 1x1 fill with distance number (0-1) # todo test
+#         """
+#         max_size = int(max(metadata1.size, metadata2.size))
+#         min_size = int(min(metadata1.size, metadata2.size))
+#         distance = 1 - (min_size / max_size)
+#         return pd.DataFrame(index=range(1), columns=range(1)).fillna(distance)
+#         # todo if this is not working try this We will fill the whole table with this numer, distance function should compute the same number (todo test)
 
 
-class IncompleteColumnsHandler(HandlerType):
-    """
-    Handler for incomplete columns
-    """
+# class ColumnExactNamesHandler(HandlerType):
+#     """
+#     Handler for exact column names
+#     """
+#
+#     def compare(self, metadata1: Metadata, metadata2: Metadata, *kwargs) -> pd.DataFrame:
+#         """
+#         This is dummy Handler if the names are exactly the same distance is 0 if not distance is 1
+#         :param metadata1: first table
+#         :param metadata2: second table
+#         :return: dataframe fill by 0 and 1
+#         """
+#         if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
+#             logger.warning("Warning: column_names_clean is not computed")
+#         return fill_result(metadata1.column_names_clean, metadata2.column_names_clean)
 
-    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
-        """
-        Compare if two columns are complete or incomplete, if both have same outcome (True False)
-         the distance is 0 otherwise is 1
-        :param metadata1: first table
-        :param metadata2: second table
-        :return: dataframe full of 1 and 0
-        """
-        return fill_result(metadata1.column_incomplete, metadata2.column_incomplete)
+
+# class ColumnNamesEmbeddingsHandler(HandlerType):
+#     """
+#     Handler for column names embeddings
+#     """
+#
+#     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
+#         """
+#         Computes cosine distance for each column name embedding
+#         :param distance_function: - not used
+#         :param metadata1: first table
+#         :param metadata2: second table
+#         :param settings: - not used
+#         :return: dataframe fill by distances between 0 and 1
+#         """
+#         if metadata1.column_name_embeddings == {} or metadata2.column_name_embeddings == {}:
+#             logger.warning("Warning: column name embedding is not computed")
+#
+#         result = pd.DataFrame()
+#         for idx1, name1 in enumerate(metadata1.column_name_embeddings.values()):
+#             for idx2, name2 in enumerate(metadata2.column_name_embeddings.values()):
+#                 result.loc[idx1, idx2] = 1 - cosine_sim(name1, name2)
+#         return result
+
+
+# class IncompleteColumnsHandler(HandlerType):# todo thsi ok
+#     """
+#     Handler for incomplete columns
+#     """
+#
+#     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame:
+#         """
+#         Compare if two columns are complete or incomplete, if both have same outcome (True False)
+#          the distance is 0 otherwise is 1
+#         :param metadata1: first table
+#         :param metadata2: second table
+#         :return: dataframe full of 1 and 0
+#         """
+#         return fill_result(metadata1.column_incomplete, metadata2.column_incomplete) ##
 
 
 class KindHandler(HandlerType):
@@ -509,51 +511,6 @@ class KindHandler(HandlerType):
         return pd.DataFrame([result])
 
 
-class TypeHandler(HandlerType):
-
-    def __numerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str):
-        num_met1 = metadata1.numerical_metadata[index1]
-        num_met2 = metadata2.numerical_metadata[index2]
-        score = 3
-        if num_met1.same_value_length == num_met2.same_value_length:
-            score += 2
-        if num_met1.min_value == num_met2.min_value:
-            score += 1
-        elif num_met1.min_value == num_met2.min_value + num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value - num_met1.range_size / 100:
-            score += 0.5
-        if num_met1.max_value == num_met2.max_value:
-            score += 1
-        elif num_met1.max_value == num_met2.max_value - num_met1.range_size / 100 or num_met1.max_value == num_met2.max_value + num_met1.range_size / 100:
-            score += 0.5
-        if num_met1.range_size == num_met2.range_size:
-            score += 2
-        return 1 - score / 9
-
-    def __nonnumerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str) -> float:
-        num_met1 = metadata1.nonnumerical_metadata[index1]
-        num_met2 = metadata2.nonnumerical_metadata[index2]
-        score = 3
-        if num_met1.longest == num_met2.longest:
-            score += 2
-        if num_met1.shortest == num_met2.shortest:
-            score += 2
-        if num_met1.avg_length == num_met2.avg_length:
-            score += 2
-        elif num_met1.avg_length == num_met2.avg_length + num_met1.avg_length / 100 or num_met1.avg_length == num_met2.avg_length - num_met1.avg_length / 100:
-            score += 1
-        return 1 - score / 9
-
-    def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame | float:
-        result = pd.DataFrame()
-        for type_ in metadata1.column_type:
-            for idx1, name1 in enumerate(metadata1.column_type[type_]):
-                for idx2, name2 in enumerate(metadata2.column_type[type_]):
-                    if name1 in metadata1.numerical_metadata and name2 in metadata2.numerical_metadata:
-                        result.loc[idx1, idx2] = self.__numerical_compare1(metadata1, metadata2, name1, name2)
-
-                    if name1 in metadata1.nonnumerical_metadata and name2 in metadata2.nonnumerical_metadata:
-                        result.loc[idx1, idx2] = self.__nonnumerical_compare1(metadata1, metadata2, name1, name2)
-        return result
 
 
 class ComparatorByType(Comparator):
@@ -573,14 +530,41 @@ class ComparatorByType(Comparator):
         if settings.column_name_embeddings:
             comparator.add_comparator_type(ColumnNamesEmbeddingsHandler(settings.weights.column_name_embeddings))
         if settings.column_embeddings:
-            comparator.add_comparator_type(ColumnEmbeddingHandler(settings.weights.column_embeddings))
+            comparator.add_comparator_type(ColumnEmbeddingsHandler(settings.weights.column_embeddings))
         if settings.kinds:
-            comparator.add_comparator_type(CategoricalHandler(settings.weights.kinds))
+            comparator.set_kinds(True)
+            comparator.kind_weight = settings.weights.kinds
         if settings.type_basic or settings.type_structural or settings.type_advanced:
-            comparator.add_comparator_type(TypeHandler(settings.weights.type))
+            comparator.set_types(True)
+            comparator.type_weight = settings.weights.type
+        if settings.distance_function:
+            func = HausdorffDistanceMin() if settings.distance_function == "HausdorffDistanceMin" else AverageDist()
+            comparator.set_distance_function(func)
         logger.info("Comparator by type created")
         logger.info(f"Handlers used: {','.join([item.__class__.__name__ for item in comparator.comparator_type])}")
         return comparator
+
+    def __init__(self):
+        super().__init__()
+        self.kinds = False
+        self.types = False
+        self.kinds_compare = True
+        self.types_compare = True
+        self.kind_weight = 1
+        self.type_weight = 1
+    def set_kinds(self, value: bool) -> "ComparatorByType":
+        """
+        Set if kinds should be compared
+        """
+        self.kinds = value
+        return self
+
+    def set_types(self, value: bool) -> "ComparatorByType":
+        """
+        Set if types should be compared
+        """
+        self.types = value
+        return self
 
     def add_comparator_type(self, comparator: HandlerType) -> "ComparatorByType":
         """
@@ -589,36 +573,78 @@ class ComparatorByType(Comparator):
         self.comparator_type.append(comparator)
         return self
 
+    def __compare_all_columns(self, metadata1: Metadata, metadata2: Metadata,
+                                 column_names1: set[str], column_names2: set[str],
+                                 comparators: list[HandlerType]) -> pd.DataFrame:
+        all_compares = []
+        for comparator in comparators:
+            col_to_col = pd.DataFrame()
+            for idx1, name1 in enumerate(column_names1):
+                for idx2, name2 in enumerate(column_names2):
+                    result = comparator.compare(metadata1, metadata2, index1=name1, index2=name2)
+                    if result is not np.nan:
+                        col_to_col.loc[idx1, idx2] = result
+            if not col_to_col.empty: all_compares.append(col_to_col) # todo add , comparator.weight
+        return pd.DataFrame if all_compares == [] else concat(*all_compares)
+
+    def __compare_types(self, type_, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
+        comparators = self.comparator_type.copy()
+        if self.types_compare: comparators.append(ColumnTypeHandler())
+        all_compares = self.__compare_all_columns(metadata1, metadata2,
+                                                  metadata1.column_type[type_],
+                                                  metadata2.column_type[type_],
+                                                  comparators)
+        return all_compares
+
+    def __compare_kinds(self, kind, metadata1: Metadata, metadata2: Metadata) -> pd.DataFrame:
+        comparators = self.comparator_type.copy()
+        if self.kinds_compare: comparators.append(ColumnKindHandler())
+        all_compares = self.__compare_all_columns(metadata1, metadata2,
+                                                  metadata1.column_kind[kind],
+                                                  metadata2.column_kind[kind],
+                                                  comparators)
+        return all_compares
+
     def _compare(self, metadata1: Metadata, metadata2: Metadata) -> SimilarityOutput:
         """
         Compare two tables according to previously set properties.
         """
         distances = []
-        for comp in self.comparator_type:
-            distance_table = comp.compare(
-                metadata1,
-                metadata2,
-            )
-            distances.append(
-                (
-                    self.distance_function.compute(distance_table),
-                    get_ratio(
-                        distance_table.shape[0],
-                        distance_table.shape[1],
-                    ),
-                    comp.weight,
-                )
-            )
+        if self.types:
+            for type_ in metadata1.column_type.keys():
+                if metadata1.column_type[type_] == set() or metadata2.column_type[type_] == set():
+                    continue
+                dist_table = self.__compare_types(type_, metadata1, metadata2)
+                if not dist_table.empty:
+                    distances.append((self.distance_function.compute(dist_table),
+                                  get_ratio(
+                                      dist_table.shape[0],
+                                      dist_table.shape[1],
+                                  ),
+                                  self.type_weight))
+        if self.kinds:
+            for kind in metadata1.column_kind.keys():
+                if metadata1.column_kind[kind] != () and  metadata2.column_kind[kind] != ():
+                    dist_table = self.__compare_kinds(kind, metadata1, metadata2)
+                    if not dist_table.empty:
+                        distances.append((self.distance_function.compute(dist_table),
+                                      get_ratio(
+                                          dist_table.shape[0],
+                                          dist_table.shape[1],
+                                      ),
+                                      self.kind_weight))
+
         result = 0
         nan = 0
+        sum_weight = sum([weight for _,_, weight in distances if not np.isnan(weight)])
         for dist, ratio, weight in distances:
             if math.isnan(dist):
                 nan += 1
                 continue
             if Settings.NO_RATIO in self.settings:
-                result += dist * dist * weight
+                result += dist * dist * weight/sum_weight
             else:
-                result += dist * dist * ratio * weight
+                result += dist * dist * ratio * weight/sum_weight
         if nan == len(distances):
             return SimilarityOutput(distance=1)
         return SimilarityOutput(distance=np.sqrt(result))

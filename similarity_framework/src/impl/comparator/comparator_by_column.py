@@ -97,6 +97,8 @@ class ColumnExactNamesHandler(GeneralColumnHandler):
         :param metadata2: second dataframe metadata
         :return: float number 0 or 1
         """
+        if metadata1.column_names_clean == {} or metadata2.column_names_clean == {}:
+            logger.warning("Warning: column_names_clean is not computed")
         return 0 if metadata1.column_names_clean[index1] == metadata2.column_names_clean[index2] else 1
 
 
@@ -146,7 +148,7 @@ class ColumnEmbeddingsHandler(GeneralColumnHandler):
             logger.debug(
                 f"column embedding is not computed - [{metadata1.column_embeddings == {}} - {metadata2.column_embeddings == {}}] {index1 if index1 not in metadata1.column_embeddings else index2}"
             )
-            return np.nan
+            return np.nan #TODO funguje to pro by_column ?? puvodne np.nan
         return 1 - cosine_sim(
             metadata1.column_embeddings[index1],
             metadata2.column_embeddings[index2],
@@ -342,20 +344,22 @@ class ColumnKindHandler(SpecificColumnHandler):
 
         """
         are_nulls = (False, 0.0)
-        if DataKind.BOOL in self.compare_kind:
+        if DataKind.BOOL in self.compare_kind and DataKind.BOOL in metadata1.column_kind and DataKind.BOOL in metadata2.column_kind:
             if index1 in metadata1.column_kind[DataKind.BOOL] and index2 in metadata2.column_kind[DataKind.BOOL]:
                 return self.compare_bools(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
             are_nulls = are_columns_null(metadata1.column_kind[DataKind.BOOL], metadata2.column_kind[DataKind.BOOL], "Boolean column")
-        if DataKind.ID in self.compare_kind:
+
+        if DataKind.ID in self.compare_kind and DataKind.ID in metadata1.column_kind and DataKind.ID in metadata2.column_kind:
             if index1 in metadata1.column_kind[DataKind.ID] and index2 in metadata2.column_kind[DataKind.ID]:
                 return self.compare_ids(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
             are_nulls = are_columns_null(metadata1.column_kind[DataKind.ID], metadata2.column_kind[DataKind.ID], "ID column")
-        if DataKind.CATEGORICAL in self.compare_kind:
+
+        if DataKind.CATEGORICAL in self.compare_kind and DataKind.CATEGORICAL in metadata1.column_kind and DataKind.CATEGORICAL in metadata2.column_kind:
             if index1 in metadata1.column_kind[DataKind.CATEGORICAL] and index2 in metadata2.column_kind[DataKind.CATEGORICAL]:
                 return self.compare_categoricals(metadata1.categorical_metadata[index1], metadata2.categorical_metadata[index2])
             are_nulls = are_columns_null(metadata1.column_kind[DataKind.CATEGORICAL], metadata2.column_kind[DataKind.CATEGORICAL], "Categorical column")
 
-        if DataKind.CONSTANT in self.compare_kind:
+        if DataKind.CONSTANT in self.compare_kind and DataKind.CONSTANT in metadata1.column_kind and DataKind.CONSTANT in metadata2.column_kind:
             if index1 in metadata1.column_kind[DataKind.CONSTANT] and index2 in metadata2.column_kind[DataKind.CONSTANT]:
                 return self.compare_constants(metadata1.kind_metadata[index1], metadata2.kind_metadata[index2])
 
@@ -369,11 +373,10 @@ class ColumnKindHandler(SpecificColumnHandler):
 class ColumnTypeHandler(SpecificColumnHandler):
 
     def __numerical_compare1(
-        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, column1_type: type[Type], column2_type: type[Type]
+        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int
     ) -> float:
         num_met1 = metadata1.numerical_metadata[index1]
         num_met2 = metadata2.numerical_metadata[index2]
-        score = 3 if column1_type == column2_type else 0
         if num_met1.same_value_length == num_met2.same_value_length:
             score += 2
         if num_met1.min_value == num_met2.min_value:
@@ -389,11 +392,10 @@ class ColumnTypeHandler(SpecificColumnHandler):
         return 1 - score / 9
 
     def __nonnumerical_compare1(
-        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, column1_type: type[Type], column2_type: type[Type]
+        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int
     ) -> float:
         num_met1 = metadata1.nonnumerical_metadata[index1]
         num_met2 = metadata2.nonnumerical_metadata[index2]
-        score = 3 if column1_type == column2_type else 0
         if num_met1.longest == num_met2.longest or num_met1.longest is num_met2.longest:
             score += 2
         if num_met1.shortest == num_met2.shortest or num_met1.shortest is num_met2.shortest:
@@ -415,11 +417,12 @@ class ColumnTypeHandler(SpecificColumnHandler):
         """
         column1_type = metadata1.get_column_type(index1)
         column2_type = metadata2.get_column_type(index2)
+        score = 3 if column1_type == column2_type else 0
         if index1 in metadata1.numerical_metadata and index2 in metadata2.numerical_metadata:
-            return self.__numerical_compare1(metadata1, metadata2, index1, index2, column1_type, column2_type)
+            return self.__numerical_compare1(metadata1, metadata2, index1, index2, score)
 
         if index1 in metadata1.nonnumerical_metadata and index2 in metadata2.nonnumerical_metadata:
-            return self.__nonnumerical_compare1(metadata1, metadata2, index1, index2, column1_type, column2_type)
+            return self.__nonnumerical_compare1(metadata1, metadata2, index1, index2, score)
 
         if column1_type == column2_type:
             return 0
