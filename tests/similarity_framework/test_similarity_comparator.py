@@ -2,9 +2,12 @@ import os
 import unittest
 
 import pandas as pd
+from pyarrow import Tensor
+from sentence_transformers import SentenceTransformer
 
-from similarity_framework.src.impl.comparator.comparator_by_type import HausdorffDistanceMin, SizeHandler, get_ratio, ComparatorByType, \
-    ColumnExactNamesHandler, ColumnNamesEmbeddingsHandler, IncompleteColumnsHandler, KindHandler
+from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType
+from similarity_framework.src.impl.comparator.handlers import HausdorffDistanceMin, SizeHandler, get_ratio, \
+    ColumnExactNamesHandler, ColumnNamesEmbeddingsHandler, IncompleteColumnsHandler
 from similarity_framework.src.impl.comparator.comparator_by_column import (ComparatorByColumn, SizeHandler as SizeHandlerByColumn,
                                                       IncompleteColumnsHandler as IncompleteColumnsHandlerByColumn,
                                                       ColumnNamesEmbeddingsHandler as ColumnNamesEmbeddingsHandlerByColumn,
@@ -13,7 +16,7 @@ from similarity_framework.src.impl.comparator.comparator_by_column import (Compa
                                                       )
 from similarity_framework.src.impl.comparator.distance_functions import AverageDist
 from similarity_framework.src.impl.comparator.utils import concat, cosine_sim, fill_result, are_columns_null, create_string_from_columns
-from similarity_framework.src.models.metadata import MetadataCreatorInput
+from similarity_framework.src.models.metadata import MetadataCreatorInput, Metadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import Settings
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
 from similarity_framework.src.models.types_ import DataKind
@@ -123,7 +126,7 @@ class TestAreColumnsNull(unittest.TestCase):
 
 class TestSingleSpecificComparator(unittest.TestCase):
     def setUp(self):
-        self.compartor = ComparatorByType()
+        self.compartor = ComparatorByType().set_types(True).set_kinds(True)
 
         self.file = os.path.join(THIS_DIR, '../data_validation/edge_cases.csv')
         self.data = pd.read_csv(self.file)
@@ -134,16 +137,17 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.data_second_half.index = self.data_second_half.index - int(len(self.data) / 2)
         self.data_diff_type = self.data.copy()  # todo fill
 
-        self.metadata_creator = (TypeMetadataCreator()
-                                 .compute_advanced_structural_types()
-                                 .compute_column_kind()
-                                 .compute_advanced_structural_types()
-                                 .compute_incomplete_column()
-                                 .compute_column_names_embeddings())
+        self.metadata_creator = TypeMetadataCreator()
+        self.metadata_creator.compute_advanced_structural_types().compute_column_kind().compute_incomplete_column().compute_column_names_embeddings()
         self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
         self.metadata_diff_column_names = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_diff_column_names))
         self.metadata_first_half = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_first_half))
         self.metadata_second_half = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_second_half))
+
+        self.compartor.types_compare = False
+        self.compartor.kinds_compare = False
+
+        self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
     def test_size_compare(self):
         self.compartor.add_comparator_type(SizeHandler())
@@ -184,7 +188,9 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
 
     def test_kind_compare(self):
-        self.compartor.add_comparator_type(KindHandler())
+        self.compartor.types_compare = True
+        self.compartor.kinds_compare = True
+        self.compartor.add_comparator_type(ColumnKindHandler())
 
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
@@ -195,27 +201,42 @@ class TestSingleSpecificComparator(unittest.TestCase):
         # self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half), 0)
 
     def test_kind_BOOL_compare(self):
-        self.compartor.add_comparator_type(KindHandler(compare_kind=[DataKind.BOOL]))
+        self.compartor.set_types(False)
+        self.compartor.add_comparator_type(ColumnKindHandler(compare_kind=[DataKind.BOOL]))
         self.assertEqual(
             self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
 
     def test_kind_ID_compare(self):
-        self.compartor.add_comparator_type(KindHandler(compare_kind=[DataKind.ID]))
+        self.compartor.set_types(False)
+        self.compartor.add_comparator_type(ColumnKindHandler(compare_kind=[DataKind.ID]))
         self.assertEqual(
             self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
 
     def test_kind_CATEGORICAL_compare(self):
-        self.compartor.add_comparator_type(KindHandler(compare_kind=[DataKind.CATEGORICAL]))
-        self.assertEqual(
-            self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
+        self.compartor.set_types(False)
+        metadata = Metadata()
+        metadata.column_kind[DataKind.CATEGORICAL] = {'column_0', 'column_1'}
+        metadata.categorical_metadata = {'column_0':
+                                             CategoricalMetadata(3, ["One", "Two", "Three"],
+                                                                 pd.Series({'One': 10, 'Two': 5, 'Three': 8}),
+                                                                 [self.model.encode('One'), self.model.encode('Two'), self.model.encode('Three')]
+                                                                 ),
+                                        'column_1':
+                                                CategoricalMetadata(3, ["One", "Two", "Three"],
+                                                                    pd.Series({'One': 15, 'Two': 1, 'Three': 7}),
+                                                                    [self.model.encode('One'), self.model.encode('Two'), self.model.encode('Three')]
+                                                                    )
+                                             }
+        self.compartor.add_comparator_type(ColumnKindHandler(compare_kind=[DataKind.CATEGORICAL]))
+        self.assertEqual(self.compartor.compare(metadata, metadata).distance, 0)
+
 
     def test_kind_CONSTANT_compare(self):
-        self.compartor.add_comparator_type(KindHandler(compare_kind=[DataKind.CONSTANT]))
+        self.compartor.set_types(False)
+        self.compartor.add_comparator_type(ColumnKindHandler(compare_kind=[DataKind.CONSTANT]))
         self.assertEqual(
             self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)

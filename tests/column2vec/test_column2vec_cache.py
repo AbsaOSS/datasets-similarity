@@ -8,7 +8,7 @@ from column2vec.src.column2vec import cache, column2vec_as_sentence, column2vec_
     column2vec_weighted_avg, column2vec_sum, column2vec_weighted_sum
 from column2vec.src.functions import get_nonnumerical_data
 
-MODEL = 'bert-base-nli-mean-tokens'
+MODEL = 'sentence-transformers/all-mpnet-base-v2'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 

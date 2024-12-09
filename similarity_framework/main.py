@@ -22,10 +22,10 @@ configure()
 
 
 def create_metadata(data):
-    return (TypeMetadataCreator(data).compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata()
+    return (TypeMetadataCreator().compute_advanced_structural_types().compute_column_kind().compute_column_names_embeddings()).get_metadata(data)
 
 
-def compare_datasets(path1, path2):
+def compare_datasets(path1: str, path2):
     """
     This function compare two tables
     It will read datasets, create metadata and comparator, compare them
@@ -41,7 +41,7 @@ def compare_datasets(path1, path2):
         ComparatorByColumn()
         ## different option
         # .add_comparator_type(SizeComparatorByColumn())
-        .add_comparator_type(IncompleteColumnsComparatorByColumn()).add_comparator_type(ColumnNamesEmbeddingsComparatorByColumn())
+        .add_comparator_type(IncompleteColumnsComparatorByColumn()).add_comparator_type(ColumnNamesEmbeddingsHandler())
         ## different option
         # .add_comparator_type(ColumnKindHandler())
     )

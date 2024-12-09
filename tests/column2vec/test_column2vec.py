@@ -17,7 +17,7 @@ SKIP_CLUSTERS = True
 SKIP_SIMILAR = False
 # alternative model
 # MODEL = 'all-mpnet-base-v2'  # bert-base-nli-mean-tokens
-MODEL = 'bert-base-nli-mean-tokens'  #
+MODEL = 'sentence-transformers/all-mpnet-base-v2'  #
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
