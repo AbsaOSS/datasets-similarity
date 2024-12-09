@@ -179,7 +179,7 @@ class ColumnKindHandler(SpecificColumnHandler):
         else:
             self.kind_weight = weight
 
-    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:  # todo add type
+    def compute_embeddings_distance(self, embeddings1, embeddings2) -> float:
         """
         Creates table of distances between embeddings for each row  and computes mean
          of row and column minimums then pick max.
@@ -463,7 +463,6 @@ class CategoricalHandler(HandlerType):
         for embed1 in embeddings1:
             siml_line = []
             for embed2 in embeddings2:
-                # todo rounding for 3 digits ? ok -> two because of minus 0
                 siml_line.append(
                     round(
                         1
@@ -504,10 +503,9 @@ class CategoricalHandler(HandlerType):
                 ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)
                 result.loc[id1, id2] = dist * ratio
                 name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
-        # todo p value or correlation
         return concat(result, name_distance)
 
-class CategoricalHandlerSimilar(CategoricalHandler):
+class CategoricalHandlerSimilar(CategoricalHandler):# pragma: no cover
     """
     Handler for column category
     """
@@ -550,14 +548,13 @@ class CategoricalHandlerSimilar(CategoricalHandler):
             for id2, (column2, categorical2) in enumerate(metadata2.categorical_metadata.items()):
                 simil_matrix = self.__create_sim_matrix(categorical1.category_embedding, categorical2.category_embedding)
                 _, score = self.__compute_similarity_score(simil_matrix)
-                ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)  # todo 1-ratio???
+                ratio = get_ratio(categorical1.count_categories, categorical1.count_categories)
                 result.loc[id1, id2] = 1 - (score * ratio)
                 name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
-        # todo p value or correlation
         return concat(result, name_distance)
 
 
-class KindHandlerOldByType(HandlerType):
+class KindHandlerOldByType(HandlerType):# pragma: no cover
     """
     Handler for column kind
     """
@@ -659,7 +656,7 @@ class KindHandlerOldByType(HandlerType):
                     value_re.loc[column1, column2] = int(meta1.value != meta2.value)
                 else:
                     value_re.loc[column1, column2] = 1 - cosine_sim(
-                        meta1.value_embeddings[0],  # todo 0 nebo 1
+                        meta1.value_embeddings[0],
                         meta2.value_embeddings[0],
                     )
 
@@ -767,7 +764,6 @@ class KindHandlerOldByType(HandlerType):
                 count1 = metadata1.categorical_metadata[column1].count_categories
                 count2 = metadata2.categorical_metadata[column2].count_categories
                 count_re.loc[column1, column2] = count1 / count2 if count1 < count2 else count2 / count1
-                # todo compare categories_with_count for metadata1 and metadata2
                 # firstly normalize dictionary categories_with_count then
                 # compare the difference between the two dictionaries
         return concat(value_re, count_re)

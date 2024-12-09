@@ -2,6 +2,8 @@ import os
 import unittest
 
 import pandas as pd
+from pyarrow import Tensor
+from sentence_transformers import SentenceTransformer
 
 from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType
 from similarity_framework.src.impl.comparator.handlers import HausdorffDistanceMin, SizeHandler, get_ratio, \
@@ -14,7 +16,7 @@ from similarity_framework.src.impl.comparator.comparator_by_column import (Compa
                                                       )
 from similarity_framework.src.impl.comparator.distance_functions import AverageDist
 from similarity_framework.src.impl.comparator.utils import concat, cosine_sim, fill_result, are_columns_null, create_string_from_columns
-from similarity_framework.src.models.metadata import MetadataCreatorInput
+from similarity_framework.src.models.metadata import MetadataCreatorInput, Metadata, CategoricalMetadata
 from similarity_framework.src.models.similarity import Settings
 from similarity_framework.src.impl.metadata.type_metadata_creator import TypeMetadataCreator
 from similarity_framework.src.models.types_ import DataKind
@@ -145,6 +147,8 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.compartor.types_compare = False
         self.compartor.kinds_compare = False
 
+        self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+
     def test_size_compare(self):
         self.compartor.add_comparator_type(SizeHandler())
 
@@ -210,6 +214,24 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.assertEqual(
             self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
         self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
+
+    def test_kind_CATEGORICAL_compare(self):
+        self.compartor.set_types(False)
+        metadata = Metadata()
+        metadata.column_kind[DataKind.CATEGORICAL] = {'column_0', 'column_1'}
+        metadata.categorical_metadata = {'column_0':
+                                             CategoricalMetadata(3, ["One", "Two", "Three"],
+                                                                 pd.Series({'One': 10, 'Two': 5, 'Three': 8}),
+                                                                 [self.model.encode('One'), self.model.encode('Two'), self.model.encode('Three')]
+                                                                 ),
+                                        'column_1':
+                                                CategoricalMetadata(3, ["One", "Two", "Three"],
+                                                                    pd.Series({'One': 15, 'Two': 1, 'Three': 7}),
+                                                                    [self.model.encode('One'), self.model.encode('Two'), self.model.encode('Three')]
+                                                                    )
+                                             }
+        self.compartor.add_comparator_type(ColumnKindHandler(compare_kind=[DataKind.CATEGORICAL]))
+        self.assertEqual(self.compartor.compare(metadata, metadata).distance, 0)
 
 
     def test_kind_CONSTANT_compare(self):
