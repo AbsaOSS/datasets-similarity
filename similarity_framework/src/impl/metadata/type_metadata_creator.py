@@ -93,7 +93,9 @@ class TypeMetadataCreator(MetadataCreator):
                             True for incomplete data and False otherwise
         """
         super().__init__()
-        self.model: Optional[SentenceTransformer] = SentenceTransformer('sentence-transformers/all-mpnet-base-v2', tokenizer_kwargs={"clean_up_tokenization_spaces": True})
+        self.model: Optional[SentenceTransformer] = SentenceTransformer(
+            "sentence-transformers/all-mpnet-base-v2", tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+        )
 
     def __normalize(self, num1: int, num2: int) -> tuple[int, int]:
         """
@@ -165,7 +167,7 @@ class TypeMetadataCreator(MetadataCreator):
         :return: embedding model if exists or creates new one
         """
         if not self.model:
-            self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2', tokenizer_kwargs={"clean_up_tokenization_spaces": True})
+            self.model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", tokenizer_kwargs={"clean_up_tokenization_spaces": True})
         return self.model
 
     # Setting Creator

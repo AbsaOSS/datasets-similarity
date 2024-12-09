@@ -7,6 +7,7 @@ from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import Settings, SimilarityOutput
 from similarity_framework.src.models.settings import AnalysisSettings
 
+
 class Comparator(ABC):
     """
     Abstract Comparator class

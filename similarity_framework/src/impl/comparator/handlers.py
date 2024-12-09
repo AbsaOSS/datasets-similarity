@@ -221,8 +221,16 @@ class ColumnKindHandler(SpecificColumnHandler):
         :return: float number in range <0, 1>
         """
         nulls = 0 if metadata1.nulls == metadata2.nulls else 1
-        dist1 = metadata1.distribution[0] / metadata1.distribution[1] if metadata1.distribution[1] > metadata1.distribution[0] else metadata1.distribution[1] / metadata1.distribution[0]
-        dist2 = metadata2.distribution[0] / metadata2.distribution[1] if metadata2.distribution[1] > metadata2.distribution[0] else metadata2.distribution[1] / metadata2.distribution[0]
+        dist1 = (
+            metadata1.distribution[0] / metadata1.distribution[1]
+            if metadata1.distribution[1] > metadata1.distribution[0]
+            else metadata1.distribution[1] / metadata1.distribution[0]
+        )
+        dist2 = (
+            metadata2.distribution[0] / metadata2.distribution[1]
+            if metadata2.distribution[1] > metadata2.distribution[0]
+            else metadata2.distribution[1] / metadata2.distribution[0]
+        )
         distr = abs(dist1 - dist2)
         if metadata1.value_embeddings is None or metadata2.value_embeddings is None:
             return (nulls + distr) / 2
@@ -374,9 +382,7 @@ class ColumnKindHandler(SpecificColumnHandler):
 
 class ColumnTypeHandler(SpecificColumnHandler):
 
-    def __numerical_compare1(
-        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int
-    ) -> float:
+    def __numerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int) -> float:
         num_met1 = metadata1.numerical_metadata[index1]
         num_met2 = metadata2.numerical_metadata[index2]
         if num_met1.same_value_length == num_met2.same_value_length:
@@ -393,9 +399,7 @@ class ColumnTypeHandler(SpecificColumnHandler):
             score += 2
         return 1 - score / 9
 
-    def __nonnumerical_compare1(
-        self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int
-    ) -> float:
+    def __nonnumerical_compare1(self, metadata1: Metadata, metadata2: Metadata, index1: str, index2: str, score: int) -> float:
         num_met1 = metadata1.nonnumerical_metadata[index1]
         num_met2 = metadata2.nonnumerical_metadata[index2]
         if num_met1.longest == num_met2.longest or num_met1.longest is num_met2.longest:
@@ -429,9 +433,6 @@ class ColumnTypeHandler(SpecificColumnHandler):
         if column1_type == column2_type:
             return 0
         return 1
-
-
-
 
 
 class CategoricalHandler(HandlerType):
@@ -505,7 +506,8 @@ class CategoricalHandler(HandlerType):
                 name_distance.loc[id1, id2] = 1 - cosine_sim(metadata1.column_name_embeddings[column1], metadata2.column_name_embeddings[column2])
         return concat(result, name_distance)
 
-class CategoricalHandlerSimilar(CategoricalHandler):# pragma: no cover
+
+class CategoricalHandlerSimilar(CategoricalHandler):  # pragma: no cover
     """
     Handler for column category
     """
@@ -554,7 +556,7 @@ class CategoricalHandlerSimilar(CategoricalHandler):# pragma: no cover
         return concat(result, name_distance)
 
 
-class KindHandlerOldByType(HandlerType):# pragma: no cover
+class KindHandlerOldByType(HandlerType):  # pragma: no cover
     """
     Handler for column kind
     """

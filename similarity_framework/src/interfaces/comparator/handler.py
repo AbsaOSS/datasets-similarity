@@ -20,4 +20,3 @@ class HandlerType(ABC):
     @abstractmethod
     def compare(self, metadata1: Metadata, metadata2: Metadata, **kwargs) -> pd.DataFrame | float:
         """This method should compare two tables and return distance table"""
-

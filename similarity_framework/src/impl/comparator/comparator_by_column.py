@@ -3,13 +3,20 @@ import pandas as pd
 
 
 from similarity_framework.src.impl.comparator.distance_functions import HausdorffDistanceMin, AverageDist
-from similarity_framework.src.impl.comparator.handlers import SizeHandler, IncompleteColumnsHandler, ColumnExactNamesHandler, ColumnNamesEmbeddingsHandler, \
-    ColumnEmbeddingsHandler, ColumnKindHandler, ColumnTypeHandler, TableHandler
+from similarity_framework.src.impl.comparator.handlers import (
+    SizeHandler,
+    IncompleteColumnsHandler,
+    ColumnExactNamesHandler,
+    ColumnNamesEmbeddingsHandler,
+    ColumnEmbeddingsHandler,
+    ColumnKindHandler,
+    ColumnTypeHandler,
+    TableHandler,
+)
 from similarity_framework.src.interfaces.comparator.comparator import HandlerType, Comparator
 from similarity_framework.src.models.metadata import Metadata
 from similarity_framework.src.models.similarity import SimilarityOutput
 from similarity_framework.src.models.settings import AnalysisSettings
-
 
 
 class ComparatorByColumn(Comparator):

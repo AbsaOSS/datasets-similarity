@@ -43,8 +43,3 @@ class UI(abc.ABC):
                 result[(first.name, second.name)] = comparator.compare(first, second, analysis_settings)
         # TODO: based on analysis settings get specified metadata objects
         self.show(result, analysis_settings)
-
-
-
-
-
