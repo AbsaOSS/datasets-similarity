@@ -3,8 +3,9 @@ import unittest
 
 import pandas as pd
 
-from similarity_framework.src.impl.comparator.comparator_by_type import HausdorffDistanceMin, SizeHandler, get_ratio, ComparatorByType, \
-    ColumnExactNamesHandler, ColumnNamesEmbeddingsHandler, IncompleteColumnsHandler, KindHandler
+from similarity_framework.src.impl.comparator.comparator_by_type import ComparatorByType
+from similarity_framework.src.impl.comparator.handlers import HausdorffDistanceMin, SizeHandler, get_ratio, \
+    ColumnExactNamesHandler, ColumnNamesEmbeddingsHandler, IncompleteColumnsHandler
 from similarity_framework.src.impl.comparator.comparator_by_column import (ComparatorByColumn, SizeHandler as SizeHandlerByColumn,
                                                       IncompleteColumnsHandler as IncompleteColumnsHandlerByColumn,
                                                       ColumnNamesEmbeddingsHandler as ColumnNamesEmbeddingsHandlerByColumn,
@@ -134,12 +135,8 @@ class TestSingleSpecificComparator(unittest.TestCase):
         self.data_second_half.index = self.data_second_half.index - int(len(self.data) / 2)
         self.data_diff_type = self.data.copy()  # todo fill
 
-        self.metadata_creator = (TypeMetadataCreator()
-                                 .compute_advanced_structural_types()
-                                 .compute_column_kind()
-                                 .compute_advanced_structural_types()
-                                 .compute_incomplete_column()
-                                 .compute_column_names_embeddings())
+        self.metadata_creator = TypeMetadataCreator()
+        self.metadata_creator.compute_advanced_structural_types().compute_column_kind().compute_incomplete_column().compute_column_names_embeddings()
         self.metadata1 = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data))
         self.metadata_diff_column_names = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_diff_column_names))
         self.metadata_first_half = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_first_half))
