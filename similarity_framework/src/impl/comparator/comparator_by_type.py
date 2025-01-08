@@ -81,7 +81,12 @@ class ComparatorByType(Comparator):
         """
         Add comparator
         """
-        self.comparator_type.append(comparator)
+        if comparator == ColumnKindHandler:
+            self.kinds = True
+        if comparator == ColumnTypeHandler:
+            self.types = True
+        else:
+            self.comparator_type.append(comparator)
         return self
 
     def __compare_all_columns(

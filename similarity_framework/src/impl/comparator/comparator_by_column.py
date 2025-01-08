@@ -107,7 +107,7 @@ class ComparatorByColumn(Comparator):
             res = self.distance_function.compute(distances)
             res = res * res
         else:
-            res = 0
+            res = 1
         if table_distances:
             for dist in table_distances:
                 res += dist * dist

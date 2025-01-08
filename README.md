@@ -12,12 +12,12 @@
 <!-- tocstop -->
 
 ## What is Datasets Similarity?
-The Dataset Similarity project deals with the
+The Dataset Similarity project deals with the   
 issue of comparing tabular datasets. 
 The idea of the project is that we will have a set of 
 datasets that we want to compare with each other
 and find out their similarity or distance.
-This project mainly focuses on comparing only two tables. 
+This project mainly focuses on comparing only two tables but it implements `similarity_runner` that can compare more tables. 
 The final similarity is calculated according
 to the similarity of individual columns based on their metadata. 
 Columns are compared by type and by content.
@@ -27,6 +27,7 @@ the main set (training) on which the program is
 tuned, and a validation set for validating the results.
 
 #### Definition of table similarity:
+Two tables are similar if they have at least *k* similar columns.
 ![img_1.png](docs/similarity_def.png)
 >Parameter **important columns** is user input.
 > 
