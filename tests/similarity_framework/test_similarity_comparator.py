@@ -1,6 +1,7 @@
 import os
 import unittest
 
+import numpy as np
 import pandas as pd
 from pyarrow import Tensor
 from sentence_transformers import SentenceTransformer
@@ -55,10 +56,10 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(AverageDist().compute(df4), 6/3)
 
     def test_get_ratio(self):
-        self.assertEqual(round(get_ratio(3, 5), 2), 1.67)
-        self.assertEqual(round(get_ratio(5, 3), 2), 1.67)
-        self.assertEqual(round(get_ratio(15, 9), 2), 1.67)
-        self.assertEqual(round(get_ratio(9, 15), 2), 1.67)
+        self.assertEqual(round(get_ratio(3, 5), 2), 0.6)
+        self.assertEqual(round(get_ratio(5, 3), 2), 0.6)
+        self.assertEqual(round(get_ratio(15, 9), 2), 0.6)
+        self.assertEqual(round(get_ratio(9, 15), 2), 0.6)
 
     def test_cosine_sim(self):
         self.assertEqual(cosine_sim([1, 2, 3], [1, 2, 3]), 1)
@@ -272,15 +273,16 @@ class TestSingleSpecificComparatorByColumn(TestSingleSpecificComparator):
         self.metadata_second_half = self.metadata_creator.get_metadata(MetadataCreatorInput(dataframe=self.data_second_half))
 
     def test_size_compare(self):
-        self.compartor.add_comparator_type(SizeHandlerByColumn())
-
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
-        self.compartor.add_settings(Settings.NO_RATIO)
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata1).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata1, self.metadata_diff_column_names).distance, 0)
-        self.assertEqual(self.compartor.compare(self.metadata_first_half, self.metadata_second_half).distance, 0)
+        comparator = ComparatorByColumn()
+        comparator.add_comparator_type(SizeHandlerByColumn())
+        res = np.sqrt(1 / 2)
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata1).distance, res)
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata_diff_column_names).distance, res)
+        self.assertEqual(comparator.compare(self.metadata_first_half, self.metadata_second_half).distance, res)
+        comparator.add_settings(Settings.NO_RATIO)
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata1).distance, res)
+        self.assertEqual(comparator.compare(self.metadata1, self.metadata_diff_column_names).distance, res)
+        self.assertEqual(comparator.compare(self.metadata_first_half, self.metadata_second_half).distance, res)
 
     def test_incomplete_compare(self):
         self.compartor.add_comparator_type(IncompleteColumnsHandlerByColumn())
