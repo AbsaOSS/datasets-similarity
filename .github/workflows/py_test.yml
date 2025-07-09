@@ -97,7 +97,7 @@ jobs:
 
   column2vec-tests:
     env:
-      TEST_FILES: test/test_column2VecCache.py test/test_column2Vec.py
+      TEST_FILES: tests/column2vec/test_column2vec_cache.py tests/column2vec/test_column2vec.py
     name: Run Column2Vec Tests
     runs-on: ubuntu-latest
     steps:
@@ -116,7 +116,7 @@ jobs:
           pip install coverage pytest pytest-xdist
 
       - name: Run tests
-        run: coverage run --source='column2Vec' -m pytest -n auto $TEST_FILES
+        run: coverage run --source='column2Vec' -m pytest -v $TEST_FILES
 
       - name: Show coverage
         run: coverage report -m --omit=".*.ipynb"
