@@ -51,7 +51,7 @@ jobs:
 
   python-tests:
     env:
-      TEST_FILES: tests/similarity_framework/test_similarity*  tests/column2vec/test_column2vec_cache.py
+      TEST_FILES: tests/similarity_framework/test_similarity*  tests/column2vec/test_column2vec_cache.py tests/runner/test_runner*
     name: Run Python Tests
     runs-on: ubuntu-latest
     steps:

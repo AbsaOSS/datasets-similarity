@@ -1,4 +1,3 @@
-import logging
 import os
 
 import numpy as np
@@ -43,8 +42,8 @@ def get_ratio(count1: int, count2: int) -> float:
     if count1 == 0 or count2 == 0:
         return 1
     if count1 < count2:
-        return count2 / count1
-    return count1 / count2
+        return count1 / count2
+    return count2 / count1
 
 
 def fill_result(metadata1_names, metadata2_names) -> pd.DataFrame:
