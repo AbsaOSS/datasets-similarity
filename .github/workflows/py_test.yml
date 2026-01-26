@@ -49,7 +49,7 @@ jobs:
         run: |
           black --check $(git ls-files '*.py')
 
-  python-tests:
+  similarity-tests:
     env:
       TEST_FILES: tests/similarity_framework/test_similarity*  tests/column2vec/test_column2vec_cache.py tests/runner/test_runner*
     name: Run Python Tests
@@ -91,6 +91,52 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'pull_request'
         with:
-          name: coverage
+          name: Similarity coverage
+          path: coverage.xml
+          retention-days: 1
+
+  column2vec-tests:
+    env:
+      TEST_FILES: tests/column2vec/test_column2vec_cache.py tests/column2vec/test_column2vec.py
+    name: Run Column2Vec Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install coverage pytest pytest-xdist
+
+      - name: Run tests
+        run: coverage run --source='column2Vec' -m pytest -v $TEST_FILES
+
+      - name: Show coverage
+        run: coverage report -m --omit=".*.ipynb"
+
+      - name: Create coverage file
+        if: github.event_name == 'pull_request'
+        run: coverage xml
+
+      - name: Get Cover
+        if: github.event_name == 'pull_request'
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdAll: 0.7
+          thresholdNew: 0.9
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: Column2Vec coverage
           path: coverage.xml
           retention-days: 1
