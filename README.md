@@ -1,3 +1,5 @@
+This repository is being archived due to no future practical use and low capacity.
+
 # Dataset Similarity
 <!-- toc -->
 - [What is Datasets Similarity?](#what-is-datasets-similarity)
