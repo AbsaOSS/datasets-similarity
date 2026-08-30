@@ -1,8 +1,10 @@
 import os
+import sys
 import unittest
 import time
 
 import pandas as pd
+from memory_profiler import profile
 from sentence_transformers import SentenceTransformer
 
 from column2vec.src.column2vec import (column2vec_as_sentence, column2vec_as_sentence_clean,
@@ -19,7 +21,16 @@ SKIP_SIMILAR = False
 # MODEL = 'all-mpnet-base-v2'  # bert-base-nli-mean-tokens
 MODEL = 'sentence-transformers/all-mpnet-base-v2'  #
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+TRANSFORMER = SentenceTransformer(MODEL)
 
+def get_size(foo):
+    num =  sys.getsizeof(foo)
+    suffix="B"
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
 
 def vectors_are_same(vec1, vec2):
     for i, j in zip(vec1, vec2):
@@ -61,7 +72,7 @@ def get_data(files):
 class TestSimilarityOfVectors(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.model = SentenceTransformer(MODEL)
+        cls.model = TRANSFORMER
         file_m2 = os.path.join(THIS_DIR, os.pardir, 'data/netflix_titles.csv')
         # make an array of all the files
         files = [file_m2]
@@ -77,7 +88,7 @@ class TestSimilarityOfVectors(unittest.TestCase):
             stop += 1
 
     def test_column2vec_as_sentence(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(
             vectors_are_same(column2vec_as_sentence(self.first, model, "a"),
                              column2vec_as_sentence(self.first, self.model, "b")))
@@ -88,7 +99,7 @@ class TestSimilarityOfVectors(unittest.TestCase):
                              column2vec_as_sentence(self.third, self.model, "f")))
 
     def test_column2vec_as_sentence_clean(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.first, model, "g"),
                                          column2vec_as_sentence_clean(self.first, self.model, "h")))
         self.assertTrue(vectors_are_same(column2vec_as_sentence_clean(self.second, model, "i"),
@@ -97,7 +108,7 @@ class TestSimilarityOfVectors(unittest.TestCase):
                                          column2vec_as_sentence_clean(self.third, self.model, "l")))
 
     def test_column2vec_as_sentence_clean_uniq(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.first, model, "m"),
                                          column2vec_as_sentence_clean_uniq(self.first, self.model, "n")))
         self.assertTrue(vectors_are_same(column2vec_as_sentence_clean_uniq(self.second, model, "o"),
@@ -106,14 +117,14 @@ class TestSimilarityOfVectors(unittest.TestCase):
                                          column2vec_as_sentence_clean_uniq(self.third, self.model, "r")))
 
     def test_column2vec_avg(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_avg(self.first, model, "v"),
                                          column2vec_avg(self.first, self.model, "s")))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.second, model), column2vec_avg(self.second, self.model)))
         # self.assertTrue(vectors_are_same(column2vec_avg(self.third, model), column2vec_avg(self.third, self.model)))
 
     def test_column2vec_weighted_avg(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.first, model, "u"),
                                          column2vec_weighted_avg(self.first, self.model, "w")))
         # self.assertTrue(vectors_are_same(column2vec_weighted_avg(self.second, model),
@@ -122,12 +133,12 @@ class TestSimilarityOfVectors(unittest.TestCase):
         # column2vec_weighted_avg(self.third, self.model)))
 
     def test_column2vec_sum(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_sum(self.first, model, "x"),
                                          column2vec_sum(self.first, self.model, "y")))
 
     def test_column2vec_weighted_sum(self):
-        model = SentenceTransformer(MODEL)
+        model = TRANSFORMER
         self.assertTrue(vectors_are_same(column2vec_weighted_sum(self.first, model, "z"),
                                          column2vec_weighted_sum(self.first, self.model, "ab")))
 
@@ -269,6 +280,9 @@ class TestSimilarColumnsCopilot(unittest.TestCase):
 
     @unittest.skipIf(SKIP_SIMILAR, "Skipping test_column2vec_avg ...")
     def test_column2vec_avg(self):
+        # slow one 1:30
+        # slow one 1:30
+        # slow one 1:30
         vectors_sentence = get_vectors(column2vec_avg, self.data)
         distances = compute_distances(vectors_sentence)
         self.print_accuracy(distances, "AVG")
